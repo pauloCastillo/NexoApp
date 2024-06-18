@@ -1,10 +1,8 @@
-import React from "react";
-import { TouchableOpacity, Text, StyleSheet } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
-export default function Buttons(props) {
-  const { btnText, onPress, icon, bgColor } = props;
-
+export default function Buttons({ btnText, onPress, icon, bgColor }) {
   return (
     <TouchableOpacity style={{ ...styles.button }} onPress={onPress}>
       <AntDesign

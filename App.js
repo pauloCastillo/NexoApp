@@ -1,9 +1,34 @@
 import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import ClockLayout from "./components/Clock";
 import Buttons from "./components/Buttons";
+import ClockLayout from "./components/Clock";
+
+import * as Location from "expo-location";
 
 export default function App() {
+  const [location, setLocation] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("negacion de la location");
+        return;
+      }
+      setLocation(await Location.getCurrentPositionAsync());
+    })();
+  }, []);
+
+  async function startBtn() {
+    const { latitude, longitude } = location.coords;
+    sendLocationToServer({ latitude, longitude });
+  }
+
+  function sendLocationToServer(locate) {
+    console.log(locate);
+  }
+
   return (
     <View style={styles.container}>
       <ClockLayout />
@@ -12,7 +37,7 @@ export default function App() {
           icon="arrowright"
           btnText="entrada"
           bgColor="green"
-          onPress={() => alert("ENTRADA")}
+          onPress={startBtn}
         />
         <Buttons
           icon="pause"
