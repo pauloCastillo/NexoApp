@@ -1,5 +1,6 @@
 import { AntDesign } from "@expo/vector-icons";
 import React from "react";
+import PropTypes from "prop-types";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 export default function Buttons({ btnText, onPress, icon, bgColor }) {
@@ -27,3 +28,10 @@ const styles = StyleSheet.create({
     padding: 16,
   },
 });
+
+Buttons.propTypes = {
+  btnText: PropTypes.string,
+  bgColor: PropTypes.string,
+  icon: PropTypes.string,
+  onPress: PropTypes.func,
+};

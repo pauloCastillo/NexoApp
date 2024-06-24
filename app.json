@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "mobile-t2",
+    "scheme": "mobile-t2",
     "slug": "mobile-t2",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -24,6 +25,7 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      "expo-router",
       [
         "expo-location",
         {
