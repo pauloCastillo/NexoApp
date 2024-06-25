@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import axios from "axios";
+import { BASE_URL } from "../constants/connectionApi";
 import Buttons from "../components/Buttons";
 import ClockLayout from "../components/Clock";
 
@@ -40,8 +40,20 @@ export default function App() {
     sendLocationToServer({ latitude, longitude }, time);
   }
 
-  function sendLocationToServer(location, workertime) {
-    axios.post("http://localhost:4200/api/employees", (location, workertime));
+  async function sendLocationToServer(location, workertime) {
+    console.log(location);
+    console.log(workertime);
+
+    try {
+      const response = await BASE_URL.post("employees", {
+        location,
+        workertime,
+      });
+
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
