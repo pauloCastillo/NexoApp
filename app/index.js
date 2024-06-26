@@ -1,11 +1,11 @@
-import { useEffect, useState, useRef } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { StyleSheet, Text, ToastAndroid, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { BASE_URL } from "../constants/connectionApi";
 import Buttons from "../components/Buttons";
 import ClockLayout from "../components/Clock";
 
 import * as Location from "expo-location";
+import { BASE_URL } from "../constants/api";
 
 export default function App() {
   const [location, setLocation] = useState(null);
@@ -45,14 +45,14 @@ export default function App() {
     console.log(workertime);
 
     try {
-      const response = await BASE_URL.post("employees", {
+      const response = await BASE_URL.post("/employees", {
         location,
         workertime,
       });
 
-      console.log(response);
+      console.log(response.data);
     } catch (error) {
-      console.log(error);
+      ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
   }
 

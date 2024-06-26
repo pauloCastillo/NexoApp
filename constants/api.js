@@ -1,8 +1,8 @@
 import axios from "axios";
-const PORT = 3200;
+
+const url = "http://192.168.1.14:8000/api";
 
 export const BASE_URL = axios.create({
-  baseUrl: `http://localhost:${PORT}/api/`,
-  timeout: 1000,
+  baseURL: url,
   responseType: "json",
 });
