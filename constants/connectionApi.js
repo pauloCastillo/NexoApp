@@ -1,8 +1,9 @@
 import axios from "axios";
-const PORT = 3200;
+import { config } from "dotenv";
 
+config();
+const PORT = process.env.PORT || 8000;
+const url = `http://192.168.1.12:${PORT}/api/`;
 export const BASE_URL = axios.create({
-  baseUrl: `http://localhost:${PORT}/api/`,
-  timeout: 1000,
-  responseType: "json",
+  baseUrl: url,
 });

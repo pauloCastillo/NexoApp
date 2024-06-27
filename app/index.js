@@ -40,19 +40,15 @@ export default function App() {
     sendLocationToServer({ latitude, longitude }, time);
   }
 
-  async function sendLocationToServer(location, workertime) {
+  async function sendLocationToServer(location, workerTime) {
     console.log(location);
-    console.log(workertime);
+    console.log(workerTime);
 
     try {
-      const response = await BASE_URL.post("employees", {
-        location,
-        workertime,
-      });
-
+      const response = await BASE_URL.get("employees");
       console.log(response);
     } catch (error) {
-      console.log(error);
+      console.error(error.message);
     }
   }
 
