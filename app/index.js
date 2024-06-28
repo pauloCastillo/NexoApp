@@ -46,7 +46,9 @@ export default function App() {
     console.log(workerTime);
 
     const PORT = process.env.EXPO_PUBLIC_API_URL;
-    const url = `http://192.168.1.14:${PORT}/api`;
+    // const localhost = process.env.EXPO_PUBLIC_LOCALHOST;
+
+    const url = `http://192.168.1.12:${PORT}/api`;
 
     try {
       const response = await axios.post(url + "/employees", {
