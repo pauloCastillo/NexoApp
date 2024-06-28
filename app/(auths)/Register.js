@@ -12,8 +12,9 @@ import {
 export default function RegisterLayout() {
   const [username, setUsername] = useState("");
   const [mail, setMail] = useState("");
-  const [jobTitle, setJobTitle] = useState("");
   const [password, setPassword] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
+  const [phone, setPhone] = useState("");
 
   const [privacy, setPrivacy] = useState(false);
 
@@ -38,15 +39,6 @@ export default function RegisterLayout() {
           value={mail}
           placeholder="correo@miempresa.com"
         />
-
-        <Text style={styles.baseText}>Cargo</Text>
-        <TextInput
-          style={styles.input}
-          underlineColorAndroid={"#f42"}
-          onChangeText={(event) => setJObTitle(event)}
-          value={jobTitle}
-          placeholder="Vendedor, o el cargo que ocupa"
-        />
         <Text style={styles.baseText}>Contraseña</Text>
         <View style={styles.inputPass}>
           <TextInput
@@ -59,6 +51,22 @@ export default function RegisterLayout() {
           />
           <Button title={privacy ? "show" : "hide"} />
         </View>
+        <Text style={styles.baseText}>Cargo</Text>
+        <TextInput
+          style={styles.input}
+          underlineColorAndroid={"#f42"}
+          onChangeText={(event) => setJobTitle(event)}
+          value={jobTitle}
+          placeholder="Vendedor, o el cargo que ocupa"
+        />
+        <Text style={styles.baseText}>n° de celular</Text>
+        <TextInput
+          style={styles.input}
+          underlineColorAndroid={"#f42"}
+          onChangeText={(event) => setPhone(event)}
+          value={phone}
+          placeholder="+591-777-77777"
+        />
       </View>
       <Button title="REGISTRAR" />
     </SafeAreaView>
