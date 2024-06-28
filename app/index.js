@@ -4,8 +4,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Buttons from "../components/Buttons";
 import ClockLayout from "../components/Clock";
 
+import axios from "axios";
 import * as Location from "expo-location";
-import { BASE_URL } from "../constants/api";
+import { Link } from "expo-router";
 
 export default function App() {
   const [location, setLocation] = useState(null);
@@ -44,8 +45,11 @@ export default function App() {
     console.log(location);
     console.log(workerTime);
 
+    const PORT = process.env.EXPO_PUBLIC_API_URL;
+    const url = `http://192.168.1.14:${PORT}/api`;
+
     try {
-      const response = await BASE_URL.post("/employees", {
+      const response = await axios.post(url + "/employees", {
         location,
         workerTime,
       });
@@ -58,6 +62,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Link href="(auths)/Register">Ir a Registrarse</Link>
       <ClockLayout ref={timeWorker} />
       <View style={styles.buttons}>
         <Buttons
