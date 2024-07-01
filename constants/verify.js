@@ -43,6 +43,10 @@ export default function verify(data, mode) {
       error.password =
         "Verifique que su password tenga: 1 mayúscula, 1 número y sea entre 6 y 15 caracteres de longitud";
     }
+
+    if (data.password === "") {
+      error.password = "Este campo no puede estar vacío";
+    }
   }
 
   return error;

@@ -38,28 +38,28 @@ export default function App() {
     setText(label);
     const time = handlerTimeWorker();
     renderTime(time);
-    sendLocationToServer({ latitude, longitude }, time);
+    sendLocationToServer({ latitude, longitude }, time, label);
   }
 
-  async function sendLocationToServer(location, workerTime) {
+  async function sendLocationToServer(location, workerTime, text) {
     const locationTimeData = {
       location,
       workerTime,
-      text,
+      label: text,
     };
 
     console.log(locationTimeData);
     const PORT = process.env.EXPO_PUBLIC_API_URL;
     // const localhost = process.env.EXPO_PUBLIC_LOCALHOST;
 
-    const url = `http://192.168.1.14:${PORT}/api`;
+    const url = `http://192.168.1.12:${PORT}/api`;
 
     try {
       const response = await axios.post(url + "/locations", {
         locationTimeData,
       });
 
-      console.log(response.data);
+      console.log(response.status);
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
