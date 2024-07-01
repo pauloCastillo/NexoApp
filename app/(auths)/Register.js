@@ -7,9 +7,7 @@ import {
   Text,
   TextInput,
   View,
-  ScrollView,
 } from "react-native";
-
 import verify from "../../constants/verify";
 
 export default function RegisterLayout() {
@@ -24,26 +22,35 @@ export default function RegisterLayout() {
     mail: "",
     password: "",
     jobTitle: "",
+    confirmPassword: "",
     phone: "",
   });
   const [checkError, setCheckError] = useState(false);
   const [privacy, setPrivacy] = useState(false);
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault();
     const user = {
+      id: uuid(),
       username,
       mail,
       password,
+      confirmPassword,
       jobTitle,
       phone,
     };
-    setError(verify(user));
+    setError(verify(user, "sign-up"));
     if (Object.getOwnPropertyNames(error).length !== 0) {
       setCheckError(true);
-      console.log(error);
     } else {
-      console.log("ENVIAR DATOS A BACKEND");
+      try {
+        const PORT = process.env.EXPO_PUBLIC_API_URL;
+        const url = `http://192.168.1.14:${PORT}/api`;
+        const response = await axios.post(url + "/employees", { user });
+        console.log(response.data + "dentro de un modal");
+      } catch (error) {
+        console.log(error.message);
+      }
     }
   }
 
@@ -123,6 +130,9 @@ export default function RegisterLayout() {
           />
           <Button title={privacy ? "show" : "hide"} />
         </View>
+        {checkError && (
+          <Text style={styles.errorMessage}>{error.confirmPassword}</Text>
+        )}
       </View>
       <Button title="REGISTRAR" onPress={submit} />
     </SafeAreaView>

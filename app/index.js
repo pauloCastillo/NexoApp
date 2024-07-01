@@ -42,18 +42,21 @@ export default function App() {
   }
 
   async function sendLocationToServer(location, workerTime) {
-    console.log(location);
-    console.log(workerTime);
+    const locationTimeData = {
+      location,
+      workerTime,
+      text,
+    };
 
+    console.log(locationTimeData);
     const PORT = process.env.EXPO_PUBLIC_API_URL;
     // const localhost = process.env.EXPO_PUBLIC_LOCALHOST;
 
-    const url = `http://192.168.1.12:${PORT}/api`;
+    const url = `http://192.168.1.14:${PORT}/api`;
 
     try {
-      const response = await axios.post(url + "/employees", {
-        location,
-        workerTime,
+      const response = await axios.post(url + "/locations", {
+        locationTimeData,
       });
 
       console.log(response.data);
