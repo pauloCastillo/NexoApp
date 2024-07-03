@@ -1,11 +1,11 @@
 const { Schema, model } = require("mongoose");
+const { findingEmployee } = require("../../utils/utils");
 
 const controlTimeSchema = new Schema(
   {
     employee: {
-      type: Schema.Types.UUID,
+      type: Schema.Types.ObjectId,
       ref: "Employee",
-      trim: true,
     },
     date: {
       type: Date,
@@ -35,17 +35,7 @@ const controlTimeSchema = new Schema(
   }
 );
 
-controlTimeSchema.pre("save", (next) => {
-  const currentDate = new Date();
-  this.date = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
-    currentDate.getDate()
-  ).toLocaleString("es-BO", { day: "2-digit", month: "long", year: "numeric" });
-  next();
-});
-
-controlTimeSchema.pre("save", (next) => {
+controlTimeSchema.pre("save", async (next) => {
   const currentDate = new Date();
   this.date = new Date(
     currentDate.getFullYear(),
@@ -56,8 +46,19 @@ controlTimeSchema.pre("save", (next) => {
     month: "2-digit",
     year: "numeric",
   });
+
   next();
 });
+
+controlTimeSchema.methods = {
+  async getEmployees() {
+    try {
+      return await ControlTime.find().where("employee").exists();
+    } catch (error) {
+      console.log(error.message);
+    }
+  },
+};
 
 const ControlTime = model("ControlTime", controlTimeSchema, "timeControls");
 module.exports = ControlTime;
