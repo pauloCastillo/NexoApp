@@ -48,9 +48,7 @@ export default function App() {
       label: text,
     };
 
-    console.log(locationTimeData);
     const PORT = process.env.EXPO_PUBLIC_API_URL;
-    // const localhost = process.env.EXPO_PUBLIC_LOCALHOST;
 
     const url = `http://192.168.1.14:${PORT}/api`;
 
@@ -59,7 +57,9 @@ export default function App() {
         locationTimeData,
       });
 
-      console.log(response.data);
+      if (response.status === 200) {
+        console.log("registro existoso!");
+      }
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
