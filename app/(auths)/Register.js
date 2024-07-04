@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 
+import axios from "axios";
 import verify from "../../constants/verify";
 
 export default function RegisterLayout() {
@@ -45,9 +46,9 @@ export default function RegisterLayout() {
     } else {
       try {
         const PORT = process.env.EXPO_PUBLIC_API_URL;
-        const url = `http://192.168.1.12:${PORT}/api`;
+        const url = `http://192.168.1.14:${PORT}/api`;
         const response = await axios.post(url + "/employees", { user });
-        console.log(response.data + "dentro de un modal");
+        console.log(response.status);
       } catch (error) {
         console.log(error.message);
       }

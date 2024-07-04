@@ -18,7 +18,7 @@ export default function verify(data, mode) {
         "Verifique que su password tenga: 1 mayúscula, 1 número y sea entre 6 y 15 caracteres de longitud";
     }
 
-    if (data.confirmPassword !== password || data.confirmPassword === "") {
+    if (data.confirmPassword !== data.password || data.confirmPassword === "") {
       error.confirmPassword =
         "Debe colocar lo mismo y de la misma forma que esta en la contraseña";
     }

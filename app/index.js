@@ -52,14 +52,14 @@ export default function App() {
     const PORT = process.env.EXPO_PUBLIC_API_URL;
     // const localhost = process.env.EXPO_PUBLIC_LOCALHOST;
 
-    const url = `http://192.168.1.12:${PORT}/api`;
+    const url = `http://192.168.1.14:${PORT}/api`;
 
     try {
       const response = await axios.post(url + "/locations", {
         locationTimeData,
       });
 
-      console.log(response.status);
+      console.log(response.data);
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }
