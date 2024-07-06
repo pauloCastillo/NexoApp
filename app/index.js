@@ -8,6 +8,8 @@ import axios from "axios";
 import * as Location from "expo-location";
 import { Link } from "expo-router";
 
+import { useSelector } from "react-redux";
+
 export default function App() {
   const [location, setLocation] = useState(null);
   const [text, setText] = useState(null);
@@ -41,8 +43,11 @@ export default function App() {
     sendLocationToServer({ latitude, longitude }, time, label);
   }
 
+  const employeeID = useSelector((state) => state.employee.id);
+
   async function sendLocationToServer(location, workerTime, text) {
     const locationTimeData = {
+      employee: employeeID,
       location,
       workerTime,
       label: text,

@@ -15,6 +15,9 @@ import { useRouter } from "expo-router";
 import axios from "axios";
 import verify from "../../constants/verify";
 
+import { useDispatch } from "react-redux";
+import { addEmployeeID } from "../../store/employees";
+
 export default function RegisterLayout() {
   const [username, setUsername] = useState("");
   const [mail, setMail] = useState("");
@@ -32,7 +35,7 @@ export default function RegisterLayout() {
   });
   const [checkError, setCheckError] = useState(false);
   const [privacy, setPrivacy] = useState(false);
-
+  const dispatch = useDispatch();
   const router = useRouter();
 
   async function submit(e) {
@@ -55,10 +58,11 @@ export default function RegisterLayout() {
         const response = await axios.post(url + "/employees", { user });
 
         if (response.status === 201) {
-          ToastAndroid.show("Se registro existosamente!");
+          dispatch(addEmployeeID({ id: response.data.user._id }));
+          ToastAndroid.show("Se registro existosamente!", ToastAndroid.LONG);
           setTimeout(() => {
-            router.navigate("../index");
-          }, 2000);
+            router.navigate("index");
+          }, 1000);
         }
       } catch (error) {
         console.log(error.message);
