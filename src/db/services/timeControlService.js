@@ -13,10 +13,10 @@ class RegisterUserAndTimeService {
     return savedNewEmployee;
   }
 
-  async timeRegister(data, locationId) {
+  async timeRegister(data, locationId, employeeID) {
     const employees = await ControlTime.schema.methods.getEmployees();
-    const existEmployee = employees.find((item) =>
-      Employee.findById({ _id: item.employee })
+    const existEmployee = employees.find(
+      (item) => item.employee === employeeID
     );
     let newWorkTime;
     if (!existEmployee) {

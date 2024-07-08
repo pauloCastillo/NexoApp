@@ -1,5 +1,8 @@
 const { ControlTime } = require("../db/models");
 
-async function generate() {
+async function generateReport() {
   const allTimeControlRegisters = await ControlTime.find();
+  console.log(allTimeControlRegisters);
 }
+
+module.exports = generateReport;
