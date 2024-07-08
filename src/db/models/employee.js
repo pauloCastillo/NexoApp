@@ -2,11 +2,6 @@ const { Schema, model } = require("mongoose");
 const { v6: uuid } = require("uuid");
 const employeeSchema = new Schema(
   {
-    id: {
-      type: Schema.Types.UUID,
-      trim: true,
-      default: () => uuid(),
-    },
     username: {
       type: String,
       trim: true,

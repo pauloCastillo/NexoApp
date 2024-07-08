@@ -1,5 +1,7 @@
-const { Location } = require("../db/models");
-const { timeRegister } = require("../db/services/timeControlService");
+const { Location, ControlTime } = require("../db/models");
+const {
+  RegisterUserAndTimeService,
+} = require("../db/services/timeControlService");
 const { httpStatusCode } = require("../utils/httpStatus");
 
 async function getTimeLocationEmployee(req, res) {
@@ -25,9 +27,9 @@ async function registerTimeLocationEmployee(req, res) {
       latitude: locationTimeData.location.latitude,
       longitude: locationTimeData.location.longitude,
     });
-    const timer = await timeRegister(timeData, newLocation._id);
-    console.log(newLocation);
-    console.log(timer);
+
+    const timerService = new RegisterUserAndTimeService();
+    const timer = await timerService.timeRegister(timeData, newLocation._id);
     res
       .status(httpStatusCode.OK)
       .json({ location: newLocation, newTime: timer });

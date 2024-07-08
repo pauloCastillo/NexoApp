@@ -1,35 +1,56 @@
 const { ControlTime } = require("../models");
+const { Employee } = require("../models");
 
-async function timeRegister(data, locationId) {
-  console.log(data, locationId);
-  let newWorkTime;
-  switch (data.label) {
-    case "entrada":
-      newWorkTime = await ControlTime.create({
-        entrada: data.time,
-        locations: locationId,
-      });
-      break;
-    case "descanso":
-      newWorkTime = await ControlTime.create({
-        descanso: data.time,
-        locations: locationId,
-      });
-      break;
-    case "retorno":
-      newWorkTime = await ControlTime.create({
-        retorno: data.time,
-        locations: locationId,
-      });
-      break;
-    case "salida":
-      newWorkTime = await ControlTime.create({
-        salida: data.time,
-        locations: locationId,
-      });
-      break;
+class RegisterUserAndTimeService {
+  async CreateEmployee(user) {
+    const newEmployeeRegister = new Employee(user);
+    const savedNewEmployee = await newEmployeeRegister.save();
+
+    const createATimeControl = new ControlTime({
+      employee: savedNewEmployee._id,
+    });
+    await createATimeControl.save();
+    return savedNewEmployee;
   }
-  return newWorkTime;
+
+  async timeRegister(data, locationId) {
+    const employees = await ControlTime.schema.methods.getEmployees();
+    const existEmployee = employees.find((item) =>
+      Employee.findById({ _id: item.employee })
+    );
+    let newWorkTime;
+    if (!existEmployee) {
+      throw Error("No existe usuario");
+    } else {
+      switch (data.label) {
+        case "entrada":
+          newWorkTime = await ControlTime.findOneAndUpdate(
+            { employee: existEmployee.employee },
+            { entrada: data.time, locations: locationId }
+          );
+          break;
+        case "descanso":
+          newWorkTime = await ControlTime.findOneAndUpdate(
+            { employee: existEmployee.employee },
+            { descanso: data.time, locations: locationId }
+          );
+          break;
+        case "retorno":
+          newWorkTime = await ControlTime.findOneAndUpdate(
+            { employee: existEmployee.employee },
+            { retorno: data.time, locations: locationId }
+          );
+          break;
+        case "salida":
+          newWorkTime = await ControlTime.findOneAndUpdate(
+            { employee: existEmployee.employee },
+            { salida: data.time, locations: locationId }
+          );
+          break;
+      }
+    }
+    return newWorkTime;
+  }
 }
 
-module.exports = { timeRegister };
+module.exports = { RegisterUserAndTimeService };

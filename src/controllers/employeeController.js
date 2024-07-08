@@ -1,5 +1,8 @@
 const { Employee} = require("../db/models");
 const { httpStatusCode } = require("../utils/httpStatus");
+const {
+  RegisterUserAndTimeService,
+} = require("../db/services/timeControlService");
 
 async function getEmployees(req, res) {
   try {
@@ -26,19 +29,20 @@ async function getEmployee(req, res) {
 
 async function createEmployee(req, res) {
   try {
-    const {user}= req.body;
+    const { user } = req.body;
+
     if (user.password !== user.confirmPassword) {
       return res.status(httpStatusCode.CONFLICT).json({
         message:
           "ERROR! Revisa la confirmación de contraseña debe ser igual a la contraseña",
       });
     }
-    delete user.confirmPassword;
-    console.log(user);
-    const newUser = await Employee.create(user);
+
+    const newRegister = new RegisterUserAndTimeService();
+    const newEmployee = await newRegister.CreateEmployee(user);
     res
       .status(httpStatusCode.CREATED)
-      .json({ message: "usuario registrado exitosamente!", user: newUser });
+      .json({ message: "usuario registrado exitosamente!", user: newEmployee });
   } catch (error) {
     res.status(httpStatusCode.INTERNAL_SERVER).json({
       messasge: "SERVER ERROR! Trata registrándote de nuevo" + error.message,
@@ -47,6 +51,7 @@ async function createEmployee(req, res) {
 }
 
 module.exports = {
+  getEmployees,
   getEmployee,
   createEmployee,
 };

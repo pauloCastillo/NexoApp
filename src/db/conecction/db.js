@@ -1,15 +1,17 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
 
-exports.dbConnection = async function () {
+async function dbConnection() {
   try {
     const db = await mongoose.connect(process.env.DB_URI, {
-      dbName: "T2-Project",
+      dbName: "project-t2",
       minPoolSize: 50,
       family: 4,
     });
-    return `Successfully Connection with ${db.dbName}`;
+    console.log(`Successfully Connection with ${db.connection.name}`);
   } catch (error) {
-    return error.message;
+    console.log(error.message);
   }
-};
+}
+
+module.exports = dbConnection;
