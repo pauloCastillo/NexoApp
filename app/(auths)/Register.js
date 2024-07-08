@@ -10,6 +10,7 @@ import {
 } from "react-native";
 
 import verify from "../../constants/verify";
+import axios from "axios";
 
 export default function RegisterLayout() {
   const [username, setUsername] = useState("");
@@ -47,9 +48,9 @@ export default function RegisterLayout() {
         const PORT = process.env.EXPO_PUBLIC_API_URL;
         const url = `http://192.168.1.12:${PORT}/api`;
         const response = await axios.post(url + "/employees", { user });
-        console.log(response.data + "dentro de un modal");
+        console.log(response.status);
       } catch (error) {
-        console.log(error.message);
+        console.log(error);
       }
     }
   }
