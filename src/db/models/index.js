@@ -1,12 +1,8 @@
-const Employee = require("./employee");
-const JobTitle = require("./jobTitle");
-const ControlTime = require("./timeControl");
-const Location = require("./locations");
 const model = {
-  Employee,
-  JobTitle,
-  ControlTime,
-  Location,
+  Employee: require("./employee"),
+  JobTitle: require("./jobTitle"),
+  ControlTime: require("./timeControl"),
+  Location: require("./locations"),
 };
 
 module.exports = model;

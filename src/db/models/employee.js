@@ -17,9 +17,8 @@ const employeeSchema = new Schema(
       trim: true,
       require: true,
     },
-    job_title: {
-      type: Schema.Types.ObjectId,
-      ref: "JobTitle",
+    jobTitle: {
+      type: String,
     },
     password: {
       type: String,

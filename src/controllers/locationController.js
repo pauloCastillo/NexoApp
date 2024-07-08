@@ -26,6 +26,8 @@ async function registerTimeLocationEmployee(req, res) {
       longitude: locationTimeData.location.longitude,
     });
     const timer = await timeRegister(timeData, newLocation._id);
+    console.log(newLocation);
+    console.log(timer);
     res
       .status(httpStatusCode.OK)
       .json({ location: newLocation, newTime: timer });
