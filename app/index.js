@@ -63,7 +63,7 @@ export default function App() {
       });
 
       if (response.status === 200) {
-        console.log("registro existoso!");
+        console.log(response.data);
       }
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);

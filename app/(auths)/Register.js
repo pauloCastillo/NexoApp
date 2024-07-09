@@ -48,6 +48,7 @@ export default function RegisterLayout() {
       jobTitle,
       phone,
     };
+
     setError(verify(user, "sign-up"));
     if (Object.getOwnPropertyNames(error).length !== 0) {
       setCheckError(true);
@@ -60,9 +61,7 @@ export default function RegisterLayout() {
         if (response.status === 201) {
           dispatch(addEmployeeID({ id: response.data.user._id }));
           ToastAndroid.show("Se registro existosamente!", ToastAndroid.LONG);
-          setTimeout(() => {
-            router.navigate("index");
-          }, 1000);
+          router.navigate("/");
         }
       } catch (error) {
         console.log(error.message);
