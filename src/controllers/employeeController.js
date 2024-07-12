@@ -30,7 +30,6 @@ async function getEmployee(req, res) {
 async function createEmployee(req, res) {
   try {
     const { user } = req.body;
-
     if (user.password !== user.confirmPassword) {
       return res.status(httpStatusCode.CONFLICT).json({
         message:

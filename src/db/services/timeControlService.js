@@ -13,14 +13,14 @@ class RegisterUserAndTimeService {
     return savedNewEmployee;
   }
 
-  async timeRegister(data, locationId) {
+  async timeRegister(data, locationId, employeeID) {
     const employees = await ControlTime.schema.methods.getEmployees();
-    const existEmployee = employees.find((item) =>
-      Employee.findById({ _id: item.employee })
+    const existEmployee = employees.find(
+      (item) => item.employee.toString() === employeeID.toString()
     );
     let newWorkTime;
     if (!existEmployee) {
-      throw Error("No existe usuario");
+      throw new Error("No existe usuario");
     } else {
       switch (data.label) {
         case "entrada":
