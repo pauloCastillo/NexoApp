@@ -8,6 +8,8 @@ import axios from "axios";
 import * as Location from "expo-location";
 import { Link } from "expo-router";
 
+import { useSelector } from "react-redux";
+
 export default function App() {
   const [location, setLocation] = useState(null);
   const [text, setText] = useState(null);
@@ -41,25 +43,28 @@ export default function App() {
     sendLocationToServer({ latitude, longitude }, time, label);
   }
 
+  const employeeID = useSelector((state) => state.employee.id);
+
   async function sendLocationToServer(location, workerTime, text) {
     const locationTimeData = {
+      employee: employeeID,
       location,
       workerTime,
       label: text,
     };
 
-    console.log(locationTimeData);
     const PORT = process.env.EXPO_PUBLIC_API_URL;
-    // const localhost = process.env.EXPO_PUBLIC_LOCALHOST;
 
-    const url = `http://192.168.1.12:${PORT}/api`;
+    const url = `http://192.168.1.14:${PORT}/api`;
 
     try {
       const response = await axios.post(url + "/locations", {
         locationTimeData,
       });
 
-      console.log(response.status);
+      if (response.status === 200) {
+        console.log(response.data);
+      }
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
     }

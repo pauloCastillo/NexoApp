@@ -6,10 +6,17 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  ToastAndroid,
   View,
 } from "react-native";
 
+import { useRouter } from "expo-router";
+
+import axios from "axios";
 import verify from "../../constants/verify";
+
+import { useDispatch } from "react-redux";
+import { addEmployeeID } from "../../store/employees";
 import axios from "axios";
 
 export default function RegisterLayout() {
@@ -29,6 +36,8 @@ export default function RegisterLayout() {
   });
   const [checkError, setCheckError] = useState(false);
   const [privacy, setPrivacy] = useState(false);
+  const dispatch = useDispatch();
+  const router = useRouter();
 
   async function submit(e) {
     e.preventDefault();
@@ -40,15 +49,21 @@ export default function RegisterLayout() {
       jobTitle,
       phone,
     };
+
     setError(verify(user, "sign-up"));
     if (Object.getOwnPropertyNames(error).length !== 0) {
       setCheckError(true);
     } else {
       try {
         const PORT = process.env.EXPO_PUBLIC_API_URL;
-        const url = `http://192.168.1.12:${PORT}/api`;
+        const url = `http://192.168.1.14:${PORT}/api`;
         const response = await axios.post(url + "/employees", { user });
-        console.log(response.status);
+
+        if (response.status === 201) {
+          dispatch(addEmployeeID({ id: response.data.user._id }));
+          ToastAndroid.show("Se registro existosamente!", ToastAndroid.LONG);
+          router.navigate("/");
+        }
       } catch (error) {
         console.log(error);
       }
