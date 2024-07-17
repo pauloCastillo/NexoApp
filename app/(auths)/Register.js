@@ -17,7 +17,6 @@ import verify from "../../constants/verify";
 
 import { useDispatch } from "react-redux";
 import { addEmployeeID } from "../../store/employees";
-import axios from "axios";
 
 export default function RegisterLayout() {
   const [username, setUsername] = useState("");
@@ -55,8 +54,8 @@ export default function RegisterLayout() {
       setCheckError(true);
     } else {
       try {
-        const PORT = process.env.EXPO_PUBLIC_API_URL;
-        const url = `http://192.168.1.14:${PORT}/api`;
+        const PORT = process.env.EXPO_PUBLIC_API_PORT;
+        const url = `http://192.168.1.11:${PORT}/api`;
         const response = await axios.post(url + "/employees", { user });
 
         if (response.status === 201) {

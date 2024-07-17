@@ -53,9 +53,9 @@ export default function App() {
       label: text,
     };
 
-    const PORT = process.env.EXPO_PUBLIC_API_URL;
+    const PORT = process.env.EXPO_PUBLIC_API_PORT;
 
-    const url = `http://192.168.1.14:${PORT}/api`;
+    const url = `http://192.168.1.11:${PORT}/api`;
 
     try {
       const response = await axios.post(url + "/locations", {
