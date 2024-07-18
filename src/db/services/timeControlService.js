@@ -1,5 +1,6 @@
 const { ControlTime } = require("../models");
 const { Employee } = require("../models");
+const createReport = require("../../report/report");
 
 class RegisterUserAndTimeService {
   async CreateEmployee(user) {
@@ -19,8 +20,10 @@ class RegisterUserAndTimeService {
       (item) => item.employee.toString() === employeeID.toString()
     );
     let newWorkTime;
-    if (!existEmployee) {
-      throw new Error("No existe usuario");
+    if (!existEmployee && employees.length === 0) {
+      throw Error("No existe trabajadores en la base de datos");
+    } else if (!existEmployee && employees.length !== 0) {
+      return employees;
     } else {
       switch (data.label) {
         case "entrada":
@@ -50,6 +53,13 @@ class RegisterUserAndTimeService {
       }
     }
     return newWorkTime;
+  }
+
+  async createReport() {
+    const registers = await ControlTime.find().populate("employee", [
+      "username",
+    ]);
+    createReport(registers);
   }
 }
 

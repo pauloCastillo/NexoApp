@@ -1,4 +1,4 @@
-const { Employee} = require("../db/models");
+const { Employee } = require("../db/models");
 const { httpStatusCode } = require("../utils/httpStatus");
 const {
   RegisterUserAndTimeService,
@@ -44,7 +44,7 @@ async function createEmployee(req, res) {
       .json({ message: "usuario registrado exitosamente!", user: newEmployee });
   } catch (error) {
     res.status(httpStatusCode.INTERNAL_SERVER).json({
-      messasge: "SERVER ERROR! Trata registrándote de nuevo" + error.message,
+      messasge: "SERVER ERROR! Trata registrándote de nuevo. " + error.message,
     });
   }
 }
