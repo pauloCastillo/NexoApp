@@ -43,7 +43,7 @@ export default function App() {
     sendLocationToServer({ latitude, longitude }, time, label);
   }
 
-  const employeeID = useSelector((state) => state.employee.id);
+  const employeeID = useSelector((state) => state.employees.id);
 
   async function sendLocationToServer(location, workerTime, text) {
     const locationTimeData = {
@@ -53,17 +53,16 @@ export default function App() {
       label: text,
     };
 
-    const PORT = process.env.EXPO_PUBLIC_API_PORT;
-
-    const url = `http://192.168.1.11:${PORT}/api`;
+    const url = `http://192.168.1.11:8000/api`;
 
     try {
       const response = await axios.post(url + "/locations", {
         locationTimeData,
       });
-
+      console.log(locationTimeData);
       if (response.status === 200) {
-        console.log(response.data);
+        console.log(response.data.newTime);
+        console.log(response.data.location);
       }
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);

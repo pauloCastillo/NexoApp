@@ -3,6 +3,6 @@ import employeesSlides from "./employees";
 
 export const store = configureStore({
   reducer: {
-    employee: employeesSlides,
+    employees: employeesSlides,
   },
 });

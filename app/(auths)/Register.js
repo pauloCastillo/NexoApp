@@ -38,7 +38,7 @@ export default function RegisterLayout() {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  async function submit(e) {
+  async function onSubmit(e) {
     e.preventDefault();
     const user = {
       username,
@@ -54,14 +54,17 @@ export default function RegisterLayout() {
       setCheckError(true);
     } else {
       try {
-        const PORT = process.env.EXPO_PUBLIC_API_PORT;
-        const url = `http://192.168.1.11:${PORT}/api`;
-        const response = await axios.post(url + "/employees", { user });
+        console.log(user);
+        const response = await axios.post(
+          `http://192.168.1.11:8000/api/employees`,
+          { user }
+        );
 
         if (response.status === 201) {
+          console.log(response.data.user);
           dispatch(addEmployeeID({ id: response.data.user._id }));
           ToastAndroid.show("Se registro existosamente!", ToastAndroid.LONG);
-          router.navigate("/");
+          router.push("/");
         }
       } catch (error) {
         console.log(error);
@@ -149,7 +152,7 @@ export default function RegisterLayout() {
           <Text style={styles.errorMessage}>{error.confirmPassword}</Text>
         )}
       </View>
-      <Button title="REGISTRAR" onPress={submit} />
+      <Button title="REGISTRAR" onPress={onSubmit} />
     </SafeAreaView>
   );
 }
