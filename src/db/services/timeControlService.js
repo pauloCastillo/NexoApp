@@ -11,6 +11,9 @@ class RegisterUserAndTimeService {
       employee: savedNewEmployee._id,
     });
     await createATimeControl.save();
+    
+    delete user.password;
+    
     return savedNewEmployee;
   }
 
@@ -56,10 +59,12 @@ class RegisterUserAndTimeService {
   }
 
   async createReport() {
-    const registers = await ControlTime.find().populate("employee", [
-      "username",
-    ]);
-    createReport(registers);
+    const registers = await ControlTime.find().populate(
+      ["employee", "locations"],
+      ["username"]
+    );
+    console.log(registers);
+    // createReport(registers);
   }
 }
 

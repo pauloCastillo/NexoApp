@@ -1,4 +1,7 @@
+require("dotenv").config();
+const axios = require("axios");
 const { Location } = require("../db/models");
+
 const {
   RegisterUserAndTimeService,
 } = require("../db/services/timeControlService");
@@ -23,9 +26,16 @@ async function registerTimeLocationEmployee(req, res) {
       label: locationTimeData.label,
       time: locationTimeData.workerTime,
     };
+
+    const response = await axios.get(
+      `https://discover.search.hereapi.com/v1/discover?at=${locationTimeData.location.latitude},${locationTimeData.location.longitude}&q=${locationTimeData.location.latitude},${locationTimeData.location.longitude}&in=countryCode%3ABOL&apiKey=${process.env.API_KEY}`
+    );
+
+    const streetName = response.data.items[0].title;
     const newLocation = await Location.create({
       latitude: locationTimeData.location.latitude,
       longitude: locationTimeData.location.longitude,
+      street: streetName,
     });
 
     const timerService = new RegisterUserAndTimeService();

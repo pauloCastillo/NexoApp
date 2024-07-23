@@ -1,5 +1,6 @@
 const { Schema, model } = require("mongoose");
-const { v6: uuid } = require("uuid");
+const { encrypt, checkingPassword, signSession } = require("../../utils/utils");
+
 const employeeSchema = new Schema(
   {
     username: {
@@ -18,6 +19,7 @@ const employeeSchema = new Schema(
     password: {
       type: String,
       trim: true,
+      select: false,
       require: true,
     },
     phone: {
@@ -34,6 +36,39 @@ const employeeSchema = new Schema(
     versionKey: false,
   }
 );
+
+employeeSchema.pre("save", function (next) {
+  if (this.isModified("password")) {
+    this.password = this.encryptPassword(this.password);
+  }
+  next();
+});
+
+employeeSchema.methods = {
+  encryptPassword(password) {
+    return encrypt(password);
+  },
+
+  authenticateUser(password, id) {
+    const user = model("Employee").findById(id).select("password");
+    return checkingPassword(password, user.password);
+  },
+  createToken() {
+    const user = {
+      email: this.mail,
+      username: this.ne,
+    };
+    return signSession(user);
+  },
+  toJSON() {
+    return {
+      id: this._id,
+      username: this.username,
+      email: this.email,
+      token: `${this.createToken()}`,
+    };
+  },
+};
 
 const Employee = model("Employee", employeeSchema, "employees");
 module.exports = Employee;

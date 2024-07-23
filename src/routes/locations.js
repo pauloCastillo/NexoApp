@@ -4,9 +4,11 @@ const {
   getTimeLocationEmployee,
 } = require("../controllers/locationController");
 
+const { verifiedToken } = require("../middlewares/verifyToken");
+
 const router = express.Router();
 
 router.get("/:id", getTimeLocationEmployee);
-router.post("/", registerTimeLocationEmployee);
+router.post("/", verifiedToken, registerTimeLocationEmployee);
 
 module.exports = router;

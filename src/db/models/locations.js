@@ -17,6 +17,7 @@ const locationSchema = new Schema(
       trim: true,
       require: true,
     },
+    street: String,
   },
   {
     timestamps: true,

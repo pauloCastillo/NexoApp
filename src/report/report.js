@@ -1,7 +1,6 @@
 const xlsx = require("xlsx");
 const currentDate = new Date();
 function createReport(data) {
-  console.log(data);
   const register = data;
   let rows = register.map((row) => {
     return {
@@ -19,13 +18,22 @@ function createReport(data) {
         month: "2-digit",
         year: "2-digit",
       }),
+      location: row.location,
     };
   });
   const worksheet = xlsx.utils.json_to_sheet(rows);
   const workbook = xlsx.utils.book_new();
   xlsx.utils.book_append_sheet(workbook, worksheet, "Asistencia");
   xlsx.utils.sheet_add_aoa(worksheet, [
-    ["Nombre", "Entrada", "Descanso", "Retorno", "Salida", "Fecha"],
+    [
+      "Nombre",
+      "Entrada",
+      "Descanso",
+      "Retorno",
+      "Salida",
+      "Fecha",
+      "Ubicación",
+    ],
   ]);
   xlsx.writeFile(workbook, "../../asistencia.xlsx", { compression: true });
 }

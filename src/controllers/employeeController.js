@@ -39,9 +39,24 @@ async function createEmployee(req, res) {
 
     const newRegister = new RegisterUserAndTimeService();
     const newEmployee = await newRegister.CreateEmployee(user);
+    console.log(newEmployee);
     res
       .status(httpStatusCode.CREATED)
       .json({ message: "usuario registrado exitosamente!", user: newEmployee });
+  } catch (error) {
+    res.status(httpStatusCode.INTERNAL_SERVER).json({
+      messasge: "SERVER ERROR! Trata registrándote de nuevo. " + error.message,
+    });
+  }
+}
+
+async function loginEmployee(req, res) {
+  try {
+    const { employee } = req.body;
+    const existEmployee = await Employee.findOne({ mail: employee.email });
+    if (!existEmployee) {
+      throw new Error("No existe colaborador");
+    }
   } catch (error) {
     res.status(httpStatusCode.INTERNAL_SERVER).json({
       messasge: "SERVER ERROR! Trata registrándote de nuevo. " + error.message,
@@ -53,4 +68,5 @@ module.exports = {
   getEmployees,
   getEmployee,
   createEmployee,
+  loginEmployee,
 };
