@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button, Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
-import Input from "../../components/auth/input";
+import Input from "../../components/auth/Input";
 import LoadingOverlay from "../../components/ui/loading";
 import { loginEmployee } from "../../store/employees";
 

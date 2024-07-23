@@ -4,7 +4,7 @@ import { Button, Image, SafeAreaView, StyleSheet, View } from "react-native";
 import { useDispatch } from "react-redux";
 import { addEmployee } from "../../store/employees";
 
-import Input from "./input";
+import Input from "./Input";
 export default function AuthForm({
   formMode,
   onSubmit,
