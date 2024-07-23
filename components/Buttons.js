@@ -5,11 +5,7 @@ import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 export default function IconButton({ btnText, onPress, icon, bgColor }) {
   return (
-    <TouchableOpacity
-      style={{ ...styles.button }}
-      onPress={onPress}
-      disabled={disabled}
-    >
+    <TouchableOpacity style={{ ...styles.button }} onPress={onPress}>
       <AntDesign
         name={icon}
         size={24}

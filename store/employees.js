@@ -57,15 +57,11 @@ const employeesSlides = createSlice({
         state.status = "succeeded";
         state.id = action.payload.user.id;
         state.token = action.payload.user.token;
-        state.message = "Registro Exitoso";
+        state.message = "Registro exitoso";
       })
-
       .addCase(registerNewEmployee.rejected, (state, action) => {
         state.status = "rejected";
         state.message = action.payload;
-      })
-      .addCase(loginEmployee.pending, (state, action) => {
-        state.status = "loading";
       })
       .addCase(loginEmployee.fulfilled, (state, action) => {
         state.status = "succeeded";
