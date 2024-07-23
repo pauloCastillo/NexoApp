@@ -1,11 +1,19 @@
 import { AntDesign } from "@expo/vector-icons";
-import React from "react";
 import PropTypes from "prop-types";
+import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
-export default function Buttons({ btnText, onPress, icon, bgColor }) {
+<<<<<<< HEAD
+export default function Buttons({ btnText, onPress, icon, bgColor, disabled }) {
+=======
+export default function IconButton({ btnText, onPress, icon, bgColor }) {
+>>>>>>> lastWork2
   return (
-    <TouchableOpacity style={{ ...styles.button }} onPress={onPress}>
+    <TouchableOpacity
+      style={{ ...styles.button }}
+      onPress={onPress}
+      disabled={disabled}
+    >
       <AntDesign
         name={icon}
         size={24}
@@ -29,9 +37,10 @@ const styles = StyleSheet.create({
   },
 });
 
-Buttons.propTypes = {
+IconButton.propTypes = {
   btnText: PropTypes.string,
   bgColor: PropTypes.string,
   icon: PropTypes.string,
   onPress: PropTypes.func,
+  disabled: PropTypes.func,
 };

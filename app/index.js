@@ -1,26 +1,31 @@
+import * as Location from "expo-location";
+import { Redirect } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, ToastAndroid, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Buttons from "../components/Buttons";
+import { useDispatch, useSelector } from "react-redux";
+import IconButton from "../components/Buttons";
 import ClockLayout from "../components/Clock";
-
-import axios from "axios";
-import * as Location from "expo-location";
-import { Link } from "expo-router";
-
-import { useSelector } from "react-redux";
+import { selectEmployee, selectEmployeeID } from "../store/employees";
+import {
+  getLocations,
+  registerTimeAndLocations,
+  selectLocation,
+  selectMessage,
+  takeTime,
+} from "../store/locations";
 
 export default function App() {
   const [location, setLocation] = useState(null);
   const [text, setText] = useState(null);
   const [showTime, setShowTime] = useState("");
   const timeWorker = useRef();
+  const employee = useSelector(selectEmployee);
 
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        console.log("negacion de la location");
         return;
       }
       setLocation(await Location.getCurrentPositionAsync());
@@ -34,65 +39,66 @@ export default function App() {
   function renderTime(time) {
     setShowTime(time);
   }
+  const dispatch = useDispatch();
 
-  async function handlerWorkerTimeLocation(label) {
-    const { latitude, longitude } = await location.coords;
+  function handlerWorkerTimeLocation(label) {
+    dispatch(getLocations(location));
     setText(label);
     const time = handlerTimeWorker();
     renderTime(time);
-    sendLocationToServer({ latitude, longitude }, time, label);
+    dispatch(takeTime({ label, time }));
+    sendLocationToServer(time, label);
   }
 
-  const employeeID = useSelector((state) => state.employees.id);
+  const employeeID = useSelector(selectEmployeeID);
+  const ubicacion = useSelector(selectLocation);
+  const message = useSelector(selectMessage);
+  const token = useSelector((state) => state.employees.token);
 
-  async function sendLocationToServer(location, workerTime, text) {
+  if (employee === null) {
+    return <Redirect href={"(auths)/Register"} />;
+  }
+
+  function sendLocationToServer(workerTime, text) {
     const locationTimeData = {
       employee: employeeID,
-      location,
+      location: ubicacion,
       workerTime,
       label: text,
+      token,
     };
 
-    const url = `http://192.168.1.11:8000/api`;
-
     try {
-      const response = await axios.post(url + "/locations", {
-        locationTimeData,
-      });
-      console.log(locationTimeData);
-      if (response.status === 200) {
-        console.log(response.data.newTime);
-        console.log(response.data.location);
-      }
+      dispatch(registerTimeAndLocations(locationTimeData));
+      ToastAndroid.show(message, ToastAndroid.LONG);
     } catch (error) {
-      ToastAndroid.show(error.message, ToastAndroid.LONG);
+      ToastAndroid.show(message, ToastAndroid.LONG);
     }
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <Link href="(auths)/Register">Ir a Registrarse</Link>
       <ClockLayout ref={timeWorker} />
       <View style={styles.buttons}>
-        <Buttons
+        <IconButton
           icon="arrowright"
           btnText="entrada"
           bgColor="green"
           onPress={() => handlerWorkerTimeLocation("entrada")}
         />
-        <Buttons
+        <IconButton
           icon="pause"
           btnText="descanso"
           bgColor="blue"
           onPress={() => handlerWorkerTimeLocation("descanso")}
         />
-        <Buttons
+        <IconButton
           icon="back"
           btnText="retorno"
           bgColor="green"
           onPress={() => handlerWorkerTimeLocation("retorno")}
         />
-        <Buttons
+        <IconButton
           icon="arrowleft"
           btnText="salida"
           bgColor="red"

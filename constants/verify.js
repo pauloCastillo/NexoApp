@@ -1,6 +1,8 @@
+import PropTypes from "prop-types";
+
 export default function verify(data, mode) {
   const error = {};
-  const regMail = /[a-zA-Z0-9._-]+@[a-zA-Z0-9.-0]+\.[a-zA-Z]{2,4}$/;
+  const regMail = /[a-zA-Z0-9._-]+@[a-zA-Z0-9]+\.[a-zA-Z]{2,4}$/;
   const regPswd = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,15}$/;
   const regPhone = /[+]?\d{3}-\d{8}/;
 
@@ -51,3 +53,8 @@ export default function verify(data, mode) {
 
   return error;
 }
+
+verify.propTypes = {
+  data: PropTypes.object,
+  mode: PropTypes.string,
+};

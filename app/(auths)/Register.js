@@ -1,158 +1,36 @@
+<<<<<<< HEAD
 import { useState } from "react";
-import {
-  Button,
-  Image,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TextInput,
-  ToastAndroid,
-  View,
-} from "react-native";
-
-import { useRouter } from "expo-router";
-
-import axios from "axios";
-import verify from "../../constants/verify";
-
-import { useDispatch } from "react-redux";
-import { addEmployeeID } from "../../store/employees";
+import { Image, SafeAreaView, StyleSheet } from "react-native";
+import { AuthContent } from "../../components/auth/authContent";
+import { useGetEmployeesQuery } from "../../store/session";
+import { signUp } from "../../utils/auth";
 
 export default function RegisterLayout() {
-  const [username, setUsername] = useState("");
-  const [mail, setMail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [jobTitle, setJobTitle] = useState("");
-  const [phone, setPhone] = useState("");
-  const [error, setError] = useState({
+  const [credentials, setCredentials] = useState({
     username: "",
     mail: "",
     password: "",
-    jobTitle: "",
     confirmPassword: "",
+    jobTitle: "",
     phone: "",
   });
-  const [checkError, setCheckError] = useState(false);
-  const [privacy, setPrivacy] = useState(false);
-  const dispatch = useDispatch();
-  const router = useRouter();
-
-  async function onSubmit(e) {
-    e.preventDefault();
-    const user = {
-      username,
-      mail,
-      password,
-      confirmPassword,
-      jobTitle,
-      phone,
-    };
-
-    setError(verify(user, "sign-up"));
-    if (Object.getOwnPropertyNames(error).length !== 0) {
-      setCheckError(true);
-    } else {
-      try {
-        console.log(user);
-        const response = await axios.post(
-          `http://192.168.1.11:8000/api/employees`,
-          { user }
-        );
-
-        if (response.status === 201) {
-          console.log(response.data.user);
-          dispatch(addEmployeeID({ id: response.data.user._id }));
-          ToastAndroid.show("Se registro existosamente!", ToastAndroid.LONG);
-          router.push("/");
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
+  const [authenticate, setAuthenticate] = useState(null);
+  const { data, isLoading, error } = useGetEmployeesQuery();
+  console.log(error, data, isLoading);
+  function handlerAuthenticated() {
+    const response = signUp("signUp", credentials);
+    console.log(response);
+    setAuthenticate(response);
+    return "isLogin";
   }
-
+  handlerAuthenticated();
   return (
     <SafeAreaView style={styles.regContainer}>
       <Image source={require("../../assets/icon.png")} style={styles.image} />
-      <View style={styles.form}>
-        <Text style={styles.baseText}>Nombre y Apellido</Text>
-        <TextInput
-          style={styles.input}
-          underlineColorAndroid={"#f42"}
-          onChangeText={setUsername}
-          value={username}
-          placeholder="Nombre y Apellido"
-        />
-        {checkError && (
-          <Text style={styles.errorMessage}>{error.username}</Text>
-        )}
-
-        <Text style={styles.baseText}>Correo</Text>
-        <TextInput
-          style={styles.input}
-          underlineColorAndroid={"#f42"}
-          onChangeText={setMail}
-          value={mail}
-          placeholder="correo@miempresa.com"
-        />
-        {checkError && <Text style={styles.errorMessage}>{error.mail}</Text>}
-
-        <Text style={styles.baseText}>Cargo</Text>
-        <TextInput
-          style={styles.input}
-          underlineColorAndroid={"#f42"}
-          onChangeText={setJobTitle}
-          value={jobTitle}
-          placeholder="Vendedor, o el cargo que ocupa"
-        />
-        {checkError && (
-          <Text style={styles.errorMessage}>{error.jobTitle}</Text>
-        )}
-
-        <Text style={styles.baseText}>n° de celular</Text>
-        <TextInput
-          style={styles.input}
-          underlineColorAndroid={"#f42"}
-          onChangeText={setPhone}
-          value={phone}
-          placeholder="+591-777-77777"
-        />
-        {checkError && <Text style={styles.errorMessage}>{error.phone}</Text>}
-
-        <Text style={styles.baseText}>Contraseña</Text>
-        <View style={styles.inputPass}>
-          <TextInput
-            style={styles.input}
-            underlineColorAndroid={"#f42"}
-            onChangeText={setPassword}
-            value={password}
-            placeholder="password entre 1-12 caracteres"
-            secureTextEntry={!privacy}
-          />
-          <Button title={privacy ? "show" : "hide"} />
-        </View>
-        {checkError && (
-          <Text style={styles.errorMessage}>{error.password}</Text>
-        )}
-
-        <Text style={styles.baseText}>confirma contraseña</Text>
-        <View style={styles.inputPass}>
-          <TextInput
-            style={styles.input}
-            underlineColorAndroid={"#f42"}
-            onChangeText={setConfirmPassword}
-            value={confirmPassword}
-            placeholder="password entre 1-12 caracteres"
-            secureTextEntry={!privacy}
-          />
-          <Button title={privacy ? "show" : "hide"} />
-        </View>
-        {checkError && (
-          <Text style={styles.errorMessage}>{error.confirmPassword}</Text>
-        )}
-      </View>
-      <Button title="REGISTRAR" onPress={onSubmit} />
+      <AuthContent
+        isLogin={handlerAuthenticated}
+        onAutehnticated={authenticate}
+      />
     </SafeAreaView>
   );
 }
@@ -169,35 +47,11 @@ const styles = StyleSheet.create({
     marginHorizontal: "auto",
     marginVertical: 20,
   },
-
-  form: {
-    borderRadius: 12,
-    marginHorizontal: "auto",
-    marginBottom: 30,
-    justifyContent: "center",
-    padding: 15,
-    width: "90%",
-  },
-  baseText: {
-    fontWeight: "600",
-    textTransform: "uppercase",
-  },
-
-  input: {
-    height: 40,
-    marginBottom: 10,
-  },
-
-  inputPass: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    height: 40,
-  },
-
-  errorMessage: {
-    fontWeight: "600",
-    fontSize: 12,
-    color: "#f42",
-  },
 });
+=======
+import AuthContent from "../../components/auth/content";
+
+export default function RegisterLayout() {
+  return <AuthContent formMode="signUp" />;
+}
+>>>>>>> lastWork2

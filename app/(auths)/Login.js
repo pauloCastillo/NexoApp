@@ -1,44 +1,93 @@
-import { useState } from "react";
-import {
-  Button,
-  Image,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+<<<<<<< HEAD
+import { Image, SafeAreaView, StyleSheet } from "react-native";
+import { AuthContent } from "../../components/auth/authContent";
+import { login } from "../../utils/auth";
 
-export default function RegisterLayout() {
-  const [mail, setMail] = useState("");
-  const [password, setPassword] = useState("");
+export default function LoginLayout() {
+  login("Pollo", "Hola123");
+=======
+import { Link, Redirect, useNavigation } from "expo-router";
+import { useState } from "react";
+import { Button, Image, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
+import Input from "../../components/auth/input";
+import LoadingOverlay from "../../components/ui/loading";
+import { loginEmployee } from "../../store/employees";
+
+export default function LoginLayout() {
+  const [mail, setMail] = useState(null);
+  const [password, setPassword] = useState(null);
+  const [privacy, setPrivacy] = useState(false);
+  const [error, setError] = useState({
+    mail: "",
+    password: "",
+  });
+
+  const status = useSelector((state) => state.employees.status);
+  console.log(status);
+  const navigation = useNavigation();
+
+  const [checkError, setCheckError] = useState(false);
+  const dispatch = useDispatch();
+
+  if (status === "loading") {
+    <LoadingOverlay message="...login" />;
+  } else {
+    <Redirect href={"/"} />;
+  }
+
+  const onSubmitHandler = () => {
+    const credentials = {
+      mail,
+      password,
+    };
+
+    dispatch(loginEmployee(credentials));
+    navigation.navigate("index");
+  };
+
+  function privascyHandler(field, value) {
+    if (password !== null && field === "password") {
+      setPrivacy(true);
+    }
+  }
+>>>>>>> lastWork2
 
   return (
-    <SafeAreaView style={styles.regContainer}>
+    <SafeAreaView>
       <Image source={require("../../assets/icon.png")} style={styles.image} />
+<<<<<<< HEAD
+      <AuthContent isLogin={"isLogin"} onAuthenticated={login} />
+=======
       <View style={styles.form}>
-        <Text style={styles.baseText}>Correo</Text>
-        <TextInput
-          style={styles.input}
-          underlineColorAndroid={"#f42"}
-          onChangeText={(event) => setMail(event)}
+        <Input
+          label="Correo"
+          onUpdateValue={setMail}
           value={mail}
-          placeholder="correo@miempresa.com"
+          placeholder={"Coloque su correo@empresa.com"}
+          checkError={checkError}
+          error={error}
         />
-        <Text style={styles.baseText}>Contraseña</Text>
-        <View style={styles.inputPass}>
-          <TextInput
-            style={styles.input}
-            underlineColorAndroid={"#f42"}
-            onChangeText={(event) => setPassword(event)}
-            value={password}
-            placeholder="password entre 1-12 caracteres"
-            secureTextEntry={!privacy}
-          />
-          <Button title={privacy ? "show" : "hide"} />
-        </View>
+        <Input
+          label="Contraseña"
+          onUpdateValue={setPassword}
+          value={password}
+          placeholder={"contraseña mínimo de 6 caracteres"}
+          mode={"privateField"}
+          privacy={true}
+          checkError={checkError}
+          error={error}
+        />
+        <Button title="INGRESAR" onPress={onSubmitHandler} />
       </View>
-      <Button title="INGRESAR" />
+      <Text style={styles.footerContent}>
+        Si no tienes una cuenta{" "}
+        <Link replace href={"Register"}>
+          registrate aqui
+        </Link>
+      </Text>
+>>>>>>> lastWork2
     </SafeAreaView>
   );
 }
@@ -55,30 +104,29 @@ const styles = StyleSheet.create({
     marginHorizontal: "auto",
     marginVertical: 20,
   },
+<<<<<<< HEAD
+=======
 
   form: {
     borderRadius: 12,
     marginHorizontal: "auto",
-    marginBottom: 24,
-    flex: 0,
+    marginBottom: 30,
+    justifyContent: "center",
     padding: 15,
-    width: "80%",
+    width: "90%",
   },
-
-  baseText: {
-    fontWeight: "600",
-    textTransform: "uppercase",
-  },
-
-  input: {
-    height: 40,
-    marginBottom: 10,
-  },
-
   inputPass: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-around",
     height: 40,
   },
+
+  footerContent: {
+    textAlign: "center",
+    fontWeight: "600",
+    color: "blue",
+    marginVertical: 15,
+  },
+>>>>>>> lastWork2
 });
