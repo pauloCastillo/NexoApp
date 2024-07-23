@@ -38,7 +38,7 @@ const employeesSlides = createSlice({
     employee: null,
     status: "",
     message: "",
-    token: "token aqui",
+    token: "",
   },
   reducers: {
     addEmployeeID(state, action) {
@@ -72,7 +72,7 @@ const employeesSlides = createSlice({
         state.id = action.payload.user.id;
         state.employee = action.payload.user.username;
         state.token = action.payload.user.token;
-        state.message = "Great! You're in";
+        state.message = "Great!";
       })
       .addCase(loginEmployee.rejected, (state, action) => {
         state.status = "rejected";

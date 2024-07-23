@@ -28,9 +28,9 @@ export default function AuthContent({ formMode }) {
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
-  // if (status === "loading") {
-  //   return <LoadingOverlay message="...login" />;
-  // }
+  if (status === "loading") {
+    return <LoadingOverlay message="...login" />;
+  }
 
   function onSubmitHandler() {
     if (employee !== null) {

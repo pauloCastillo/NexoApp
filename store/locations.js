@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 export const getLocations = createAsyncThunk(
-  "lcoations/getLocation",
+  "locations/getLocation",
   async (location) => {
     try {
       const { latitude, longitude } = await location.coords;
@@ -20,8 +20,8 @@ export const registerTimeAndLocations = createAsyncThunk(
       const response = await axios.post(
         "http://192.168.1.14:8000/api/locations",
         {
-          locationTimeData,
           headers: { Authorization: `Bearer ${locationTimeData.token}` },
+          data: locationTimeData,
         }
       );
 
@@ -80,9 +80,10 @@ const timeLocationSlice = createSlice({
       })
       .addCase(registerTimeAndLocations.fulfilled, (state, action) => {
         state.status = "succeeded";
-        console.log(action.payload);
+        console.log(action.payload.newTime);
       })
       .addCase(registerTimeAndLocations.rejected, (state, action) => {
+        state.status = "rejected";
         state.message = action.payload;
       });
   },

@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-import { Image, SafeAreaView, StyleSheet } from "react-native";
-import { AuthContent } from "../../components/auth/authContent";
-import { login } from "../../utils/auth";
-
-export default function LoginLayout() {
-  login("Pollo", "Hola123");
-=======
 import { Link, Redirect, useNavigation } from "expo-router";
 import { useState } from "react";
 import { Button, Image, StyleSheet, Text, View } from "react-native";
@@ -47,19 +39,15 @@ export default function LoginLayout() {
     navigation.navigate("index");
   };
 
-  function privascyHandler(field, value) {
+  function privacyHandler(field, value) {
     if (password !== null && field === "password") {
       setPrivacy(true);
     }
   }
->>>>>>> lastWork2
 
   return (
     <SafeAreaView>
       <Image source={require("../../assets/icon.png")} style={styles.image} />
-<<<<<<< HEAD
-      <AuthContent isLogin={"isLogin"} onAuthenticated={login} />
-=======
       <View style={styles.form}>
         <Input
           label="Correo"
@@ -87,7 +75,6 @@ export default function LoginLayout() {
           registrate aqui
         </Link>
       </Text>
->>>>>>> lastWork2
     </SafeAreaView>
   );
 }
@@ -104,8 +91,6 @@ const styles = StyleSheet.create({
     marginHorizontal: "auto",
     marginVertical: 20,
   },
-<<<<<<< HEAD
-=======
 
   form: {
     borderRadius: 12,
@@ -128,5 +113,4 @@ const styles = StyleSheet.create({
     color: "blue",
     marginVertical: 15,
   },
->>>>>>> lastWork2
 });

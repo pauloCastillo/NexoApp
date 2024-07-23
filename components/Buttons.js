@@ -3,11 +3,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
-<<<<<<< HEAD
-export default function Buttons({ btnText, onPress, icon, bgColor, disabled }) {
-=======
 export default function IconButton({ btnText, onPress, icon, bgColor }) {
->>>>>>> lastWork2
   return (
     <TouchableOpacity
       style={{ ...styles.button }}
@@ -42,5 +38,4 @@ IconButton.propTypes = {
   bgColor: PropTypes.string,
   icon: PropTypes.string,
   onPress: PropTypes.func,
-  disabled: PropTypes.func,
 };
