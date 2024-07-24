@@ -18,13 +18,13 @@ export const registerTimeAndLocations = createAsyncThunk(
   async (locationTimeData) => {
     try {
       const response = await axios.post(
-        "http://192.168.1.14:8000/api/locations",
+        "http://192.168.1.12:8000/api/locations",
         {
           headers: { Authorization: `Bearer ${locationTimeData.token}` },
           data: locationTimeData,
         }
       );
-
+      console.log(response.data);
       return response.status === 200 && response.data;
     } catch (error) {
       console.log(error.message);
@@ -62,10 +62,7 @@ const timeLocationSlice = createSlice({
         case "salida":
           state.schedule.exitJob = time;
           break;
-        default:
-          return state.schedule;
       }
-      return state.schedule;
     },
   },
   extraReducers(builder) {
@@ -75,16 +72,21 @@ const timeLocationSlice = createSlice({
         state.location = action.payload;
       })
 
-      .addCase(getLocations.rejected, (state, action) => {
-        state.message = action.payload;
+      .addCase(getLocations.rejected, (state) => {
+        state.status = "rejected";
+        state.message = "Error en obtener la ubicacion";
+      })
+      .addCase(registerTimeAndLocations.pending, (state) => {
+        state.status = "loading";
       })
       .addCase(registerTimeAndLocations.fulfilled, (state, action) => {
         state.status = "succeeded";
-        console.log(action.payload.newTime);
+        state.message = "Registro Exitoso";
+        console.log(action.payload);
       })
       .addCase(registerTimeAndLocations.rejected, (state, action) => {
         state.status = "rejected";
-        state.message = action.payload;
+        console.log(action.payload);
       });
   },
 });

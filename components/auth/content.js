@@ -53,7 +53,7 @@ export default function AuthContent({ formMode }) {
       <Text style={styles.footerContent}>
         Si ya tienes una cuenta{" "}
         <Link replace href={"/Login"}>
-          ingresa aqui
+          ingresa aquí
         </Link>
       </Text>
     );

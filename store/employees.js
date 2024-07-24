@@ -6,11 +6,13 @@ export const registerNewEmployee = createAsyncThunk(
   async (user) => {
     try {
       const response = await axios.post(
-        "http://192.168.1.14:8000/api/employees",
+        "http://192.168.1.12:8000/api/employees/signup",
         { user }
       );
+      console.log(response.data);
       return response.data;
     } catch (error) {
+      console.log(error);
       return error.message;
     }
   }
@@ -21,11 +23,13 @@ export const loginEmployee = createAsyncThunk(
   async (employee) => {
     try {
       const response = await axios.post(
-        "http://192.168.1.14:8000/api/employees",
+        "http://192.168.1.12:8000/api/employees/login",
         { employee }
       );
+      console.log(response);
       return response.data;
     } catch (error) {
+      console.log(error);
       return error.message;
     }
   }
@@ -38,7 +42,7 @@ const employeesSlides = createSlice({
     employee: null,
     status: "",
     message: "",
-    token: "",
+    // token: "",
   },
   reducers: {
     addEmployeeID(state, action) {
@@ -50,29 +54,32 @@ const employeesSlides = createSlice({
   },
   extraReducers(builder) {
     builder
-      .addCase(registerNewEmployee.pending, (state, action) => {
+      .addCase(registerNewEmployee.pending, (state) => {
         state.status = "loading";
       })
       .addCase(registerNewEmployee.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.id = action.payload.user.id;
-        state.token = action.payload.user.token;
-        state.message = "Registro exitoso";
+        // state.id = action.payload.user._id;
+        // state.token = action.payload.user.token;
+        state.message = action.payload.message;
       })
       .addCase(registerNewEmployee.rejected, (state, action) => {
         state.status = "rejected";
-        state.message = action.payload;
+        // state.message = action.payload;
+        console.log(action.payload);
+      })
+      .addCase(loginEmployee.pending, (state, action) => {
+        state.status = "loading";
       })
       .addCase(loginEmployee.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.id = action.payload.user.id;
-        state.employee = action.payload.user.username;
-        state.token = action.payload.user.token;
+        // state.id = action.payload.user._id;
+        // state.token = action.payload.user.token;
         state.message = "Great!";
       })
       .addCase(loginEmployee.rejected, (state, action) => {
         state.status = "rejected";
-        state.message = action.payload;
+        console.log(action.payload);
       });
   },
 });

@@ -1,49 +1,67 @@
-import { Link, Redirect, useNavigation } from "expo-router";
-import { useState } from "react";
-import { Button, Image, StyleSheet, Text, View } from "react-native";
+import { Link, useNavigation } from "expo-router";
+import { useState, useEffect } from "react";
+import {
+  Button,
+  Image,
+  StyleSheet,
+  Text,
+  View,
+  ToastAndroid,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import Input from "../../components/auth/Input";
 import LoadingOverlay from "../../components/ui/loading";
-import { loginEmployee } from "../../store/employees";
+import verify from "../../constants/verify";
+import {
+  addEmployee,
+  loginEmployee,
+  selectEmployee,
+  selectMessage,
+} from "../../store/employees";
 
 export default function LoginLayout() {
   const [mail, setMail] = useState(null);
   const [password, setPassword] = useState(null);
-  const [privacy, setPrivacy] = useState(false);
   const [error, setError] = useState({
     mail: "",
     password: "",
   });
 
   const status = useSelector((state) => state.employees.status);
-  console.log(status);
   const navigation = useNavigation();
 
   const [checkError, setCheckError] = useState(false);
+  const employee = useSelector(selectEmployee);
+  const message = useSelector(selectMessage);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    dispatch(addEmployee({ mail, password }));
+  }, [mail, password]);
+
   if (status === "loading") {
-    <LoadingOverlay message="...login" />;
-  } else {
-    <Redirect href={"/"} />;
+    loadingComponent();
+  }
+
+  function loadingComponent() {
+    return <LoadingOverlay message="...login" />;
   }
 
   const onSubmitHandler = () => {
-    const credentials = {
-      mail,
-      password,
-    };
-
-    dispatch(loginEmployee(credentials));
-    navigation.navigate("index");
-  };
-
-  function privacyHandler(field, value) {
-    if (password !== null && field === "password") {
-      setPrivacy(true);
+    if (employee !== null) {
+      setError(verify(employee, "login"));
+      if (Object.getOwnPropertyNames(error).length !== 0) {
+        setCheckError(true);
+      } else {
+        dispatch(loginEmployee(employee));
+        ToastAndroid.show(message, ToastAndroid.LONG);
+        navigation.replace("index");
+      }
+    } else {
+      setCheckError(true);
     }
-  }
+  };
 
   return (
     <SafeAreaView>
@@ -55,7 +73,7 @@ export default function LoginLayout() {
           value={mail}
           placeholder={"Coloque su correo@empresa.com"}
           checkError={checkError}
-          error={error}
+          error={error.mail}
         />
         <Input
           label="Contraseña"
@@ -65,14 +83,14 @@ export default function LoginLayout() {
           mode={"privateField"}
           privacy={true}
           checkError={checkError}
-          error={error}
+          error={error.password}
         />
         <Button title="INGRESAR" onPress={onSubmitHandler} />
       </View>
       <Text style={styles.footerContent}>
-        Si no tienes una cuenta{" "}
+        Si no tienes una cuenta
         <Link replace href={"Register"}>
-          registrate aqui
+          regístrate aquí
         </Link>
       </Text>
     </SafeAreaView>
