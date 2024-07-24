@@ -22,6 +22,7 @@ async function getTimeLocationEmployee(req, res) {
 async function registerTimeLocationEmployee(req, res) {
   try {
     const { locationTimeData } = req.body;
+    console.log(locationTimeData);
     const timeData = {
       label: locationTimeData.label,
       time: locationTimeData.workerTime,
@@ -44,7 +45,7 @@ async function registerTimeLocationEmployee(req, res) {
       newLocation._id,
       locationTimeData.employee
     );
-
+    console.log(timer);
     timerService.createReport();
 
     res

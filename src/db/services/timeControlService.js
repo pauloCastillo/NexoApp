@@ -11,9 +11,7 @@ class RegisterUserAndTimeService {
       employee: savedNewEmployee._id,
     });
     await createATimeControl.save();
-    
     delete user.password;
-    
     return savedNewEmployee;
   }
 
