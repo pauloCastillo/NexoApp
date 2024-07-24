@@ -6,7 +6,7 @@ export const registerNewEmployee = createAsyncThunk(
   async (user) => {
     try {
       const response = await axios.post(
-        "http://192.168.1.12:8000/api/employees/signup",
+        "http://192.168.1.12:8000/api/employees/signup/",
         { user }
       );
       console.log(response.data);
@@ -23,14 +23,14 @@ export const loginEmployee = createAsyncThunk(
   async (employee) => {
     try {
       const response = await axios.post(
-        "http://192.168.1.12:8000/api/employees/login",
+        "http://192.168.1.12:8000/api/employees/login/",
         { employee }
       );
-      console.log(response);
+      console.log(response.data);
       return response.data;
     } catch (error) {
       console.log(error);
-      return error.message;
+      return error;
     }
   }
 );
@@ -79,7 +79,8 @@ const employeesSlides = createSlice({
       })
       .addCase(loginEmployee.rejected, (state, action) => {
         state.status = "rejected";
-        console.log(action.payload);
+        console.log(action.payload.message);
+        state.message = action.payload.message;
       });
   },
 });
