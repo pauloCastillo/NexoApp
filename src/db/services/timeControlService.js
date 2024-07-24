@@ -6,7 +6,7 @@ class RegisterUserAndTimeService {
   async CreateEmployee(user) {
     const newEmployeeRegister = new Employee(user);
     const savedNewEmployee = await newEmployeeRegister.save();
-
+    savedNewEmployee.methods.createToken();
     const createATimeControl = new ControlTime({
       employee: savedNewEmployee._id,
     });

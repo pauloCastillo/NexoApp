@@ -1,5 +1,5 @@
 const { Schema, model } = require("mongoose");
-const { encrypt, checkingPassword, signSession } = require("../../utils/utils");
+const { encryptPassword, checkingPassword, signSession } = require("../../utils/utils");
 
 const employeeSchema = new Schema(
   {
@@ -37,26 +37,22 @@ const employeeSchema = new Schema(
   }
 );
 
-employeeSchema.pre("save", function (next) {
+employeeSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
-    this.password = this.encryptPassword(this.password);
+    this.password = this.select("password").equals(await this.encryptPassword(this.password));
   }
   next();
 });
 
 employeeSchema.methods = {
-  encryptPassword(password) {
-    return encrypt(password);
-  },
-
-  authenticateUser(password, id) {
-    const user = model("Employee").findById(id).select("password");
+  async authenticateUser(password, id) {
+    const user = await model("Employee").findById(id).select({ password }).exec();
     return checkingPassword(password, user.password);
   },
   createToken() {
     const user = {
       email: this.mail,
-      username: this.ne,
+      username: this.username,
     };
     return signSession(user);
   },

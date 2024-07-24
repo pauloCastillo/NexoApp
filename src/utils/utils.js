@@ -4,17 +4,14 @@ const jwt = require("jsonwebtoken");
 
 const saltRounds = 12;
 
-const encrypt = (password) => {
-  bcrypt.genSalt(saltRounds, function (err, salt) {
-    if (err) throw new Error(err.message);
-    bcrypt.hash(password, salt, (err, hashedPsswd) => {
-      if (err) throw new Error(err.message);
-      return hashedPsswd;
-    });
-  });
-};
+
+const encryptPassword = async (password)=> {
+  return await bcrypt.hash(password, saltRounds);
+}
 
 const checkingPassword = (plaintext, hash) => {
+  console.log(plaintext);
+  console.log(hash);
   return bcrypt.compareSync(plaintext, hash);
 };
 
@@ -42,7 +39,7 @@ const verifyingSession = (token) => {
 };
 
 module.exports = {
-  encrypt,
+  encryptPassword,
   checkingPassword,
   signSession,
   verifyingSession,
