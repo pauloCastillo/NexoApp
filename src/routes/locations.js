@@ -8,7 +8,7 @@ const { verifiedToken } = require("../middlewares/verifyToken");
 
 const router = express.Router();
 
-router.get("/:id", verifiedToken,  getTimeLocationEmployee);
-router.post("/", registerTimeLocationEmployee);
+router.get("/:id", getTimeLocationEmployee);
+router.post("/", verifiedToken, registerTimeLocationEmployee);
 
 module.exports = router;

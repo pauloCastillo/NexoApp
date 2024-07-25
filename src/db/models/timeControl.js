@@ -55,7 +55,7 @@ controlTimeSchema.methods = {
     try {
       return await ControlTime.find().where("employee").exists();
     } catch (error) {
-      console.log(error.message);
+      return error.message;
     }
   },
 };

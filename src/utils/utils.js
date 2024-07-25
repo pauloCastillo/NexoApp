@@ -20,7 +20,6 @@ const signSession = (loadedUser) => {
 
 const verifyingSession = (token) => {
   try {
-    console.log(token)
     const verifiedToken = jwt.verify(token, process.env.SECRET_KEY, {
       maxAge: 60,
     });

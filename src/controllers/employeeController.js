@@ -39,7 +39,6 @@ async function createEmployee(req, res) {
 
     const newRegister = new RegisterUserAndTimeService();
     const newEmployee = await newRegister.CreateEmployee(user);
-    
     res
       .status(httpStatusCode.CREATED)
       .json({ message: "usuario registrado exitosamente!", user: newEmployee });

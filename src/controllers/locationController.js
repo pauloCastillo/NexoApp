@@ -22,7 +22,6 @@ async function getTimeLocationEmployee(req, res) {
 async function registerTimeLocationEmployee(req, res) {
   try {
     const { locationTimeData } = req.body;
-    console.log(locationTimeData);
     const timeData = {
       label: locationTimeData.label,
       time: locationTimeData.workerTime,
@@ -45,14 +44,13 @@ async function registerTimeLocationEmployee(req, res) {
       newLocation._id,
       locationTimeData.employee
     );
-    console.log(timer);
+    
     timerService.createReport();
 
     res
       .status(httpStatusCode.OK)
-      .json({ location: newLocation, newTime: timer });
+      .json({ message:"Registro Exitoso", location: newLocation, newTime: timer });
   } catch (error) {
-    console.log(error);
     res.status(httpStatusCode.INTERNAL_SERVER).json({ message: error.message });
   }
 }
