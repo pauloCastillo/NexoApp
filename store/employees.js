@@ -9,7 +9,6 @@ export const registerNewEmployee = createAsyncThunk(
         "http://192.168.1.12:8000/api/employees/signup",
         { user }
       );
-      console.log(response.data);
       return response.data;
     } catch (error) {
       console.log(error);
@@ -26,7 +25,6 @@ export const loginEmployee = createAsyncThunk(
         "http://192.168.1.12:8000/api/employees/login",
         { employee }
       );
-      console.log(response.data);
       return response.data;
     } catch (error) {
       return error.message;
@@ -41,7 +39,7 @@ const employeesSlides = createSlice({
     employee: null,
     status: "",
     message: "",
-    // token: "",
+    token: "",
   },
   reducers: {
     addEmployeeID(state, action) {
@@ -58,15 +56,13 @@ const employeesSlides = createSlice({
       })
       .addCase(registerNewEmployee.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.id = action.payload.user._id;
-        // state.token = action.payload.user.token;
-        state.message = action.payload.message;
-        console.log(action.payload);
+        state.id = action.payload.user.id;
+        state.token = action.payload.user.token;
+        state.message = action.payload.user.message;
       })
       .addCase(registerNewEmployee.rejected, (state, action) => {
         state.status = "rejected";
-        // state.message = action.payload;
-        console.log(action.payload);
+        state.message = action.payload.message;
       })
       .addCase(loginEmployee.pending, (state, action) => {
         state.status = "loading";

@@ -54,11 +54,13 @@ export default function LoginLayout() {
       if (Object.getOwnPropertyNames(error).length !== 0) {
         setCheckError(true);
       } else {
+        console.log(message);
         dispatch(loginEmployee(employee));
         ToastAndroid.show(message, ToastAndroid.LONG);
         navigation.replace("index");
       }
     } else {
+      ToastAndroid.show(message, ToastAndroid.LONG);
       setCheckError(true);
     }
   };

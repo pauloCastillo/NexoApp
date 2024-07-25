@@ -21,6 +21,7 @@ export default function App() {
   const [showTime, setShowTime] = useState("");
   const timeWorker = useRef();
   const employee = useSelector(selectEmployee);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     (async () => {
@@ -39,10 +40,12 @@ export default function App() {
   function renderTime(time) {
     setShowTime(time);
   }
-  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getLocations(location));
+  }, [location]);
 
   function handlerWorkerTimeLocation(label) {
-    dispatch(getLocations(location));
     setText(label);
     const time = handlerTimeWorker();
     renderTime(time);
@@ -51,9 +54,9 @@ export default function App() {
   }
 
   const employeeID = useSelector(selectEmployeeID);
-  const ubicacion = useSelector(selectLocation);
   const message = useSelector(selectMessage);
   const token = useSelector((state) => state.employees.token);
+  const place = useSelector(selectLocation);
 
   if (employee === null) {
     return <Redirect href={"(auths)/Register"} />;
@@ -62,7 +65,7 @@ export default function App() {
   function sendLocationToServer(workerTime, text) {
     const locationTimeData = {
       employee: employeeID,
-      location: ubicacion,
+      location: place,
       workerTime,
       label: text,
       token,
