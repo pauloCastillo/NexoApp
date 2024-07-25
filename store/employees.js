@@ -6,7 +6,7 @@ export const registerNewEmployee = createAsyncThunk(
   async (user) => {
     try {
       const response = await axios.post(
-        "http://192.168.1.12:8000/api/employees/signup/",
+        "http://192.168.1.12:8000/api/employees/signup",
         { user }
       );
       console.log(response.data);
@@ -23,14 +23,13 @@ export const loginEmployee = createAsyncThunk(
   async (employee) => {
     try {
       const response = await axios.post(
-        "http://192.168.1.12:8000/api/employees/login/",
+        "http://192.168.1.12:8000/api/employees/login",
         { employee }
       );
       console.log(response.data);
       return response.data;
     } catch (error) {
-      console.log(error);
-      return error;
+      return error.message;
     }
   }
 );
@@ -59,9 +58,10 @@ const employeesSlides = createSlice({
       })
       .addCase(registerNewEmployee.fulfilled, (state, action) => {
         state.status = "succeeded";
-        // state.id = action.payload.user._id;
+        state.id = action.payload.user._id;
         // state.token = action.payload.user.token;
         state.message = action.payload.message;
+        console.log(action.payload);
       })
       .addCase(registerNewEmployee.rejected, (state, action) => {
         state.status = "rejected";
@@ -73,13 +73,12 @@ const employeesSlides = createSlice({
       })
       .addCase(loginEmployee.fulfilled, (state, action) => {
         state.status = "succeeded";
-        // state.id = action.payload.user._id;
-        // state.token = action.payload.user.token;
-        state.message = "Great!";
+        state.id = action.payload.worker.id;
+        state.token = action.payload.worker.token;
+        state.message = action.payload.message;
       })
       .addCase(loginEmployee.rejected, (state, action) => {
         state.status = "rejected";
-        console.log(action.payload.message);
         state.message = action.payload.message;
       });
   },
