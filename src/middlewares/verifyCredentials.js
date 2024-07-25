@@ -9,9 +9,13 @@ const verifyCredentials = async (req, res, next )=>{
       return res.status(httpStatusCode.NO_CONTENT).json({ message: "No existe colaborador. Revisa tu usuario y contraseña" });
     }
       const userPassword = await existEmployee.schema.methods.authenticateUser(employee.password, existEmployee._id);
-      console.log(userPassword)
-      if(!userPassword) return res.status(httpStatusCode.NO_CONTENT).json({ message: "Revisa tu contraseña" });
-      next();
+      if(!userPassword){
+        return res.status(httpStatusCode.NO_CONTENT).json({ message: "Revisa tu contraseña" });
+      }else{
+        next();
+      }
+
+
   }catch (error){
     res.status(httpStatusCode.INTERNAL_SERVER).json({ message: "Error: " + error.message });
   }

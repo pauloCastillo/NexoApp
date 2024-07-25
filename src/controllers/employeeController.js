@@ -39,7 +39,7 @@ async function createEmployee(req, res) {
 
     const newRegister = new RegisterUserAndTimeService();
     const newEmployee = await newRegister.CreateEmployee(user);
-    console.log(newEmployee)
+    
     res
       .status(httpStatusCode.CREATED)
       .json({ message: "usuario registrado exitosamente!", user: newEmployee });
@@ -54,7 +54,8 @@ async function loginEmployee(req, res) {
   try{
     const { employee } = req.body;
     const existEmployee = await Employee.findOne({ mail: employee.mail });
-    console.log(existEmployee);
+    existEmployee.createToken();
+    existEmployee.toJSON();
     res.status(httpStatusCode.OK).json({ message: "bienvenido", worker: existEmployee });
   } catch (error) {
     res.status(httpStatusCode.INTERNAL_SERVER).json({

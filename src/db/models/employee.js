@@ -39,14 +39,15 @@ const employeeSchema = new Schema(
 
 employeeSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
-    this.password = this.select("password").equals(await this.encryptPassword(this.password));
+    this.password = await encryptPassword(this.password);
   }
   next();
 });
 
 employeeSchema.methods = {
+
   async authenticateUser(password, id) {
-    const user = await model("Employee").findById(id).select({ password }).exec();
+    const user = await model("Employee").findById(id).select("password").exec();
     return checkingPassword(password, user.password);
   },
   createToken() {
@@ -60,7 +61,7 @@ employeeSchema.methods = {
     return {
       id: this._id,
       username: this.username,
-      email: this.email,
+      email: this.mail,
       token: `${this.createToken()}`,
     };
   },
