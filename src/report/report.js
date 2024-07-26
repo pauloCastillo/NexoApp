@@ -18,7 +18,7 @@ function createReport(data) {
         month: "2-digit",
         year: "2-digit",
       }),
-      location: row.location,
+      location: row.locations.street,
     };
   });
   const worksheet = xlsx.utils.json_to_sheet(rows);

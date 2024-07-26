@@ -56,15 +56,8 @@ class RegisterUserAndTimeService {
   }
 
   async createReport() {
-    const employees = await ControlTime.find().populate("employee", "username");
-    const locations = await ControlTime.find().populate("locations", "street");
-    console.log(employees);
-    console.log(locations)
-    const dataToReport = {
-      employees,
-      locations
-    }
-    createReport(dataToReport);
+    const registerData = await ControlTime.find({}).populate("employee", "username").populate("locations", "street");
+    createReport(registerData);
   }
 }
 
