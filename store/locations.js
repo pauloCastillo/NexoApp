@@ -19,7 +19,7 @@ export const registerTimeAndLocations = createAsyncThunk(
     const token = locationTimeData.token;
     try {
       const response = await axios.post(
-        "http://192.168.1.12:8000/api/locations",
+        "http://192.168.0.16:8000/api/locations",
         {
           locationTimeData,
         },

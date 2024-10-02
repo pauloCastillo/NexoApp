@@ -38,7 +38,6 @@ export default function AuthContent({ formMode }) {
       if (Object.getOwnPropertyNames(error).length !== 0) {
         setCheckError(true);
       } else {
-        console.log(message);
         dispatch(registerNewEmployee(employee));
         ToastAndroid.show(message, ToastAndroid.LONG);
         navigation.replace("index");

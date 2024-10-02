@@ -6,7 +6,7 @@ export const registerNewEmployee = createAsyncThunk(
   async (user) => {
     try {
       const response = await axios.post(
-        "http://192.168.1.12:8000/api/employees/signup",
+        "http://192.168.0.16:8000/api/employees/signup",
         { user }
       );
       return response.data;
@@ -21,7 +21,7 @@ export const loginEmployee = createAsyncThunk(
   async (employee) => {
     try {
       const response = await axios.post(
-        "http://192.168.1.12:8000/api/employees/login",
+        "http://192.168.0.16:8000/api/employees/login",
         { employee }
       );
       return response.data;

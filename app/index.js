@@ -70,7 +70,7 @@ export default function App() {
       label: text,
       token,
     };
-
+    
     try {
       dispatch(registerTimeAndLocations(locationTimeData));
       ToastAndroid.show(message, ToastAndroid.LONG);
