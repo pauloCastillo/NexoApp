@@ -22,7 +22,7 @@ async function getEmployee(req, res) {
     res.status(httpStatusCode.OK).json({ user: getUser });
   } catch (error) {
     res.status(httpStatusCode.INTERNAL_SERVER).json({
-      messasge: error.message,
+      message: error.message,
     });
   }
 }

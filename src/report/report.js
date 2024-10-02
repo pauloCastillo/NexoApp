@@ -1,5 +1,18 @@
 const xlsx = require("xlsx");
+const fs = require("fs");
+const filePath = "../../asistencia.xlsx\";
+
 const currentDate = new Date();
+
+function addNewData(newData){
+  let workbook
+  if(fs.exists(filePath)){
+    workbook = xlsx.readFile(filePath);
+  }else{
+   workbook = xlsx.utils.book_new();
+  }
+}
+
 function createReport(data) {
   const register = data;
   let rows = register.map((row) => {
@@ -37,5 +50,17 @@ function createReport(data) {
   ]);
   xlsx.writeFile(workbook, "../../asistencia.xlsx", { compression: true });
 }
+
+const pageName = "Asistencia del Personal";
+let newSheet = workbook.Sheets[pageName];
+let existsData = [];
+if(newSheet){
+  existsData = xlsx.utils.sheet_to_json(workpage);
+}
+
+const updatedFiles = [...existsData, ...data];
+const newSheet = xlsx.utils.json_to_sheet(updatedFiles);
+newSheet.Sheets[newSheet];
+xlsx.writeFile(workbook, path);
 
 module.exports = createReport;
