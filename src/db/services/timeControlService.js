@@ -51,6 +51,10 @@ class RegisterUserAndTimeService {
       locations,
     };
     createReport(dataToReport);
+    const registerData = await ControlTime.find({})
+      .populate("employee", "username")
+      .populate("locations", "street");
+    createReport(registerData);
   }
 }
 
