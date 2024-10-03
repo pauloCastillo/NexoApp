@@ -49,22 +49,19 @@ async function createEmployee(req, res) {
   }
 }
 
-async function loginEmployee(req, res) {
-  try{
-    const { employee } = req.body;
-    const existEmployee = await Employee.findOne({ mail: employee.mail });
-    existEmployee.createToken();
-    existEmployee.toJSON();
-    res.status(httpStatusCode.OK).json({ message: "bienvenido", worker: existEmployee });
-  } catch (error) {
-    res.status(httpStatusCode.INTERNAL_SERVER).json({
-      message: "SERVER ERROR! " + error.message,
-    });
-  }
+async function updateEmployee(req, res) {
+  const { body } = req;
+  console.log(body);
+}
+
+async function deleteEmployee(req, res) {
+  const { id } = req.body;
+  console.log(id);
 }
 
 module.exports = {
   getEmployees,
   createEmployee,
-  loginEmployee,
+  updateEmployee,
+  deleteEmployee,
 };

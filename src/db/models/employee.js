@@ -1,5 +1,9 @@
 const { Schema, model } = require("mongoose");
-const { encryptPassword, checkingPassword, signSession } = require("../../utils/utils");
+const {
+  encryptPassword,
+  checkingPassword,
+  signSession,
+} = require("../../utils/utils");
 
 const employeeSchema = new Schema(
   {
@@ -45,7 +49,6 @@ employeeSchema.pre("save", async function (next) {
 });
 
 employeeSchema.methods = {
-
   async authenticateUser(password, id) {
     const user = await model("Employee").findById(id).select("password").exec();
     return checkingPassword(password, user.password);

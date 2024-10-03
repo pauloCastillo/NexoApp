@@ -1,19 +1,7 @@
 const { ControlTime } = require("../models");
-const { Employee } = require("../models");
 const createReport = require("../../report/report");
 
 class RegisterUserAndTimeService {
-  async CreateEmployee(user) {
-    const newEmployeeRegister = new Employee(user);
-    const savedNewEmployee = await newEmployeeRegister.save();
-    const createATimeControl = new ControlTime({
-      employee: savedNewEmployee._id,
-    });
-    await createATimeControl.save();
-    delete user.password;
-    return savedNewEmployee;
-  }
-
   async timeRegister(data, locationId, employeeID) {
     const employees = await ControlTime.schema.methods.getEmployees();
     const existEmployee = employees.find(
@@ -58,12 +46,10 @@ class RegisterUserAndTimeService {
   async createReport() {
     const employees = await ControlTime.find().populate("employee", "username");
     const locations = await ControlTime.find().populate("locations", "street");
-    console.log(employees);
-    console.log(locations)
     const dataToReport = {
       employees,
-      locations
-    }
+      locations,
+    };
     createReport(dataToReport);
   }
 }
