@@ -1,5 +1,4 @@
 const { Employee, ControlTime } = require("../models");
-const { encryptPassword } = require("../../utils/utils");
 
 class User {
   #newUser = {};
@@ -33,8 +32,19 @@ class User {
     return findingUser;
   }
 
-  updateEmployee() {}
-  deleteEmployee() {}
+  async updateEmployee(updateUserData) {
+    const userUpdated = await Employee.findOneAndUpdate({
+      mail: this.#newUser.email,
+    }).replaceOne(updateUserData);
+
+    return userUpdated;
+  }
+  async deleteEmployee(mail) {
+    const userDeleted = await Employee.findOneAndDelete({
+      mail: this.#newUser.email,
+    });
+    return userDeleted;
+  }
 
   async loginChecking() {
     const findingUser = await Employee.findOne({ mail: this.#newUser.email });

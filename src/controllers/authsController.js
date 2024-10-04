@@ -1,5 +1,4 @@
 const { httpStatusCode } = require("../utils/httpStatus");
-const { Employee } = require("../db/models");
 const { User } = require("../db/services/userServices");
 
 async function registerEmployee(req, res) {

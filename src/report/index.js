@@ -1,15 +1,15 @@
 const xlsx = require("xlsx");
 const fs = require("fs");
-const filePath = "../../asistencia.xlsx\";
+const filePath = "../../asistencia.xlsx";
 
 const currentDate = new Date();
 
-function addNewData(newData){
-  let workbook
-  if(fs.exists(filePath)){
-    workbook = xlsx.readFile(filePath);
-  }else{
-   workbook = xlsx.utils.book_new();
+function addNewData(newData) {
+  console.log(newData);
+  if (fs.exists(filePath)) {
+    console.log(xlsx.readFile(filePath));
+  } else {
+    console.log(xlsx.utils.book_new());
   }
 }
 
@@ -49,18 +49,18 @@ function createReport(data) {
     ],
   ]);
   xlsx.writeFile(workbook, "../../asistencia.xlsx", { compression: true });
+
+  const pageName = "Asistencia de Personal";
+  let newSheet = workbook.Sheets[pageName];
+  let existsData = [];
+  if (newSheet) {
+    existsData = xlsx.utils.sheet_to_json(workpage);
+  }
+
+  const updatedFiles = [...existsData, ...data];
+  const updateSheet = xlsx.utils.json_to_sheet(updatedFiles);
+  console.log(updateSheet);
+  xlsx.writeFile(workbook, path);
 }
 
-const pageName = "Asistencia del Personal";
-let newSheet = workbook.Sheets[pageName];
-let existsData = [];
-if(newSheet){
-  existsData = xlsx.utils.sheet_to_json(workpage);
-}
-
-const updatedFiles = [...existsData, ...data];
-const newSheet = xlsx.utils.json_to_sheet(updatedFiles);
-newSheet.Sheets[newSheet];
-xlsx.writeFile(workbook, path);
-
-module.exports = createReport;
+module.exports = { createReport, addNewData };

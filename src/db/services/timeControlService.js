@@ -1,61 +1,55 @@
 const { ControlTime } = require("../models");
-const createReport = require("../../report/report");
+class ControlTimeService {
+  constructor(data, idLocation, employeeId) {
+    this.data = data;
+    this.idLocation = idLocation;
+    this.employeeId = employeeId;
+  }
 
-class RegisterUserAndTimeService {
-  async timeRegister(data, locationId, employeeID) {
+  async timeRegister() {
     const employees = await ControlTime.schema.methods.getEmployees();
     const existEmployee = employees.find(
-      (item) => item.employee.toString() === employeeID.toString()
+      (item) => item.employee.toString() === this.employeeId.toString()
     );
     let newWorkTime;
     if (!existEmployee && employees.length === 0) {
-      throw Error("No existe trabajadores en la base de datos");
+      return new Error("No existe trabajador en la base de datos");
     } else if (!existEmployee && employees.length !== 0) {
       return employees;
     } else {
-      switch (data.label) {
+      switch (this.data.label) {
         case "entrada":
-          newWorkTime = await ControlTime.findOneAndUpdate(
-            { employee: existEmployee.employee },
-            { entrada: data.time, locations: locationId }
-          );
+          newWorkTime = await ControlTime.create({
+            employee: existEmployee.employee,
+            entrada: this.data.time,
+            locations: this.locationId,
+          });
           break;
         case "descanso":
-          newWorkTime = await ControlTime.findOneAndUpdate(
-            { employee: existEmployee.employee },
-            { descanso: data.time, locations: locationId }
-          );
+          newWorkTime = await ControlTime.create({
+            employee: existEmployee.employee,
+            descanso: this.data.time,
+            locations: this.locationId,
+          });
           break;
         case "retorno":
-          newWorkTime = await ControlTime.findOneAndUpdate(
-            { employee: existEmployee.employee },
-            { retorno: data.time, locations: locationId }
-          );
+          newWorkTime = await ControlTime.create({
+            employee: existEmployee.employee,
+            retorno: this.data.time,
+            locations: this.locationId,
+          });
           break;
         case "salida":
-          newWorkTime = await ControlTime.findOneAndUpdate(
-            { employee: existEmployee.employee },
-            { salida: data.time, locations: locationId }
-          );
+          newWorkTime = await ControlTime.create({
+            employee: existEmployee.employee,
+            salida: this.data.time,
+            locations: this.locationId,
+          });
           break;
       }
     }
     return newWorkTime;
   }
-
-  async createReport() {
-    const employees = await ControlTime.find().populate("employee", "username");
-    const locations = await ControlTime.find().populate("locations", "street");
-    const dataToReport = {
-      employees,
-      locations,
-    };
-    createReport(dataToReport);
-    const registerData = await ControlTime.find({})
-      .populate("employee", "username")
-      .populate("locations", "street");
-    createReport(registerData);
-  }
 }
 
-module.exports = { RegisterUserAndTimeService };
+module.exports = { ControlTimeService };

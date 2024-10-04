@@ -1,10 +1,7 @@
 require("dotenv").config();
 const axios = require("axios");
 const { Location } = require("../db/models");
-
-const {
-  RegisterUserAndTimeService,
-} = require("../db/services/timeControlService");
+const { ControlTimeService } = require("../db/services/timeControlService");
 const { httpStatusCode } = require("../utils/httpStatus");
 
 async function getTimeLocationEmployee(req, res) {
@@ -19,7 +16,7 @@ async function getTimeLocationEmployee(req, res) {
   }
 }
 
-async function registerTimeLocationEmployee(req, res) {
+async function registerEmployeesTimeLocation(req, res) {
   try {
     const { locationTimeData } = req.body;
     const timeData = {
@@ -38,18 +35,19 @@ async function registerTimeLocationEmployee(req, res) {
       street: streetName,
     });
 
-    const timerService = new RegisterUserAndTimeService();
-    const timer = await timerService.timeRegister(
+    const timerService = new ControlTimeService(
       timeData,
       newLocation._id,
       locationTimeData.employee
     );
-    
-    timerService.createReport();
 
-    res
-      .status(httpStatusCode.OK)
-      .json({ message:"Registro Exitoso", location: newLocation, newTime: timer });
+    const timer = await timerService.timeRegister();
+
+    res.status(httpStatusCode.OK).json({
+      message: "Registro Exitoso",
+      location: newLocation,
+      newTime: timer,
+    });
   } catch (error) {
     res.status(httpStatusCode.INTERNAL_SERVER).json({ message: error.message });
   }
@@ -57,5 +55,5 @@ async function registerTimeLocationEmployee(req, res) {
 
 module.exports = {
   getTimeLocationEmployee,
-  registerTimeLocationEmployee,
+  registerEmployeesTimeLocation,
 };
