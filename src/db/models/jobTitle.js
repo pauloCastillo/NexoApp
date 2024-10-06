@@ -3,7 +3,7 @@ const { Schema, model } = require("mongoose");
 const jobSchema = new Schema(
   {
     employee: {
-      type: Schema.Types.UUID,
+      type: Schema.Types.ObjectId,
       ref: "Employee",
       trim: true,
       require: true,

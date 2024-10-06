@@ -1,5 +1,4 @@
 const { Schema, model } = require("mongoose");
-const { findingEmployee } = require("../../utils/utils");
 
 const controlTimeSchema = new Schema(
   {
@@ -8,9 +7,8 @@ const controlTimeSchema = new Schema(
       ref: "Employee",
     },
     date: {
-      type: Date,
-      trim: true,
-      require: true,
+      type: Schema.Types.Date,
+      default: Date.now,
     },
     entrada: {
       type: String,
@@ -35,18 +33,13 @@ const controlTimeSchema = new Schema(
   }
 );
 
-controlTimeSchema.pre("save", async (next) => {
-  const currentDate = new Date();
+controlTimeSchema.pre("save", function (next) {
+  const currentdate = new Date();
   this.date = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
-    currentDate.getDate()
-  ).toLocaleString("es-BO", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-
+    currentdate.getFullYear(),
+    currentdate.getMonth(),
+    currentdate.getDate()
+  ).toDateString("es-BO");
   next();
 });
 

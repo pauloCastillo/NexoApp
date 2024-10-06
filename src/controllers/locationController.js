@@ -41,12 +41,10 @@ async function registerEmployeesTimeLocation(req, res) {
       locationTimeData.employee
     );
 
-    const timer = await timerService.timeRegister();
-
     res.status(httpStatusCode.OK).json({
       message: "Registro Exitoso",
       location: newLocation,
-      newTime: timer,
+      newTime: await timerService.timeRegister(),
     });
   } catch (error) {
     res.status(httpStatusCode.INTERNAL_SERVER).json({ message: error.message });

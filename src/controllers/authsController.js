@@ -6,8 +6,7 @@ async function registerEmployee(req, res) {
 
   try {
     const employee = new User(user);
-    employee.createEmployee();
-    res.status(httpStatusCode.CREATED).send("registro exitoso!");
+    res.status(httpStatusCode.CREATED).send(await employee.createEmployee());
   } catch (error) {
     res.status(httpStatusCode.INTERNAL_SERVER).json({
       message: "SERVER ERROR! " + error.message,
@@ -24,7 +23,7 @@ async function loginEmployee(req, res) {
       ? res.status(httpStatusCode.OK).json({ message: "bienvenido" })
       : res
           .status(httpStatusCode.BAD_REQUEST)
-          .json({ message: "Algo ocurrio!" });
+          .json({ message: "Usuario o Contraseña incorrectos" });
   } catch (error) {
     res.status(httpStatusCode.INTERNAL_SERVER).json({
       message: "SERVER ERROR! " + error.message,

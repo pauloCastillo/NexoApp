@@ -62,6 +62,13 @@ class User {
   }
 }
 
+class Manager extends User {
+  constructor(...args) {
+    super(args);
+  }
+}
+
 module.exports = {
   User,
+  Manager,
 };

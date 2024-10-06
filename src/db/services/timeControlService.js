@@ -1,55 +1,92 @@
 const { ControlTime } = require("../models");
 class ControlTimeService {
+  #timingRegister = {};
+
   constructor(data, idLocation, employeeId) {
     this.data = data;
     this.idLocation = idLocation;
     this.employeeId = employeeId;
   }
 
-  async timeRegister() {
-    const employees = await ControlTime.schema.methods.getEmployees();
-    const existEmployee = employees.find(
-      (item) => item.employee.toString() === this.employeeId.toString()
-    );
-    let newWorkTime;
-    if (!existEmployee && employees.length === 0) {
-      return new Error("No existe trabajador en la base de datos");
-    } else if (!existEmployee && employees.length !== 0) {
-      return employees;
-    } else {
-      switch (this.data.label) {
+  async #registerTiming(existRegister, existEmployee) {
+    if (existRegister) {
+      switch (existEmployee.label) {
         case "entrada":
-          newWorkTime = await ControlTime.create({
+          this.#timingRegister = await ControlTime.findOneAndUpdate({
             employee: existEmployee.employee,
-            entrada: this.data.time,
+            entrada: existEmployee.time,
             locations: this.locationId,
           });
           break;
         case "descanso":
-          newWorkTime = await ControlTime.create({
+          this.#timingRegister = await ControlTime.findOneAndUpdate({
             employee: existEmployee.employee,
-            descanso: this.data.time,
+            descanso: existEmployee.time,
             locations: this.locationId,
           });
           break;
         case "retorno":
-          newWorkTime = await ControlTime.create({
+          this.#timingRegister = await ControlTime.findOneAndUpdate({
             employee: existEmployee.employee,
-            retorno: this.data.time,
+            retorno: existEmployee.time,
             locations: this.locationId,
           });
           break;
         case "salida":
-          newWorkTime = await ControlTime.create({
+          this.#timingRegister = await ControlTime.findOneAndUpdate({
             employee: existEmployee.employee,
-            salida: this.data.time,
+            salida: existEmployee.time,
+            locations: this.locationId,
+          });
+          break;
+      }
+    } else {
+      switch (existEmployee.label) {
+        case "entrada":
+          this.#timingRegister = await ControlTime.create({
+            employee: existEmployee.employee,
+            entrada: existEmployee.time,
+            locations: this.locationId,
+          });
+          break;
+        case "descanso":
+          this.#timingRegister = await ControlTime.create({
+            employee: existEmployee.employee,
+            descanso: existEmployee.time,
+            locations: this.locationId,
+          });
+          break;
+        case "retorno":
+          this.#timingRegister = await ControlTime.create({
+            employee: existEmployee.employee,
+            retorno: existEmployee.time,
+            locations: this.locationId,
+          });
+          break;
+        case "salida":
+          this.#timingRegister = await ControlTime.create({
+            employee: existEmployee.employee,
+            salida: existEmployee.time,
             locations: this.locationId,
           });
           break;
       }
     }
-    return newWorkTime;
+    return this.#timingRegister;
+  }
+
+  async timeRegister() {
+    const getEmployees = await ControlTime.schema.methods.getEmployees();
+    if (getEmployees.length === 0) {
+      return "No existen empleados registrados en la base de datos";
+    }
+    const existEmployee = await ControlTime.findOne().where({
+      employee: this.employeeId,
+    });
+    return await this.#registerTiming(existEmployee, this.data);
   }
 }
 
-module.exports = { ControlTimeService };
+module.exports = {
+  ControlTimeService,
+};
