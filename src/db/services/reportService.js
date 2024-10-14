@@ -3,12 +3,9 @@ const { ControlTime } = require("../models");
 
 class Report {
   async createReport() {
-    // const employees = await ControlTime.find().populate("employee", "username");
-    // const locations = await ControlTime.find().populate("locations", "street");
-    const registerData = await ControlTime.find({})
-      .populate("employee", "username")
-      .populate("locations", "street");
-    createReport(registerData);
+    const employees = await ControlTime.find().populate("employee", "username");
+    const locations = await ControlTime.find().populate("locations", "street");
+   return  createReport({ employees, locations });
   }
 }
 

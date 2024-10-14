@@ -1,6 +1,6 @@
 const express = require("express");
 const { createManagers } = require("../controllers/managersController");
-const { createJobTitle } = require("../controllers/jobsTitleControllers");
+const { createJobTitle } = require("../controllers/jobController");
 const { verifyingSession } = require("../utils/utils");
 const { verifiedToken } = require("../middlewares/verifyToken");
 

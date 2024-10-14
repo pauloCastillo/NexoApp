@@ -1,4 +1,4 @@
-const { Employee, ControlTime } = require("../models");
+const { Employee, ControlTime, JobTitle } = require("../models");
 
 class User {
   #newUser = {};
@@ -21,44 +21,43 @@ class User {
     const createATimeControl = new ControlTime({
       employee: savedUser._id,
     });
+    const newJob = new JobTitle({ employee: savedUser._id, job_Title: savedUser.jobTitle});
+    await newJob.save();
     await createATimeControl.save();
     delete this.#newUser.password;
-    this.addTokenToUser(savedUser._id);
-    return savedUser;
+    return await this.addTokenToUser(savedUser._id);
   }
 
   async #readEmployee(id) {
-    const findingUser = await Employee.findById(id);
-    return findingUser;
+    return await Employee.findById(id);
   }
 
-  async updateEmployee(updateUserData) {
-    const userUpdated = await Employee.findOneAndUpdate({
+  async updateEmployee(user) {
+    const data = await Employee.findOneAndUpdate({
       mail: this.#newUser.email,
-    }).replaceOne(updateUserData);
+    }).replaceOne(user);
 
-    return userUpdated;
+    return data;
   }
   async deleteEmployee(mail) {
     const userDeleted = await Employee.findOneAndDelete({
-      mail: this.#newUser.email,
+      mail: mail
     });
     return userDeleted;
   }
 
   async loginChecking() {
     const findingUser = await Employee.findOne({ mail: this.#newUser.email });
-    const existUser = await findingUser.authenticateUser(
+    return await findingUser.authenticateUser(
       this.#newUser.password,
       findingUser._id
     );
-    return existUser;
   }
 
   async addTokenToUser(id) {
     const user = await this.#readEmployee(id);
     user.createToken();
-    user.toJSON();
+    return user.toJSON();
   }
 }
 

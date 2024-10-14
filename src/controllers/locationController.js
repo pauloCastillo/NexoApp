@@ -38,8 +38,11 @@ async function registerEmployeesTimeLocation(req, res) {
     const timerService = new ControlTimeService(
       timeData,
       newLocation._id,
-      locationTimeData.employee
+      locationTimeData.employe
     );
+
+    const reportHandler = new Report();
+    console.log(reportHandler.createReport());
 
     res.status(httpStatusCode.OK).json({
       message: "Registro Exitoso",
