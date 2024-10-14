@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-
+import { BASEURL } from "./configApi";
 export const getLocations = createAsyncThunk(
   "locations/getLocation",
   async (location) => {
@@ -18,13 +17,10 @@ export const registerTimeAndLocations = createAsyncThunk(
   async (locationTimeData) => {
     const token = locationTimeData.token;
     try {
-      const response = await axios.post(
-        "http://192.168.0.16:8000/api/locations",
-        {
-          locationTimeData,
-        },
-        { headers: { Authorization: "Bearer " + token } }
-      );
+      const response = await BASEURL.post("locations", {
+        data: locationTimeData,
+        headers: { Authorization: "Bearer " + token },
+      });
       return response.data;
     } catch (error) {
       return error.message;
