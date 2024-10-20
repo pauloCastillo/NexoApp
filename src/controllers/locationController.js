@@ -3,6 +3,7 @@ const axios = require("axios");
 const { Location } = require("../db/models");
 const { ControlTimeService } = require("../db/services/timeControlService");
 const { httpStatusCode } = require("../utils/httpStatus");
+const { Report } = require("../db/services/reportService");
 
 async function getTimeLocationEmployee(req, res) {
   try {
@@ -21,7 +22,7 @@ async function registerEmployeesTimeLocation(req, res) {
     const { locationTimeData } = req.body;
     const timeData = {
       label: locationTimeData.label,
-      time: locationTimeData.workerTime,
+      time: locationTimeData.workerTime
     };
 
     const response = await axios.get(
@@ -38,11 +39,11 @@ async function registerEmployeesTimeLocation(req, res) {
     const timerService = new ControlTimeService(
       timeData,
       newLocation._id,
-      locationTimeData.employe
-    );
-
+      locationTimeData.employee
+    )
+    
     const reportHandler = new Report();
-    console.log(reportHandler.createReport());
+    await reportHandler.createReport();
 
     res.status(httpStatusCode.OK).json({
       message: "Registro Exitoso",

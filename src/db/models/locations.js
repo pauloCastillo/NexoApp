@@ -2,6 +2,10 @@ const { Schema, model } = require("mongoose");
 
 const locationSchema = new Schema(
   {
+    employee:{
+      type:Schema.Types.ObjectId,
+      ref:"Employee",
+    },
     date: {
       type: Date,
       trim: true,
