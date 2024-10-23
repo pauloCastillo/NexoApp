@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { BASEURL } from "./configApi";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const registerNewEmployee = createAsyncThunk(
   "employee/addNewEmployee",
@@ -54,7 +53,6 @@ const employeesSlides = createSlice({
       })
       .addCase(registerNewEmployee.fulfilled, (state, action) => {
         state.status = "succeeded";
-        console.log(action.payload.newEmployee);
         state.id = action.payload.newEmployee.id;
         state.token = action.payload.newEmployee.token;
         state.message = action.payload.message;

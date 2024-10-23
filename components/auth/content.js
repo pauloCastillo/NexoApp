@@ -9,10 +9,8 @@ import {
   selectEmployee,
   selectMessage,
   selectStatus,
-  selectToken,
 } from "../../store/employees";
 import AuthForm from "./form";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function AuthContent({ formMode }) {
   const [error, setError] = useState({
@@ -28,7 +26,6 @@ export default function AuthContent({ formMode }) {
   const employee = useSelector(selectEmployee);
   const status = useSelector(selectStatus);
   const message = useSelector(selectMessage);
-  const token = useSelector(selectToken);
   const dispatch = useDispatch();
   const navigation = useNavigation();
 

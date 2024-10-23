@@ -41,7 +41,8 @@ export default function LoginLayout() {
 
   useEffect(() => {
     dispatch(addEmployee({ mail, password }));
-  }, [mail, password]);
+    console.log(token);
+  }, [mail, password, token]);
 
   if (status === "loading") {
     loadingComponent();
