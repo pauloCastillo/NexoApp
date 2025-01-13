@@ -14,6 +14,7 @@ import {
   selectMessage,
   takeTime,
 } from "../store/locations";
+import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 
 export default function App() {
   const [location, setLocation] = useState(null);
@@ -23,6 +24,8 @@ export default function App() {
   const employee = useSelector(selectEmployee);
   const dispatch = useDispatch();
 
+  const asynStorage = useAsyncStorage();
+
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -31,6 +34,10 @@ export default function App() {
       }
       setLocation(await Location.getCurrentPositionAsync());
     })();
+    asynStorage.removeItem((error, data) => {
+      console.log(error);
+      console.log(data);
+    });
   }, []);
 
   function handlerTimeWorker() {
@@ -70,7 +77,7 @@ export default function App() {
       label: text,
       token,
     };
-    
+
     try {
       dispatch(registerTimeAndLocations(locationTimeData));
       ToastAndroid.show(message, ToastAndroid.LONG);

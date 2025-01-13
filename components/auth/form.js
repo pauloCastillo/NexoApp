@@ -13,19 +13,23 @@ export default function AuthForm({
   footerContent,
 }) {
   const [username, setUsername] = useState("");
+  const [userlastname, setUserlastname] = useState("");
+  const [userfullname, setUserfullname] = useState("");
   const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [jobTitle, setJobTitle] = useState("");
   const [phone, setPhone] = useState("");
-  const [privacy, setPrivacy] = useState(false);
 
   const dispatch = useDispatch();
 
   function onUpdateValueHandler(label, enteredValue) {
-    switch (label) {
-      case "username":
+    switch (label.toLowerCase()) {
+      case "nombres":
         setUsername(enteredValue);
+        break;
+      case "apellidos":
+        setUserlastname(enteredValue);
         break;
       case "mail":
         setMail(enteredValue);
@@ -38,18 +42,21 @@ export default function AuthForm({
         break;
       case "password":
         setPassword(enteredValue);
-        setPrivacy(true);
         break;
       case "confirmPassword":
         setConfirmPassword(enteredValue);
-        setPrivacy(true);
         break;
     }
+
+    if (username !== "" && userlastname !== "") {
+      setUserfullname(username + " " + userlastname);
+    }
   }
+
   useEffect(() => {
     dispatch(
       addEmployee({
-        username,
+        username: userfullname,
         mail,
         jobTitle,
         phone: `+591-${phone}`,
@@ -57,7 +64,7 @@ export default function AuthForm({
         confirmPassword,
       })
     );
-  }, [username, mail, jobTitle, phone, password, confirmPassword]);
+  }, [userfullname, mail, jobTitle, phone, password, confirmPassword]);
 
   return (
     <SafeAreaView style={styles.regContainer}>
@@ -65,11 +72,18 @@ export default function AuthForm({
       {formMode === "signUp" && (
         <View style={styles.form}>
           <Input
-            label="Nombre y Apellido"
+            label="Nombres"
             onUpdateValue={onUpdateValueHandler.bind(this, "username")}
             value={username}
-            placeholder={"Coloque su nombre y apellido"}
-            privacy={privacy}
+            placeholder={"Coloque sus nombres"}
+            checkError={checkError}
+            error={error.username}
+          />
+          <Input
+            label="Apellidos"
+            onUpdateValue={onUpdateValueHandler.bind(this, "username")}
+            value={userlastname}
+            placeholder={"Coloque sus apellidos"}
             checkError={checkError}
             error={error.username}
           />
@@ -78,7 +92,6 @@ export default function AuthForm({
             onUpdateValue={onUpdateValueHandler.bind(this, "mail")}
             value={mail}
             placeholder={"Coloque su correo@empresa.com"}
-            privacy={privacy}
             checkError={checkError}
             error={error.mail}
           />
@@ -87,7 +100,6 @@ export default function AuthForm({
             onUpdateValue={onUpdateValueHandler.bind(this, "jobTitle")}
             value={jobTitle}
             placeholder={"Coloque su cargo, ejemplo Vendedor"}
-            privacy={privacy}
             checkError={checkError}
             error={error.jobTitle}
           />
@@ -96,7 +108,6 @@ export default function AuthForm({
             onUpdateValue={onUpdateValueHandler.bind(this, "phone")}
             value={phone}
             placeholder={"77777777"}
-            privacy={privacy}
             checkError={checkError}
             error={error.phone}
           />
@@ -105,7 +116,6 @@ export default function AuthForm({
             onUpdateValue={onUpdateValueHandler.bind(this, "password")}
             value={password}
             placeholder={"password entre 1-12 caracteres"}
-            privacy={privacy}
             checkError={checkError}
             error={error.password}
             mode={"privateField"}
@@ -115,12 +125,13 @@ export default function AuthForm({
             onUpdateValue={onUpdateValueHandler.bind(this, "confirmPassword")}
             value={confirmPassword}
             placeholder={"repite la misma contraseña anterior"}
-            privacy={privacy}
             checkError={checkError}
             error={error.confirmPassword}
             mode={"privateField"}
           />
-          <Button title="REGISTRAR" onPress={onSubmit} />
+          <View style={styles.button}>
+            <Button title="REGISTRAR" onPress={onSubmit} />
+          </View>
           {footerContent}
         </View>
       )}
@@ -148,6 +159,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 15,
     width: "90%",
+  },
+  button: {
+    marginTop: 20,
   },
 });
 

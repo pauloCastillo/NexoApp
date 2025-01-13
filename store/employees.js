@@ -4,8 +4,14 @@ import { BASEURL } from "./configApi";
 export const registerNewEmployee = createAsyncThunk(
   "employee/addNewEmployee",
   async (user) => {
+    console.log(user);
     try {
-      const response = await BASEURL.post("auth/register", { user });
+      const response = await BASEURL.post("auth/register", {
+        user,
+        headers: {
+          "User-Agent": "mobile",
+        },
+      });
       return response.data;
     } catch (error) {
       return error.message;
@@ -20,7 +26,11 @@ export const loginEmployee = createAsyncThunk(
       const response = await BASEURL.post(
         "auth/login",
         { employee },
-        { headers: { Authorization: "Bearer " + selectToken } }
+        {
+          headers: {
+            Authorization: "Bearer " + selectToken,
+          },
+        }
       );
       return response.data;
     } catch (error) {

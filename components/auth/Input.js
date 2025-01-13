@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import { useState } from "react";
 import { Button, StyleSheet, Text, TextInput, View } from "react-native";
 export default function Input({
   label,
@@ -8,8 +9,19 @@ export default function Input({
   checkError,
   error,
   mode,
-  privacy,
 }) {
+  const showText = "show";
+  const hideText = "hide";
+  const [defaultPrivacy, setDefaultPrivacy] = useState(true);
+
+  const handlerPsswdState = () => {
+    if (defaultPrivacy) {
+      setDefaultPrivacy(false);
+    } else {
+      setDefaultPrivacy(true);
+    }
+  };
+
   if (mode === "privateField") {
     return (
       <>
@@ -21,9 +33,15 @@ export default function Input({
             onChangeText={onUpdateValue}
             value={value}
             placeholder={placeholder}
-            secureTextEntry={privacy}
+            secureTextEntry={defaultPrivacy}
           />
-          <Button title={privacy ? "show" : "hide"} />
+          <View style={styles.btn}>
+            <Button
+              title={defaultPrivacy ? showText : hideText}
+              onPress={handlerPsswdState}
+              style={styles.btn}
+            />
+          </View>
           {checkError && <Text style={styles.errorMessage}>{error}</Text>}
         </View>
       </>
@@ -52,19 +70,24 @@ const styles = StyleSheet.create({
   },
 
   input: {
+    width: "100%",
     height: 40,
     marginBottom: 15,
   },
   inputPass: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-around",
     height: 40,
   },
   errorMessage: {
     fontWeight: "600",
     fontSize: 12,
     color: "#f42",
+  },
+  btn: {
+    position: "absolute",
+    top: 0,
+    right: 0,
   },
 });
 
@@ -75,6 +98,5 @@ Input.propTypes = {
   placeholder: PropTypes.string,
   checkError: PropTypes.bool,
   error: PropTypes.string,
-  privacy: PropTypes.bool,
   mode: PropTypes.string,
 };

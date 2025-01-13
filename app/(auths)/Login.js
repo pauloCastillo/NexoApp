@@ -20,7 +20,6 @@ import {
   selectMessage,
   selectToken,
 } from "../../store/employees";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginLayout() {
   const [mail, setMail] = useState(null);
@@ -41,7 +40,6 @@ export default function LoginLayout() {
 
   useEffect(() => {
     dispatch(addEmployee({ mail, password }));
-    console.log(token);
   }, [mail, password, token]);
 
   if (status === "loading") {
@@ -58,7 +56,6 @@ export default function LoginLayout() {
       if (Object.getOwnPropertyNames(error).length !== 0) {
         setCheckError(true);
       } else {
-        console.log(token);
         dispatch(loginEmployee(employee));
         ToastAndroid.show(message, ToastAndroid.LONG);
         navigation.replace("index");
