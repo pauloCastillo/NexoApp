@@ -11,21 +11,14 @@ import {
   selectStatus,
 } from "../../store/employees";
 import AuthForm from "./form";
-
+import LoadingOverlay from "../../app/loading";
 export default function AuthContent({ formMode }) {
-  const [error, setError] = useState({
-    username: "",
-    mail: "",
-    password: "",
-    jobTitle: "",
-    confirmPassword: "",
-    phone: "",
-  });
+  const [error, setError] = useState({});
   const [checkError, setCheckError] = useState(false);
 
   const employee = useSelector(selectEmployee);
   const status = useSelector(selectStatus);
-  const message = useSelector(selectMessage);
+  // const message = useSelector(selectMessage);
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
@@ -34,20 +27,18 @@ export default function AuthContent({ formMode }) {
   }
 
   function onSubmitHandler() {
-    if (employee !== null) {
-      setError(verify(employee, "sign-up"));
-      if (Object.getOwnPropertyNames(error).length !== 0) {
-        setCheckError(true);
-      } else {
-        console.log(employee);
-        console.log(error);
-        // dispatch(registerNewEmployee(employee));
-        ToastAndroid.show(message, ToastAndroid.LONG);
-        navigation.replace("index");
-      }
-    } else {
-      ToastAndroid.show(message, ToastAndroid.LONG);
+    setError(verify(employee, "sign-up"));
+    if (Object.keys(error).length > 0) {
       setCheckError(true);
+      console.log(error);
+      ToastAndroid.show(
+        "Ocurrio un error, vuelve a registrarte",
+        ToastAndroid.LONG
+      );
+    } else {
+      dispatch(registerNewEmployee(employee));
+      ToastAndroid.show("Registrado exitosamente!", ToastAndroid.LONG);
+      navigation.navigate("index");
     }
   }
 
@@ -68,6 +59,7 @@ export default function AuthContent({ formMode }) {
       footerContent={content}
       onSubmit={onSubmitHandler}
       checkError={checkError}
+      setError={setCheckError}
       error={error}
     />
   );

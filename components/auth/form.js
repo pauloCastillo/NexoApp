@@ -11,6 +11,7 @@ export default function AuthForm({
   checkError,
   error,
   footerContent,
+  setError,
 }) {
   const [username, setUsername] = useState("");
   const [userlastname, setUserlastname] = useState("");
@@ -23,6 +24,36 @@ export default function AuthForm({
 
   const dispatch = useDispatch();
 
+  const handlerError = (error) => {
+    if (Object.keys(error).length > 0) {
+      for (let { key } in error) {
+        switch (key) {
+          case "usernames":
+            username === "" && setError(false);
+            break;
+          case "lastnames":
+            lastnames === "" && setError(false);
+            break;
+          case "email":
+            email === "" && setError(false);
+            break;
+          case "jobTitle":
+            jobTitle === "" && setError(false);
+            break;
+          case "phone":
+            phone === "" && setError(false);
+            break;
+          case "password":
+            password === "" && setError(false);
+            break;
+          case "confirmPassword":
+            confirmPassword === "" && setError(false);
+            break;
+        }
+      }
+    }
+  };
+
   function onUpdateValueHandler(label, enteredValue) {
     switch (label.toLowerCase()) {
       case "nombres":
@@ -34,7 +65,7 @@ export default function AuthForm({
       case "mail":
         setMail(enteredValue);
         break;
-      case "jobTitle":
+      case "jobtitle":
         setJobTitle(enteredValue);
         break;
       case "phone":
@@ -43,7 +74,7 @@ export default function AuthForm({
       case "password":
         setPassword(enteredValue);
         break;
-      case "confirmPassword":
+      case "confirmpassword":
         setConfirmPassword(enteredValue);
         break;
     }
@@ -54,6 +85,10 @@ export default function AuthForm({
   }
 
   useEffect(() => {
+    if (checkError) {
+      handlerError(error);
+    }
+
     dispatch(
       addEmployee({
         username: userfullname,
@@ -64,7 +99,15 @@ export default function AuthForm({
         confirmPassword,
       })
     );
-  }, [userfullname, mail, jobTitle, phone, password, confirmPassword]);
+  }, [
+    userfullname,
+    mail,
+    jobTitle,
+    phone,
+    password,
+    confirmPassword,
+    checkError,
+  ]);
 
   return (
     <SafeAreaView style={styles.regContainer}>
@@ -73,7 +116,7 @@ export default function AuthForm({
         <View style={styles.form}>
           <Input
             label="Nombres"
-            onUpdateValue={onUpdateValueHandler.bind(this, "username")}
+            onUpdateValue={onUpdateValueHandler.bind(this, "nombres")}
             value={username}
             placeholder={"Coloque sus nombres"}
             checkError={checkError}
@@ -81,7 +124,7 @@ export default function AuthForm({
           />
           <Input
             label="Apellidos"
-            onUpdateValue={onUpdateValueHandler.bind(this, "username")}
+            onUpdateValue={onUpdateValueHandler.bind(this, "apellidos")}
             value={userlastname}
             placeholder={"Coloque sus apellidos"}
             checkError={checkError}
@@ -171,4 +214,5 @@ AuthForm.propTypes = {
   checkError: PropTypes.bool,
   error: PropTypes.object,
   footerContent: PropTypes.element,
+  setError: PropTypes.func,
 };

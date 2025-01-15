@@ -42,8 +42,8 @@ export default function Input({
               style={styles.btn}
             />
           </View>
-          {checkError && <Text style={styles.errorMessage}>{error}</Text>}
         </View>
+        {checkError && <Text style={styles.errorMessage}>{error}</Text>}
       </>
     );
   } else {

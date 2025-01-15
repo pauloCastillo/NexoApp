@@ -2,17 +2,43 @@ import { AntDesign } from "@expo/vector-icons";
 import PropTypes from "prop-types";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
-
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+} from "react-native-reanimated";
 export default function IconButton({ btnText, onPress, icon, bgColor }) {
+  let defaultAnimation = useSharedValue(0);
+  const opacity = useSharedValue(1);
+
+  const startAnimation = useAnimatedStyle(() => ({
+    transform: [{ translateX: defaultAnimation.value }],
+    opacity: opacity.value,
+  }));
+
+  const handlerPressOut = () => {
+    defaultAnimation.value = withTiming(-defaultAnimation.value, {
+      duration:500,
+      easing: Easing.linear(100)
+    }),
+  };
+
   return (
-    <TouchableOpacity style={{ ...styles.button }} onPress={onPress}>
-      <AntDesign
-        name={icon}
-        size={24}
-        color={bgColor}
-        style={{ textAlign: "center" }}
-      />
-      <Text style={{ textAlign: "center", fontSize: 16 }}>{btnText}</Text>
+    <TouchableOpacity
+      style={styles.button}
+      onPress={onPress}
+      onPressOut={handlerPressOut}
+    >
+      <Animated.View style={startAnimation}>
+        <AntDesign
+          name={icon}
+          size={24}
+          color={bgColor}
+          style={{ textAlign: "center" }}
+        />
+        <Text style={{ textAlign: "center", fontSize: 16 }}>{btnText}</Text>
+      </Animated.View>
     </TouchableOpacity>
   );
 }

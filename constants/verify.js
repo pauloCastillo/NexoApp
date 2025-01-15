@@ -3,12 +3,13 @@ import PropTypes from "prop-types";
 export default function verify(data, mode) {
   const error = {};
   const regMail = /[a-zA-Z0-9._-]+@[a-zA-Z0-9]+\.[a-zA-Z]{2,4}$/;
-  const regPswd = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,15}$/;
+  const regPswd = /^.{4,12}$/;
   const regPhone = /[+]?\d{3}-\d{8}/;
 
   if (mode === "sign-up") {
-    if (data.username.trim() === "") {
-      error.username = "Introduzca su Nombre y Apellido";
+    if (data.username === undefined || data.username === "") {
+      error.usernames =
+        "Introduzca en los campos correspondientes su(s) nombres y apellido(s)";
     }
 
     if (!data.mail.match(regMail)) {
@@ -17,7 +18,7 @@ export default function verify(data, mode) {
 
     if (!data.password.match(regPswd)) {
       error.password =
-        "Verifique que su password tenga: 1 mayúscula, 1 número y sea entre 6 y 15 caracteres de longitud";
+        "Verifique que su password tenga entre 4 y 12 caracteres de longitud";
     }
 
     if (data.confirmPassword !== data.password || data.confirmPassword === "") {
@@ -25,7 +26,7 @@ export default function verify(data, mode) {
         "Debe colocar lo mismo y de la misma forma que esta en la contraseña";
     }
 
-    if (data.jobTitle.trim() === "") {
+    if (data.jobTitle === "" || data.jobTitle === undefined) {
       error.jobTitle = "Introduzca su el cargo que ocupa";
     }
 
@@ -34,7 +35,7 @@ export default function verify(data, mode) {
     }
   } else {
     if (!data.mail.match(regMail)) {
-      error.mail = "Verifique que su correo sea micorreo@dominio.com";
+      error.mail = "Verifique que su correo sea micorreo@gmail.com";
     }
 
     if (data.mail === "") {
@@ -43,7 +44,7 @@ export default function verify(data, mode) {
 
     if (!data.password.match(regPswd)) {
       error.password =
-        "Verifique que su password tenga: 1 mayúscula, 1 número y sea entre 6 y 15 caracteres de longitud";
+        "Verifique que su password tenga entre 4 y 12 caracteres de longitud";
     }
 
     if (data.password === "") {
