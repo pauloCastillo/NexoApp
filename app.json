@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "mobile-t2",
+    "name": "personal-app",
     "scheme": "mobile-t2",
-    "slug": "mobile-t2",
+    "slug": "personal-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -20,7 +20,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.t2project.personalapp",
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -33,6 +38,15 @@
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "34e2f084-b791-4979-9d99-d907df29c74b"
+      }
+    },
+    "owner": "pollomonroy"
   }
 }

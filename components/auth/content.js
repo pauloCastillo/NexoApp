@@ -7,7 +7,6 @@ import verify from "../../constants/verify";
 import {
   registerNewEmployee,
   selectEmployee,
-  selectMessage,
   selectStatus,
 } from "../../store/employees";
 import AuthForm from "./form";
@@ -18,7 +17,6 @@ export default function AuthContent({ formMode }) {
 
   const employee = useSelector(selectEmployee);
   const status = useSelector(selectStatus);
-  // const message = useSelector(selectMessage);
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
@@ -32,7 +30,7 @@ export default function AuthContent({ formMode }) {
       setCheckError(true);
       console.log(error);
       ToastAndroid.show(
-        "Ocurrio un error, vuelve a registrarte",
+        "Ocurrio un error, vuelve a intentarlo",
         ToastAndroid.LONG
       );
     } else {
@@ -47,7 +45,7 @@ export default function AuthContent({ formMode }) {
     content = (
       <Text style={styles.footerContent}>
         Si ya tienes una cuenta{" "}
-        <Link replace href={"/Login"}>
+        <Link replace href={"/Login"} style={styles.footerLink}>
           ingresa aquí
         </Link>
       </Text>
@@ -66,9 +64,14 @@ export default function AuthContent({ formMode }) {
 }
 
 const styles = StyleSheet.create({
+  footerLink: {
+    fontWeight: "600",
+    textTransform: "uppercase",
+    color: "blue",
+  },
   footerContent: {
     textAlign: "center",
-    fontWeight: "600",
+    fontWeight: "400",
     color: "blue",
     marginVertical: 15,
   },

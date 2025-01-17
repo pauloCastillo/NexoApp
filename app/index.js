@@ -2,10 +2,6 @@ import * as Location from "expo-location";
 import { Redirect } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, ToastAndroid, View } from "react-native";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-} from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import IconButton from "../components/Buttons";
@@ -51,6 +47,7 @@ export default function App() {
 
   function handlerWorkerTimeLocation(label) {
     setText(label);
+    console.log("registrado");
     const time = handlerTimeWorker();
     renderTime(time);
     dispatch(takeTime({ label, time }));
@@ -90,6 +87,7 @@ export default function App() {
         <IconButton
           icon="arrowright"
           btnText="entrada"
+          index={1}
           bgColor="green"
           onPress={() => handlerWorkerTimeLocation("entrada")}
         />
@@ -97,18 +95,21 @@ export default function App() {
           icon="pause"
           btnText="descanso"
           bgColor="blue"
+          index={2}
           onPress={() => handlerWorkerTimeLocation("descanso")}
         />
         <IconButton
           icon="back"
           btnText="retorno"
           bgColor="green"
+          index={3}
           onPress={() => handlerWorkerTimeLocation("retorno")}
         />
         <IconButton
           icon="arrowleft"
           btnText="salida"
           bgColor="red"
+          index={4}
           onPress={() => handlerWorkerTimeLocation("salida")}
         />
       </View>

@@ -91,8 +91,8 @@ export default function LoginLayout() {
         <Button title="INGRESAR" onPress={onSubmitHandler} />
       </View>
       <Text style={styles.footerContent}>
-        Si no tienes una cuenta
-        <Link replace href={"Register"}>
+        Si no tienes una cuenta{" "}
+        <Link replace href={"Register"} style={styles.footerLink}>
           regístrate aquí
         </Link>
       </Text>
@@ -127,10 +127,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     height: 40,
   },
-
+  footerLink: {
+    fontWeight: "600",
+    textTransform: "uppercase",
+    color: "blue",
+  },
   footerContent: {
     textAlign: "center",
-    fontWeight: "600",
+    fontWeight: "400",
     color: "blue",
     marginVertical: 15,
   },
