@@ -7,10 +7,10 @@ export const registerNewEmployee = createAsyncThunk(
     console.log(user);
     try {
       const response = await BASEURL.post("auth/register", {
-        user,
         headers: {
           "User-Agent": "mobile",
         },
+        data: user,
       });
       return response.data;
     } catch (error) {

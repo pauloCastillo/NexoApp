@@ -11,7 +11,6 @@ import {
   getLocations,
   registerTimeAndLocations,
   selectLocation,
-  selectMessage,
   takeTime,
 } from "../store/locations";
 
@@ -47,7 +46,6 @@ export default function App() {
 
   function handlerWorkerTimeLocation(label) {
     setText(label);
-    console.log("registrado");
     const time = handlerTimeWorker();
     renderTime(time);
     dispatch(takeTime({ label, time }));
@@ -55,7 +53,6 @@ export default function App() {
   }
 
   const employeeID = useSelector(selectEmployeeID);
-  const message = useSelector(selectMessage);
   const token = useSelector((state) => state.employees.token);
   const place = useSelector(selectLocation);
 
@@ -74,9 +71,12 @@ export default function App() {
 
     try {
       dispatch(registerTimeAndLocations(locationTimeData));
-      ToastAndroid.show(message, ToastAndroid.LONG);
+      ToastAndroid.show("registro del tiempo exitoso!", ToastAndroid.LONG);
     } catch (error) {
-      ToastAndroid.show(message, ToastAndroid.LONG);
+      ToastAndroid.show(
+        "Ocurrió un problema! " + error.message,
+        ToastAndroid.LONG
+      );
     }
   }
 

@@ -28,14 +28,13 @@ export default function AuthContent({ formMode }) {
     setError(verify(employee, "sign-up"));
     if (Object.keys(error).length > 0) {
       setCheckError(true);
-      console.log(error);
       ToastAndroid.show(
-        "Ocurrio un error, vuelve a intentarlo",
+        "Ocurrió un error: " + error.message,
         ToastAndroid.LONG
       );
     } else {
       dispatch(registerNewEmployee(employee));
-      ToastAndroid.show("Registrado exitosamente!", ToastAndroid.LONG);
+      ToastAndroid.show("Usuario registrado exitosamente!", ToastAndroid.LONG);
       navigation.navigate("index");
     }
   }
