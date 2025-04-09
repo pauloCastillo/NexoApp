@@ -1,5 +1,7 @@
 const { Schema, model } = require("mongoose");
+const { date } = require("./locations");
 
+const currentDate = Date.now();
 const controlTimeSchema = new Schema(
   {
     employee: {
@@ -8,7 +10,8 @@ const controlTimeSchema = new Schema(
     },
     date: {
       type: Schema.Types.Date,
-      default: Date.now,
+      required: true,
+      default: () => new Date(currentDate).toLocaleDateString("es-BO", { dateStyle:"short"}),
     },
     entrada: {
       type: String,
@@ -22,7 +25,7 @@ const controlTimeSchema = new Schema(
     salida: {
       type: String,
     },
-    locations: {
+    location: {
       type: Schema.Types.ObjectId,
       ref: "Location",
     },
@@ -32,26 +35,6 @@ const controlTimeSchema = new Schema(
     versionKey: false,
   }
 );
-
-controlTimeSchema.pre("save", function (next) {
-  const currentdate = new Date();
-  this.date = new Date(
-    currentdate.getFullYear(),
-    currentdate.getMonth(),
-    currentdate.getDate()
-  ).toDateString("es-BO");
-  next();
-});
-
-controlTimeSchema.methods = {
-  async getEmployees() {
-    try {
-      return await ControlTime.find().where("employee").exists();
-    } catch (error) {
-      return error.message;
-    }
-  },
-};
 
 const ControlTime = model("ControlTime", controlTimeSchema, "timeControls");
 module.exports = ControlTime;

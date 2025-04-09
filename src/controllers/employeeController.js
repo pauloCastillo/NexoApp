@@ -1,8 +1,5 @@
 const { Employee } = require("../db/models");
 const { httpStatusCode } = require("../utils/httpStatus");
-const {
-  RegisterUserAndTimeService,
-} = require("../db/services/timeControlService");
 
 async function getEmployees(req, res) {
   try {
@@ -11,18 +8,6 @@ async function getEmployees(req, res) {
   } catch (error) {
     res.status(httpStatusCode.INTERNAL_SERVER).json({
       messasge: error.message,
-    });
-  }
-}
-
-async function getEmployee(req, res) {
-  try {
-    const { id } = req.params;
-    const getUser = await Employee.findById({ _id: id });
-    res.status(httpStatusCode.OK).json({ user: getUser });
-  } catch (error) {
-    res.status(httpStatusCode.INTERNAL_SERVER).json({
-      message: error.message,
     });
   }
 }

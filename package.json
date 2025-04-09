@@ -6,20 +6,20 @@
     "start-server": "nodemon main.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Paulo Castillo",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "nodemon": "^3.1.4"
+    "nodemon": "^3.1.9"
   },
   "dependencies": {
-    "axios": "^1.7.2",
+    "axios": "^1.8.4",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.5.1",
+    "mongoose": "^8.13.2",
     "xlsx": "file:vendors/xlsx-0.20.2.tgz"
   }
 }

@@ -10,6 +10,11 @@ const locationSchema = new Schema(
       type: Date,
       trim: true,
       require: true,
+      default: () => new Date().toLocaleString("es-BO", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      }), 
     },
     latitude: {
       type: Number,
@@ -32,20 +37,6 @@ const locationSchema = new Schema(
     versionKey: false,
   }
 );
-
-locationSchema.pre("save", (next) => {
-  const currentDate = new Date();
-  this.date = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
-    currentDate.getDate()
-  ).toLocaleString("es-BO", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-  next();
-});
 
 const Location = model("Location", locationSchema, "locations");
 module.exports = Location;

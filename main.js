@@ -2,10 +2,16 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const router = require("./src/routes");
-const dbConnection = require("./src/db/conecction/db");
+const dbConnection = require("./src/db/config/db");
 
 const app = express();
-const port = process.env.PORT || 8000;
+let port = "";
+
+if(process.env.DEV_STATUS === "development"){
+  port = process.env.PORT_DEV;
+}else{
+  port = process.env.PORT_PROD;
+}
 
 app.use(cors());
 app.use(express.json());

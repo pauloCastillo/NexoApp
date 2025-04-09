@@ -1,5 +1,5 @@
-const { createReport } = require("../../report");
-const { ControlTime } = require("../models");
+const { createReport } = require("../report");
+const { ControlTime } = require("../db/models");
 
 class Report {
   async createReport() {
