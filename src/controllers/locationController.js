@@ -1,9 +1,6 @@
-require("dotenv").config();
-const axios = require("axios");
 const { Location } = require("../db/models");
 const ServiceFactory = require("../factories/serviceFactory");
 const { httpStatusCode } = require("../utils/httpStatus");
-const { Report } = require("../services/reportService");
 
 async function getTimeLocationEmployee(req, res) {
   try {
@@ -29,22 +26,19 @@ async function registerEmployeesTimeLocation(req, res) {
       location:"",
     };
 
-    const response = await axios.get(
-      `https://discover.search.hereapi.com/v1/discover?at=${locationTimeData.location.latitude},${locationTimeData.location.longitude}&q=${locationTimeData.location.latitude},${locationTimeData.location.longitude}&in=countryCode%3ABOL&apiKey=${process.env.API_KEY}`
-    );
-
-    const streetName = response.data.items[0].title;
-    const newLocation = await Location.create({
+    const locationData = {
       latitude: locationTimeData.location.latitude,
       longitude: locationTimeData.location.longitude,
-      street: streetName,
-    });
+      street: "",
+      employee: locationTimeData.employee
+    } 
+
+    const locationService = ServiceFactory.getService("location",  locationData);
+    const newLocation = await locationService.create();
 
     timeData.location = newLocation._id.toString();
     const timerService = ServiceFactory.getService("timeControl", timeData);
     
-    // const reportHandler = new Report();
-    // await reportHandler.createReport();
     res.status(httpStatusCode.OK).json({
       message: "Registro Exitoso",
       newTime: await timerService.registerTime(),

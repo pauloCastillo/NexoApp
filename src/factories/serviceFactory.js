@@ -4,6 +4,8 @@ const ManagerRepository = require("../repositories/managerRepository");
 const ManagerService = require("../services/managerService");
 const TimeControlRepository = require("../repositories/timeControlRepository");
 const TimeControlService = require("../services/timeControlService");
+const LocationService = require("../services/locationService");
+const LocationRepository = require("../repositories/locationRepository");
 
 class ServiceFactory {
   static getService(serviceType, data) {
@@ -14,8 +16,8 @@ class ServiceFactory {
         return new ManagerService(data, new ManagerRepository());
       case "timeControl":
         return new TimeControlService(data, new TimeControlRepository());
-      // case "location":
-      //   return new LocationService(data, new LocationRepository());
+      case "location":
+        return new LocationService(data, new LocationRepository());
       default:
         throw new Error(`Service type ${serviceType} not recognized.`);
     }

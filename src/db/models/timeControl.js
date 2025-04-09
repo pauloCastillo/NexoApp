@@ -11,7 +11,12 @@ const controlTimeSchema = new Schema(
     date: {
       type: Schema.Types.Date,
       required: true,
-      default: () => new Date(currentDate).toLocaleDateString("es-BO", { dateStyle:"short"}),
+      default: () => new Date(currentDate).toLocaleDateString("es-BO", { 
+        dateStyle:"short", 
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      }),
     },
     entrada: {
       type: String,
