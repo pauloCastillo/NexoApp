@@ -12,7 +12,7 @@ const managerSchema = new Schema(
       trim: true,
       require: true,
     },
-    mail: {
+    email: {
       type: String,
       trim: true,
       require: true,

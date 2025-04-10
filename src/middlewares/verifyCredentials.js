@@ -3,7 +3,7 @@ const {httpStatusCode} = require("../utils/httpStatus");
 
 const verifyCredentials = async (req, res, next )=>{
   try{
-    const { employee } = req.body;
+    const employee = req.body;
     const existEmployee = await Employee.findOne({ mail: employee.mail });
     if (!existEmployee) {
       return res.status(httpStatusCode.NO_CONTENT).json({ message: "No existe colaborador. Revisa tu usuario y contraseña" });

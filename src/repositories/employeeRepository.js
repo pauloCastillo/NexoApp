@@ -6,7 +6,8 @@ class EmployeeRepository {
         return employees;
     }
 
-    async getEmployeeById(id) {
+    async getEmployeeById(employeeData) {
+        console.log(employeeData);
         const employee = await Employee.findById(id);
         return employee;
     }
@@ -41,13 +42,14 @@ class EmployeeRepository {
         user.createToken();
         return user.toJSON();
     }
-      // async loginChecking() {
-  //   const findingUser = await Employee.findOne({ mail: this.#newUser.email });
-  //   return await findingUser.authenticateUser(
-  //     this.#newUser.password,
-  //     findingUser._id
-  //   );
-  // }
+    async loginChecking(employeeData, id) {
+        const findingUser = await Employee.findOne({ mail: employeeData.mail });
+        if (!findingUser) {
+            throw new Error("User not found");
+        }
+    
+        return await findingUser.authenticateUser(employeeData.password, id);
+    }
 }
 
 module.exports = EmployeeRepository;

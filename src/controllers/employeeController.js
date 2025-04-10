@@ -1,10 +1,13 @@
 const { Employee } = require("../db/models");
 const { httpStatusCode } = require("../utils/httpStatus");
+const ServiceFactory = require("../factories/serviceFactory");
 
-async function getEmployees(req, res) {
+
+async function getAllEmployees(req, res) {
   try {
-    const getUsers = await Employee.find({});
-    res.status(httpStatusCode.OK).json({ users: getUsers });
+    const employeeService = ServiceFactory.getService("employee", Employee);
+    const getUsers = await employeeService.getAll();
+    res.status(httpStatusCode.OK).json({ users: getUsers });  
   } catch (error) {
     res.status(httpStatusCode.INTERNAL_SERVER).json({
       messasge: error.message,
@@ -12,41 +15,36 @@ async function getEmployees(req, res) {
   }
 }
 
-async function createEmployee(req, res) {
+async function getEmployeeById(req, res) {
+  const { id } = req.params;
   try {
-    const { user } = req.body;
-    if (user.password !== user.confirmPassword) {
-      return res.status(httpStatusCode.CONFLICT).json({
-        message:
-          "ERROR! Revisa la confirmación de contraseña debe ser igual a la contraseña",
-      });
-    }
-
-    const newEmployee = await newRegister.CreateEmployee(user);
-
-    res
-      .status(httpStatusCode.CREATED)
-      .json({ message: "usuario registrado exitosamente!", user: newEmployee });
+    const employeeService = ServiceFactory.getService("employee", Employee);
+    const employee = await employeeService.getEmployee(id);
+    res.status(httpStatusCode.OK).json({ user: employee });
   } catch (error) {
     res.status(httpStatusCode.INTERNAL_SERVER).json({
-      message: "SERVER ERROR! Trata registrándote de nuevo. " + error.message,
+      message: error.message,
     });
   }
 }
 
-async function updateEmployee(req, res) {
-  const { body } = req;
-  console.log(body);
-}
-
 async function deleteEmployee(req, res) {
-  const { id } = req.body;
-  console.log(id);
+  const { id } = req.params;
+  const employeeService = ServiceFactory.getService("employee", Employee);
+  const deletedEmployee = await employeeService.delete(id);
+  if (!deletedEmployee) {
+    return res.status(httpStatusCode.NOT_FOUND).json({
+      message: "Employee not found",
+    });
+  } else {
+    return res.status(httpStatusCode.OK).json({
+      message: "Employee deleted successfully",
+    });
+  }
 }
 
 module.exports = {
-  getEmployees,
-  createEmployee,
-  updateEmployee,
-  deleteEmployee,
+  getAllEmployees,
+  getEmployeeById,
+  deleteEmployee
 };
