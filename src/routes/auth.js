@@ -5,11 +5,10 @@ const {
 } = require("../controllers/authsController");
 
 const { verifiedToken } = require("../middlewares/verifyToken");
-const { verifyCredentials } = require("../middlewares/verifyCredentials");
 
 const router = express.Router();
 
 router.post("/register", registerEmployee);
-router.post("/login", verifiedToken, verifyCredentials, loginEmployee);
+router.post("/login", verifiedToken, loginEmployee);
 
 module.exports = router;

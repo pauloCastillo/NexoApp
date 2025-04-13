@@ -9,18 +9,18 @@ class Manager extends UserService {
   // TODO: Arreglar los otros metodos excepto create
 
   async getAll() {
-    const employees = await this.repository.getAllEmployees();
+    const employees = await this.repository.getAllManagers();
       return employees.map((employee) => {
         const { password, ...rest } = employee.toObject();
         return rest
       });
     }
-    async getEmployee(id) {
-      const employee = await this.repository.getEmployeeById(id);
-      if (!employee) {
-        throw new Error("Employee not found");
+    async getManager() {
+      const manager = await this._repository.getManagerById(this.newUser);
+      if (!manager) {
+        throw new Error("El correo y contraseña no coinciden");
       }
-      return employee.toObject();
+      return manager.toObject();
     }
   
 
@@ -33,7 +33,7 @@ class Manager extends UserService {
   }
 
   async update(id, employeeData) {
-    const updatedEmployee = await this.repository.updateEmployee(id, employeeData);
+    const updatedEmployee = await this.repository.updateManager(id, employeeData);
     if (!updatedEmployee) {
       throw new Error("Employee not found");
     }
@@ -41,7 +41,7 @@ class Manager extends UserService {
   }
 
   async delete(id) {
-    const deletedEmployee = await this.repository.deleteEmployee(id);
+    const deletedEmployee = await this.repository.deleteManager(id);
     return deletedEmployee.toObject();
   }
 }

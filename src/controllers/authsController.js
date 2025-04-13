@@ -14,7 +14,6 @@ async function registerEmployee(req, res) {
       return res.status(httpStatusCode.CREATED).json({message:"registro exitoso!", newManager: await newManager.create() });
     }
   } catch (error) {
-    console.log(error.message);
     res.status(httpStatusCode.INTERNAL_SERVER).json({
       message: "SERVER ERROR! " + error.message,
     });
@@ -23,17 +22,19 @@ async function registerEmployee(req, res) {
 
 async function loginEmployee(req, res) {
   try {
-    const employee = req.body;
-    const employeeService = ServiceFactory.getService("employee", employee);
-    const existEmployee = await employeeService.getEmployee();
-    
-    console.log(existEmployee);
-    
-    // response
-    //   ? res.status(httpStatusCode.OK).json({ message: "bienvenido(a) " + response.username })
-    //   : res
-    //       .status(httpStatusCode.BAD_REQUEST)
-    //       .json({ message: "Usuario o Contraseña incorrectos" });
+    const user = req.body;
+    const userType = req.headers["user-agent"];
+
+    if(userType.includes("mobile")){
+      const employeeService = ServiceFactory.getService("employee", user);
+      const existEmployee = await employeeService.getEmployee();
+
+    }else if(userType.includes("desktop")){
+      const managerService = ServiceFactory.getService("manager", user)
+      const existManager = await managerService.getManager();
+      // DEVOLVER UN TOKEN DE EXITO con caducidad
+      return res.status(httpStatusCode.OK).json({ message: "bienvenido(a) " + existManager.username });
+    }
   } catch (error) {
     res.status(httpStatusCode.INTERNAL_SERVER).json({
       message: "SERVER ERROR! " + error.message,

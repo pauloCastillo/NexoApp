@@ -8,8 +8,7 @@ class EmployeeService extends UserService {
   }
       // TODO: Arreglar los otros metodos excepto create
    async getAll() {
-    const employees = await this.repository.getAllEmployees();
-    console.log(employees);
+    const employees = await this._repository.getAllEmployees();
       return employees.map((employee) => {
         console.log(rest);
         const { password, ...rest } = employee.toObject();
@@ -18,7 +17,7 @@ class EmployeeService extends UserService {
     }
   
     async getEmployee() {
-      const employee = await this.repository.getEmployeeById(this.employee);
+      const employee = await this._repository.getEmployeeById(this.newUser.id);
       if (!employee) {
         throw new Error("Employee not found");
       }

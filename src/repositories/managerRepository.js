@@ -1,13 +1,21 @@
 const { ManagerModel } = require("../db/models");
+const { checkingPassword } = require("../utils/utils");
 
 class ManagerRepository {
-    async getAllManager() {
+    async getAllManagers() {
         const managers = await ManagerModel.find().populate("department");
         return managers;
     }
 
-    async getManagerById(id) {
-        return await ManagerModel.findById(id);
+    async getManagerById(managerData) {
+        const foundManager = await ManagerModel.findOne({ email: managerData.email });
+        const verifiedManager  = await ManagerModel.schema.methods.authenticateUser(managerData.password, foundManager._id.toString());
+        if(verifiedManager){
+            delete managerData.password;
+            return foundManager;
+        }else{
+            return  new Error("La contraseña no coincide con el correo");
+        }
     }
     
     async createManager(managerData) {

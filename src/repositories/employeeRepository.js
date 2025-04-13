@@ -6,8 +6,7 @@ class EmployeeRepository {
         return employees;
     }
 
-    async getEmployeeById(employeeData) {
-        console.log(employeeData);
+    async getEmployeeById(id) {
         const employee = await Employee.findById(id);
         return employee;
     }
