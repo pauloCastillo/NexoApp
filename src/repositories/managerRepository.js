@@ -40,13 +40,6 @@ class ManagerRepository {
         user.createToken();
         return user.toJSON();
     }
-      // async loginChecking() {
-  //   const findingUser = await Employee.findOne({ mail: this.#newUser.email });
-  //   return await findingUser.authenticateUser(
-  //     this.#newUser.password,
-  //     findingUser._id
-  //   );
-  // }
 }
 
 module.exports = ManagerRepository;

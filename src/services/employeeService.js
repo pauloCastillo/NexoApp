@@ -6,17 +6,21 @@ class EmployeeService extends UserService {
     super(employee);
     this._repository = repository;
   }
-      // TODO: Arreglar los otros metodos excepto create
+
    async getAll() {
-    const employees = await this._repository.getAllEmployees();
-      return employees.map((employee) => {
-        console.log(rest);
-        const { password, ...rest } = employee.toObject();
-        return rest
-      });
+    if(this.newUser === null){
+      const employees = await this._repository.getAllEmployees();
+        return employees.map((employee) => {
+          const rest = employee.toObject();
+          return rest
+        });
+      }
     }
   
     async getEmployee() {
+      if(this.newUser === null){
+        throw new Error("the server cannot found the resource");
+      }
       const employee = await this._repository.getEmployeeById(this.newUser.id);
       if (!employee) {
         throw new Error("Employee not found");
@@ -25,6 +29,11 @@ class EmployeeService extends UserService {
     }
 
     async create(){
+      
+      if(this.newUser === null){
+        throw new Error("the server cannot found the resource");
+      }
+
       if(this.validateUser()){
         return await this._repository.createEmployee(this.newUser)
       }else{
@@ -33,6 +42,11 @@ class EmployeeService extends UserService {
     }
   
     async update(id, employeeData) {
+      
+      if(this.newUser === null){
+        throw new Error("the server cannot found the resource");
+      }
+
       const updatedEmployee = await this.repository.updateEmployee(id, employeeData);
       if (!updatedEmployee) {
         throw new Error("Employee not found");
@@ -41,6 +55,11 @@ class EmployeeService extends UserService {
     }
   
     async delete(id) {
+      
+      if(this.newUser === null){
+        throw new Error("the server cannot found the resource");
+      }
+
       const deletedEmployee = await this.repository.deleteEmployee(id);
       return deletedEmployee.toObject();
     }

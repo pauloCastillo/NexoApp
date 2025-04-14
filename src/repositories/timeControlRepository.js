@@ -2,7 +2,7 @@ const { ControlTime } = require("../db/models");
 
 class TimeControlRepository{
     async getTimeControlById(id) { 
-        return await ControlTime.findOne().where({ employee: id }).populate("employee").populate("location");  
+        return await ControlTime.findOne().where({ employee: id }).populate("employee").populate("location","locations.street");  
     }
     async getAllTimeControls() { 
         return await ControlTime.find().populate("employee").populate("location");
@@ -13,7 +13,7 @@ class TimeControlRepository{
                 [`${data.label}`]: data.time,
                 location: data.location,
             },
-        }, {new: true}).populate("location", "street");
+        }, {new: true}).populate("location", "locations.street");
     }   
 
     async deleteTimeControl(id) { 

@@ -24,11 +24,11 @@ async function loginEmployee(req, res) {
   try {
     const user = req.body;
     const userType = req.headers["user-agent"];
-
+    
     if(userType.includes("mobile")){
       const employeeService = ServiceFactory.getService("employee", user);
       const existEmployee = await employeeService.getEmployee();
-
+      return res.status(httpStatusCode.OK).json({ message: "bienvenido(a) " + existEmployee.username });
     }else if(userType.includes("desktop")){
       const managerService = ServiceFactory.getService("manager", user)
       const existManager = await managerService.getManager();

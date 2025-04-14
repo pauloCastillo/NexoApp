@@ -1,6 +1,7 @@
 const { Location } = require("../db/models");
 const ServiceFactory = require("../factories/serviceFactory");
 const { httpStatusCode } = require("../utils/httpStatus");
+const { DateTime } = require("luxon");
 
 async function getTimeLocationEmployee(req, res) {
   try {
@@ -17,10 +18,10 @@ async function getTimeLocationEmployee(req, res) {
 async function registerEmployeesTimeLocation(req, res) {
   try {
     const { locationTimeData } = req.body;
-
+  
     const timeData = {
       employee:locationTimeData.employee,
-      date: locationTimeData.date,
+      date: locationTimeData.date || DateTime.now().setZone("America/La_Paz").toISO(),
       label: locationTimeData.label,  
       time: locationTimeData.time,
       location:"",
@@ -29,7 +30,6 @@ async function registerEmployeesTimeLocation(req, res) {
     const locationData = {
       latitude: locationTimeData.location.latitude,
       longitude: locationTimeData.location.longitude,
-      street: "",
       employee: locationTimeData.employee
     } 
 

@@ -1,7 +1,6 @@
 const { Schema, model } = require("mongoose");
-const { date } = require("./locations");
+const { DateTime } = require("luxon");
 
-const currentDate = Date.now();
 const controlTimeSchema = new Schema(
   {
     employee: {
@@ -11,12 +10,7 @@ const controlTimeSchema = new Schema(
     date: {
       type: Schema.Types.Date,
       required: true,
-      default: () => new Date(currentDate).toLocaleDateString("es-BO", { 
-        dateStyle:"short", 
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit"
-      }),
+      default: () => DateTime.now().setZone("America/La_Paz").toISO(),
     },
     entrada: {
       type: String,

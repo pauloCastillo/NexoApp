@@ -12,7 +12,7 @@ const employeeSchema = new Schema(
       trim: true,
       require: true,
     },
-    mail: {
+    email: {
       type: String,
       trim: true,
       require: true,
@@ -30,9 +30,9 @@ const employeeSchema = new Schema(
       type: String,
       trim: true,
     },
-    time_control: {
+    controlTimeID: {
       type: Schema.Types.ObjectId,
-      ref: "TimeControl",
+      ref: "ControlTime",
     },
   },
   {
@@ -55,7 +55,7 @@ employeeSchema.methods = {
   },
   createToken() {
     const user = {
-      email: this.mail,
+      email: this.email,
       username: this.username,
     };
     return signSession(user);
@@ -64,7 +64,8 @@ employeeSchema.methods = {
     return {
       id: this._id,
       username: this.username,
-      email: this.mail,
+      email: this.email,
+      controlTimeID: this.controlTimeID,
       token: `${this.createToken()}`,
     };
   },

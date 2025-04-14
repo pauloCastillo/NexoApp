@@ -1,40 +1,37 @@
 const { Schema, model } = require("mongoose");
+const { DateTime } = require("luxon");
 
-const locationSchema = new Schema(
+const locationSchema = new Schema({
+  date: {
+    type: Date,
+    trim: true,
+    require: true,
+    default: () => DateTime.now().setZone("America/La_Paz").toISO(), 
+  },
+  latitude: {
+    type: Number,
+    trim: true,
+    require: true,
+  },
+  longitude: {
+    type: Number,
+    trim: true,
+    require: true,
+  },
+  street: {
+    type: String,
+    trim: true,
+    require: true
+  },
+})
+
+const EmployeesLocationSchema = new Schema(
   {
     employee:{
       type:Schema.Types.ObjectId,
       ref:"Employee",
     },
-    date: {
-      type: Date,
-      trim: true,
-      require: true,
-      default: () => new Date().toLocaleString("es-BO", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour24: true,
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",  
-      }), 
-    },
-    latitude: {
-      type: Number,
-      trim: true,
-      require: true,
-    },
-    longitude: {
-      type: Number,
-      trim: true,
-      require: true,
-    },
-    street: {
-      type: String,
-      trim: true,
-      require: true
-    },
+    locations:[locationSchema],
   },
   {
     timestamps: true,
@@ -42,5 +39,5 @@ const locationSchema = new Schema(
   }
 );
 
-const Location = model("Location", locationSchema, "locations");
+const Location = model("Location", EmployeesLocationSchema, "locations");
 module.exports = Location;

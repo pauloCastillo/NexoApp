@@ -8,7 +8,7 @@ const LocationService = require("../services/locationService");
 const LocationRepository = require("../repositories/locationRepository");
 
 class ServiceFactory {
-  static getService(serviceType, data) {
+  static getService(serviceType, data = null) {
     switch (serviceType) {
       case "employee":
         return new EmployeeService(data, new EmployeeRepository());
