@@ -4,9 +4,6 @@
     "appVersionSource": "remote"
   },
   "build": {
-    "android": {
-      "enableHermes": true
-    },
     "development": {
       "developmentClient": true,
       "distribution": "internal"

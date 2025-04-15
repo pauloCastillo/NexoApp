@@ -21,6 +21,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "enableHermes": "true",
       "package": "com.t2project.personalapp",
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
