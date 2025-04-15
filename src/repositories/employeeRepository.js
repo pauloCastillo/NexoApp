@@ -2,7 +2,15 @@ const {Employee, JobTitle, ControlTime} = require("../db/models");
 
 class EmployeeRepository {
     async getAllEmployees() {
-       return await Employee.find({});
+       return await Employee.find({}).populate({ 
+            path:"controlTimeID", 
+            populate:{
+                path:"location",
+                populate:{
+                    path:"locations",
+                }
+            }
+        });
     }
 
     async getEmployeeById(id) {

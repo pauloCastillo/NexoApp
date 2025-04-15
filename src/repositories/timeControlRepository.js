@@ -13,7 +13,7 @@ class TimeControlRepository{
                 [`${data.label}`]: data.time,
                 location: data.location,
             },
-        }, {new: true}).populate("location", "locations.street");
+        }, {new: true}).populate("location", "locations");
     }   
 
     async deleteTimeControl(id) { 

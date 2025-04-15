@@ -1,4 +1,3 @@
-const { Employee } = require("../db/models");
 const { httpStatusCode } = require("../utils/httpStatus");
 const ServiceFactory = require("../factories/serviceFactory");
 
