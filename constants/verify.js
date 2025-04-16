@@ -12,8 +12,8 @@ export default function verify(data, mode) {
         "Introduzca en los campos correspondientes su(s) nombres y apellido(s)";
     }
 
-    if (!data.mail.match(regMail)) {
-      error.mail = "Verifique que su correo sea micorreo@dominio.com";
+    if (!data.email.match(regMail)) {
+      error.email = "Verifique que su correo sea micorreo@dominio.com";
     }
 
     if (!data.password.match(regPswd)) {

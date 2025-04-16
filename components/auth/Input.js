@@ -22,6 +22,16 @@ export default function Input({
     }
   };
 
+  const handlerKeyboardType = (label) => {
+    if (label === "Celular") {
+      return "numeric";
+    } else if (label === "Correo") {
+      return "email-address";
+    } else {
+      return "default";
+    }
+  };
+
   if (mode === "privateField") {
     return (
       <>
@@ -55,6 +65,7 @@ export default function Input({
           underlineColorAndroid={"#f42"}
           onChangeText={onUpdateValue}
           value={value}
+          keyboardType={handlerKeyboardType(label)}
           placeholder={placeholder}
         />
         {checkError && <Text style={styles.errorMessage}>{error}</Text>}

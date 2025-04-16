@@ -1,16 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { BASEURL } from "./configApi";
+import BaseUrl from "./configApi";
 
 export const registerNewEmployee = createAsyncThunk(
   "employee/addNewEmployee",
-  async (user) => {
-    console.log(user);
+  async (userData) => {
     try {
-      const response = await BASEURL.post("auth/register", {
+      const response = await BaseUrl.post("auth/register", userData, {
         headers: {
           "User-Agent": "mobile",
         },
-        data: user,
       });
       return response.data;
     } catch (error) {
@@ -23,7 +21,7 @@ export const loginEmployee = createAsyncThunk(
   "employee/login",
   async (employee) => {
     try {
-      const response = await BASEURL.post(
+      const response = await BaseUrl.post(
         "auth/login",
         { employee },
         {
@@ -63,7 +61,8 @@ const employeesSlides = createSlice({
       })
       .addCase(registerNewEmployee.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.id = action.payload.newEmployee.id;
+        state.id = action.payload.newEmployee.id.toString();
+        state.username = action.payload.newEmployee.username;
         state.token = action.payload.newEmployee.token;
         state.message = action.payload.message;
       })

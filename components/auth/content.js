@@ -7,10 +7,14 @@ import verify from "../../constants/verify";
 import {
   registerNewEmployee,
   selectEmployee,
+  selectEmployeeID,
   selectStatus,
+  selectToken,
 } from "../../store/employees";
 import AuthForm from "./form";
 import LoadingOverlay from "../../app/loading";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 export default function AuthContent({ formMode }) {
   const [error, setError] = useState({});
   const [checkError, setCheckError] = useState(false);
@@ -19,10 +23,21 @@ export default function AuthContent({ formMode }) {
   const status = useSelector(selectStatus);
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const id = useSelector(selectEmployeeID);
+  const token = useSelector(selectToken);
+  const storageKey = "register";
 
   if (status === "loading") {
     return <LoadingOverlay message="...login" />;
   }
+
+  const toStorageData = async (data) => {
+    try {
+      await AsyncStorage.setItem(storageKey, JSON.stringify(data));
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   function onSubmitHandler() {
     setError(verify(employee, "sign-up"));
@@ -34,8 +49,30 @@ export default function AuthContent({ formMode }) {
       );
     } else {
       dispatch(registerNewEmployee(employee));
-      ToastAndroid.show("Usuario registrado exitosamente!", ToastAndroid.LONG);
-      navigation.navigate("index");
+      if (
+        (id !== null && token !== null) ||
+        (id !== undefined && token !== undefined)
+      ) {
+        console.log(id, token);
+        const response = {
+          userId: id,
+          token,
+        };
+        toStorageData(response);
+      }
+
+      if (toStorageData) {
+        ToastAndroid.show(
+          "Usuario registrado exitosamente!",
+          ToastAndroid.LONG
+        );
+        navigation.navigate("index");
+      } else {
+        ToastAndroid.show(
+          "Usuario no registrado!, intente de nuevo",
+          ToastAndroid.LONG
+        );
+      }
     }
   }
 

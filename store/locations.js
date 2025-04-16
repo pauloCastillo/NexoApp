@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { BASEURL } from "./configApi";
+import BaseUrl from "./configApi";
 export const getLocations = createAsyncThunk(
   "locations/getLocation",
   async (location) => {
@@ -14,11 +14,9 @@ export const getLocations = createAsyncThunk(
 
 export const registerTimeAndLocations = createAsyncThunk(
   "locations/addTimesLocations",
-  async (locationTimeData) => {
-    const token = locationTimeData.token;
+  async (locationTimeData, token) => {
     try {
-      const response = await BASEURL.post("locations", {
-        data: locationTimeData,
+      const response = await BaseUrl.post("locations", locationTimeData, {
         headers: { Authorization: "Bearer " + token },
       });
       return response.data;

@@ -13,6 +13,7 @@ import {
   selectLocation,
   takeTime,
 } from "../store/locations";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function App() {
   const [location, setLocation] = useState(null);
@@ -22,7 +23,24 @@ export default function App() {
   const employee = useSelector(selectEmployee);
   const dispatch = useDispatch();
 
+  const storageKey = "register";
+
+  async function getData() {
+    try {
+      const value = await AsyncStorage.getItem(storageKey);
+      console.log(JSON.parse(value));
+      if (value) {
+        console.log("ir a la pantalla principal");
+      } else {
+        console.log("ir a la pantalla de registro");
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
   useEffect(() => {
+    getData();
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -63,14 +81,13 @@ export default function App() {
   function sendLocationToServer(workerTime, text) {
     const locationTimeData = {
       employee: employeeID,
-      location: place,
-      workerTime,
       label: text,
-      token,
+      time: workerTime,
+      location: place,
     };
 
     try {
-      dispatch(registerTimeAndLocations(locationTimeData));
+      dispatch(registerTimeAndLocations(locationTimeData, token));
       ToastAndroid.show("registro del tiempo exitoso!", ToastAndroid.LONG);
     } catch (error) {
       ToastAndroid.show(

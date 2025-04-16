@@ -16,7 +16,7 @@ export default function AuthForm({
   const [username, setUsername] = useState("");
   const [userlastname, setUserlastname] = useState("");
   const [userfullname, setUserfullname] = useState("");
-  const [mail, setMail] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [jobTitle, setJobTitle] = useState("");
@@ -62,8 +62,8 @@ export default function AuthForm({
       case "apellidos":
         setUserlastname(enteredValue);
         break;
-      case "mail":
-        setMail(enteredValue);
+      case "email":
+        setEmail(enteredValue);
         break;
       case "jobtitle":
         setJobTitle(enteredValue);
@@ -92,7 +92,7 @@ export default function AuthForm({
     dispatch(
       addEmployee({
         username: userfullname,
-        mail,
+        email,
         jobTitle,
         phone: `+591-${phone}`,
         password,
@@ -101,7 +101,7 @@ export default function AuthForm({
     );
   }, [
     userfullname,
-    mail,
+    email,
     jobTitle,
     phone,
     password,
@@ -132,11 +132,11 @@ export default function AuthForm({
           />
           <Input
             label="Correo"
-            onUpdateValue={onUpdateValueHandler.bind(this, "mail")}
-            value={mail}
+            onUpdateValue={onUpdateValueHandler.bind(this, "email")}
+            value={email}
             placeholder={"Coloque su correo@empresa.com"}
             checkError={checkError}
-            error={error.mail}
+            error={error.email}
           />
           <Input
             label="Cargo"
