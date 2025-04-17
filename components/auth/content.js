@@ -64,12 +64,6 @@ export default function AuthContent({ formMode }) {
       );
     } else {
       dispatch(registerNewEmployee(employee));
-      // if (JSON.parse(res).userId !== "") {
-      //
-      //
-      // } else {
-      //
-      // }
     }
   }
 

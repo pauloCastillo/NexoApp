@@ -14,7 +14,6 @@ import {
   takeTime,
 } from "../store/locations";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFocusEffect } from "@react-navigation/native";
 
 export default function App() {
   const [location, setLocation] = useState(null);
@@ -65,7 +64,7 @@ export default function App() {
     );
 
     return () => {
-      subscription.remove;
+      subscription.remove();
     };
   }, []);
 
