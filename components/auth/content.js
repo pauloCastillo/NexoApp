@@ -1,6 +1,6 @@
 import { Link, useNavigation } from "expo-router";
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, ToastAndroid } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import verify from "../../constants/verify";
@@ -20,24 +20,39 @@ export default function AuthContent({ formMode }) {
   const [checkError, setCheckError] = useState(false);
 
   const employee = useSelector(selectEmployee);
-  const status = useSelector(selectStatus);
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const id = useSelector(selectEmployeeID);
   const token = useSelector(selectToken);
-  const storageKey = "register";
+  const status = useSelector(selectStatus);
+  const storageKey = "@register";
 
-  if (status === "loading") {
-    return <LoadingOverlay message="...login" />;
-  }
-
-  const toStorageData = async (data) => {
-    try {
-      await AsyncStorage.setItem(storageKey, JSON.stringify(data));
-    } catch (error) {
-      console.log(error.message);
+  const storageData = async (id, token) => {
+    if ((id !== "", token !== "")) {
+      await AsyncStorage.setItem(
+        storageKey,
+        JSON.stringify({
+          userId: id,
+          userToken: token,
+        })
+      );
     }
   };
+
+  useEffect(() => {
+    if (status === "loading") {
+      console.log(status);
+    } else if (status === "succeeded") {
+      storageData(id, token);
+      navigation.navigate("index");
+      ToastAndroid.show("Usuario registrado exitosamente!", ToastAndroid.LONG);
+    } else if (status === "rejected") {
+      ToastAndroid.show(
+        "Usuario no registrado!, intente de nuevo",
+        ToastAndroid.LONG
+      );
+    }
+  }, [status, id, token]);
 
   function onSubmitHandler() {
     setError(verify(employee, "sign-up"));
@@ -49,30 +64,12 @@ export default function AuthContent({ formMode }) {
       );
     } else {
       dispatch(registerNewEmployee(employee));
-      if (
-        (id !== null && token !== null) ||
-        (id !== undefined && token !== undefined)
-      ) {
-        console.log(id, token);
-        const response = {
-          userId: id,
-          token,
-        };
-        toStorageData(response);
-      }
-
-      if (toStorageData) {
-        ToastAndroid.show(
-          "Usuario registrado exitosamente!",
-          ToastAndroid.LONG
-        );
-        navigation.navigate("index");
-      } else {
-        ToastAndroid.show(
-          "Usuario no registrado!, intente de nuevo",
-          ToastAndroid.LONG
-        );
-      }
+      // if (JSON.parse(res).userId !== "") {
+      //
+      //
+      // } else {
+      //
+      // }
     }
   }
 
@@ -87,6 +84,7 @@ export default function AuthContent({ formMode }) {
       </Text>
     );
   }
+
   return (
     <AuthForm
       formMode={formMode}

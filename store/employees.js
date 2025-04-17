@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import BaseUrl from "./configApi";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const registerNewEmployee = createAsyncThunk(
   "employee/addNewEmployee",
@@ -10,6 +11,7 @@ export const registerNewEmployee = createAsyncThunk(
           "User-Agent": "mobile",
         },
       });
+
       return response.data;
     } catch (error) {
       return error.message;

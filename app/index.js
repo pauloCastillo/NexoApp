@@ -1,7 +1,7 @@
 import * as Location from "expo-location";
-import { Redirect } from "expo-router";
+import { Redirect, useNavigation } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, ToastAndroid, View } from "react-native";
+import { StyleSheet, Text, ToastAndroid, View, AppState } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import IconButton from "../components/Buttons";
@@ -14,6 +14,7 @@ import {
   takeTime,
 } from "../store/locations";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function App() {
   const [location, setLocation] = useState(null);
@@ -22,25 +23,16 @@ export default function App() {
   const timeWorker = useRef();
   const employee = useSelector(selectEmployee);
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
-  const storageKey = "register";
+  const storageKey = "@register";
 
-  async function getData() {
-    try {
-      const value = await AsyncStorage.getItem(storageKey);
-      console.log(JSON.parse(value));
-      if (value) {
-        console.log("ir a la pantalla principal");
-      } else {
-        console.log("ir a la pantalla de registro");
-      }
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
+  const loadCredentials = async () => {
+    const credentials = await AsyncStorage.getItem(storageKey);
+    return JSON.parse(credentials);
+  };
 
   useEffect(() => {
-    getData();
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -48,6 +40,33 @@ export default function App() {
       }
       setLocation(await Location.getCurrentPositionAsync());
     })();
+
+    (async () => {
+      const credentials = await loadCredentials();
+      if (credentials.userId !== "") {
+        navigation.navigate("index");
+      }
+    })();
+
+    const subscription = AppState.addEventListener(
+      "change",
+      async (appState) => {
+        console.log(appState);
+
+        if (appState === "background") {
+          await AsyncStorage.setItem("@lastScreen", "index");
+        }
+
+        if (appState === "active") {
+          const lastScreen = await AsyncStorage.getItem("@lastScreen");
+          lastScreen && navigation.navigate(lastScreen);
+        }
+      }
+    );
+
+    return () => {
+      subscription.remove;
+    };
   }, []);
 
   function handlerTimeWorker() {
