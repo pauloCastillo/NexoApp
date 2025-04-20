@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
-    "start-server": "nodemon main.js"
+    "start": "nodemon main.js"
+  },
+  "engines": {
+    "node": "22.14.0"
   },
   "keywords": [],
   "author": "Paulo Castillo",
@@ -21,6 +24,11 @@
     "jsonwebtoken": "^9.0.2",
     "luxon": "^3.6.1",
     "mongoose": "^8.13.2",
+    "socket.io": "^4.8.1",
     "xlsx": "file:vendors/xlsx-0.20.2.tgz"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.9",
+    "utf-8-validate": "^6.0.5"
   }
 }
