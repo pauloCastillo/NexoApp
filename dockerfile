@@ -1,12 +1,8 @@
-FROM node:22.14.0-alpine3.17
-DIR /server
+FROM node:23-alpine3.20
+WORKDIR /server
 COPY package.json ./
-RUN npm install
 COPY . .
-EXPOSE 8000
+RUN npm install
+EXPOSE 8080
 CMD ["npm", "start"]
-# docker build -t my-node-app .
-# docker run -p 8000:8000 my-node-app
-# docker run -p 8000:8000 -v $(pwd):/usr/src/app my-node-app
-# docker run -p 8000:8000 -v $(pwd):/usr/src/app --name my-node-app my-node-app
-# docker run -p 8000:8000 -v $(pwd):/usr/src/app --name my-node-app -d my-node-app
+ENV DEV_STATUS = development DB_URI=mongodb+srv://pauloCastillo:pogh3gb3WGbLgsoI@prj-t2.70zydwj.mongodb.net/?retryWrites=true&w=majority&appName=prj-T2 SECRET_KEY=3fac2817624fd140bc7e13e0c5fc929bc5044b9306413945b1ef911e3b7abf60 API_KEY=pBAdPpS5UZwacgbZEMh8NoaqdjFFhNADm5Y1bD7AcyQ APP_ID=uTrELyHElOWcRllqest2 PORT_DEV=9000 PORT_PROD=8080 CLIENT_URL = * MOBILE_APP_URL = http://192.168.1.14:8080 SSL_KEY: ./etc/cert/key.pem SSL_CERT: ./etc/cert/cert.pem

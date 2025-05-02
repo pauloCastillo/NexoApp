@@ -11,4 +11,4 @@ const router = express.Router();
 router.get("/:id", getTimeLocationEmployee);
 router.post("/", verifiedToken, registerEmployeesTimeLocation);
 
-module.exports = router;
+module.exports = {router};

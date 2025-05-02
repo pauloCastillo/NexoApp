@@ -11,7 +11,7 @@ function getFilename(file) {
 fs.readdirSync(basedir).filter((file) => {
   const filename = getFilename(file);
   if (filename !== "index") {
-    router.use(`/${filename}`, require(`./${file}`));
+    router.use(`/${filename}`, require(`./${file}`).router);
   }
 });
 

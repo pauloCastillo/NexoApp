@@ -1,7 +1,6 @@
 const { httpStatusCode } = require("../utils/httpStatus");
 const ServiceFactory = require("../factories/serviceFactory");
 
-
 async function getAllEmployees(req, res) {
   try {
     const employeeService = ServiceFactory.getService("employee");
@@ -17,7 +16,7 @@ async function getAllEmployees(req, res) {
 async function getEmployeeById(req, res) {
   const { id } = req.params;
   const { body } = req;
-  console.log(body);
+  console.log("body", body);
   try {
     const employeeService = ServiceFactory.getService("employee", id);
     const employee = await employeeService.getEmployee();

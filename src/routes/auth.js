@@ -11,4 +11,4 @@ const router = express.Router();
 router.post("/register", registerEmployee);
 router.post("/login", verifiedToken, loginEmployee);
 
-module.exports = router;
+module.exports = {router};
