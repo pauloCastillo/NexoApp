@@ -14,6 +14,7 @@ import {
   takeTime,
 } from "../store/locations";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { io } from "socket.io-client";
 
 export default function App() {
   const [location, setLocation] = useState(null);
@@ -50,8 +51,6 @@ export default function App() {
     const subscription = AppState.addEventListener(
       "change",
       async (appState) => {
-        console.log(appState);
-
         if (appState === "background") {
           await AsyncStorage.setItem("@lastScreen", "index");
         }
@@ -96,6 +95,13 @@ export default function App() {
     return <Redirect href={"(auths)/Register"} />;
   }
 
+  const socket = io(process.env.EXPO_BASE_URL, {
+    agent: "mobile",
+    auth: {
+      token,
+    },
+  });
+
   function sendLocationToServer(workerTime, text) {
     const locationTimeData = {
       employee: employeeID,
@@ -105,8 +111,10 @@ export default function App() {
     };
 
     try {
-      dispatch(registerTimeAndLocations(locationTimeData, token));
-      ToastAndroid.show("registro del tiempo exitoso!", ToastAndroid.LONG);
+      socket.emit("register", () => {
+        dispatch(registerTimeAndLocations(locationTimeData, token));
+        ToastAndroid.show("registro del tiempo exitoso!", ToastAndroid.LONG);
+      });
     } catch (error) {
       ToastAndroid.show(
         "Ocurrió un problema! " + error.message,

@@ -50,14 +50,23 @@ export default function LoginLayout() {
     return <LoadingOverlay message="...login" />;
   }
 
+  const socket = io(process.env.EXPO_BASE_URL, {
+    agent: "mobile",
+    auth: {
+      token,
+    },
+  });
+
   const onSubmitHandler = () => {
     if (employee !== null) {
       setError(verify(employee, "login"));
       if (Object.getOwnPropertyNames(error).length !== 0) {
         setCheckError(true);
       } else {
-        dispatch(loginEmployee(employee));
-        ToastAndroid.show(message, ToastAndroid.LONG);
+        socket.emit("login", () => {
+          dispatch(loginEmployee(employee));
+          ToastAndroid.show(message, ToastAndroid.LONG);
+        });
         navigation.replace("index");
       }
     } else {

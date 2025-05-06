@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import BaseUrl from "./configApi";
+
 export const getLocations = createAsyncThunk(
   "locations/getLocation",
   async (location) => {
