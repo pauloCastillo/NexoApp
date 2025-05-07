@@ -111,10 +111,10 @@ export default function App() {
     };
 
     try {
-      socket.emit("register", () => {
+      socket.emit("getLocation", () => {
         dispatch(registerTimeAndLocations(locationTimeData, token));
-        ToastAndroid.show("registro del tiempo exitoso!", ToastAndroid.LONG);
       });
+      ToastAndroid.show("registro del tiempo exitoso!", ToastAndroid.LONG);
     } catch (error) {
       ToastAndroid.show(
         "Ocurrió un problema! " + error.message,

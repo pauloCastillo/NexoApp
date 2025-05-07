@@ -12,6 +12,10 @@ export default function verify(data, mode) {
         "Introduzca en los campos correspondientes su(s) nombres y apellido(s)";
     }
 
+    if(!data.companyName || data.companyName === "") {
+      error.companyName = "Introduzca el nombre de la empresa";
+    }
+
     if (!data.email.match(regMail)) {
       error.email = "Verifique que su correo sea micorreo@dominio.com";
     }
@@ -36,6 +40,10 @@ export default function verify(data, mode) {
   } else {
     if (!data.mail.match(regMail)) {
       error.mail = "Verifique que su correo sea micorreo@gmail.com";
+    }
+
+    if(!data.companyName || data.companyName === "") {
+      error.companyName = "Introduzca el nombre de la empresa";
     }
 
     if (data.mail === "") {

@@ -21,6 +21,7 @@ export default function AuthForm({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [jobTitle, setJobTitle] = useState("");
   const [phone, setPhone] = useState("");
+  const [companyName, setCompanyName] = useState("");
 
   const dispatch = useDispatch();
 
@@ -33,6 +34,9 @@ export default function AuthForm({
             break;
           case "lastnames":
             lastnames === "" && setError(false);
+            break;
+          case "companyName":
+            companyName === "" && setError(false);
             break;
           case "email":
             email === "" && setError(false);
@@ -62,7 +66,10 @@ export default function AuthForm({
       case "apellidos":
         setUserlastname(enteredValue);
         break;
-      case "email":
+      case "companyname": 
+        setCompanyName(enteredValue);
+        break;
+      case "email": 
         setEmail(enteredValue);
         break;
       case "jobtitle":
@@ -92,6 +99,7 @@ export default function AuthForm({
     dispatch(
       addEmployee({
         username: userfullname,
+        companyName,
         email,
         jobTitle,
         phone: `+591-${phone}`,
@@ -101,6 +109,7 @@ export default function AuthForm({
     );
   }, [
     userfullname,
+    companyName,
     email,
     jobTitle,
     phone,
@@ -129,6 +138,14 @@ export default function AuthForm({
             placeholder={"Coloque sus apellidos"}
             checkError={checkError}
             error={error.username}
+          />
+          <Input
+            label="Nombre de la empresa"
+            onUpdateValue={onUpdateValueHandler.bind(this, "companyName")}
+            value={companyName}
+            placeholder={"Coloque el nombre de la empresa"}
+            checkError={checkError}
+            error={error.companyName}
           />
           <Input
             label="Correo"
