@@ -12,6 +12,11 @@ const employeeSchema = new Schema(
       trim: true,
       require: true,
     },
+    companyName:{
+      type: String,
+      trim: true,
+      require: true,
+    },
     email: {
       type: String,
       trim: true,

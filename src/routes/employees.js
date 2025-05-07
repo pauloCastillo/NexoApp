@@ -22,7 +22,6 @@ function setupEmployeeNamespace(io) {
   const employeeNamespace = io.of('/api/employees');
   
   employeeNamespace.on('connection', async (socket) => {
-    
     console.log(socket.id);
     const employeeService = ServiceFactory.getService("employee");
       const employees = await employeeService.getAll();

@@ -7,6 +7,7 @@ const router = require("./src/routes");
 const dbConnection = require("./src/db/config/db");
 const setupSocketIO = require("./src/utils/socketManager");
 const { setupEmployeeNamespace } = require("./src/routes/employees");
+const { setupEmployeeLocationNamespace } = require("./src/routes/locations");
 const app = express();
 let port = "";
 
@@ -31,6 +32,7 @@ dbConnection();
 // Socket.io setup
 const io = setupSocketIO(server);
 setupEmployeeNamespace(io);
+setupEmployeeLocationNamespace(io);
 
 server.listen(port, () =>
   console.log(`Listening on port https://localhost:${port}`)

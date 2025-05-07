@@ -18,7 +18,6 @@ async function getTimeLocationEmployee(req, res) {
 async function registerEmployeesTimeLocation(req, res) {
   try {
     const { locationTimeData } = req.body;
-  
     const timeData = {
       employee:locationTimeData.employee,
       date: locationTimeData.date || DateTime.now().setZone("America/La_Paz").toISO(),
