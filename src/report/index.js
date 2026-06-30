@@ -1,5 +1,5 @@
-const xlsx = require("xlsx");
-const fs = require("fs");
+import xlsx from 'xlsx';
+import fs from 'fs';
 const filePath = "../../asistencia.xlsx";
 
 const currentDate = new Date();
@@ -42,4 +42,4 @@ function createReport(data) {
   xlsx.writeFile(workbook, filePath, { compression: true });
 }
 
-module.exports = { createReport };
+export { createReport };

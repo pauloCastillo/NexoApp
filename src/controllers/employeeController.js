@@ -1,5 +1,5 @@
-const { httpStatusCode } = require("../utils/httpStatus");
-const ServiceFactory = require("../factories/serviceFactory");
+import {  httpStatusCode  } from '../utils/httpStatus.js';
+import ServiceFactory from '../factories/serviceFactory.js';
 
 async function getAllEmployees(req, res) {
   try {
@@ -55,9 +55,4 @@ async function deleteEmployee(req, res) {
   }
 }
 
-module.exports = {
-  getAllEmployees,
-  getEmployeeById,
-  createEmployee,
-  deleteEmployee
-};
+export { getAllEmployees, getEmployeeById, createEmployee, deleteEmployee };

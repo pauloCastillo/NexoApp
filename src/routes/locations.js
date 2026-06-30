@@ -1,10 +1,10 @@
-const express = require("express");
-const {
+import express from 'express';
+import { 
   registerEmployeesTimeLocation,
   getTimeLocationEmployee,
-} = require("../controllers/locationController");
+ } from '../controllers/locationController.js';
 
-const { verifiedToken } = require("../middlewares/verifyToken");
+import {  verifiedToken  } from '../middlewares/verifyToken.js';
 
 const router = express.Router();
 
@@ -29,4 +29,4 @@ function setupEmployeeLocationNamespace(io) {
   return employeeNamespace;
 }
 
-module.exports = {router, setupEmployeeLocationNamespace};
+export { router, setupEmployeeLocationNamespace };

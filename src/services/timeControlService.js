@@ -12,4 +12,4 @@ class TimeControlService {
   }
 }
 
-module.exports = TimeControlService;
+export default TimeControlService;

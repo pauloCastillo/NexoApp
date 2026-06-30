@@ -1,4 +1,4 @@
-const { ControlTime } = require("../db/models");
+import {  ControlTime  } from '../db/models/index.js';
 
 class TimeControlRepository{
     async getTimeControlById(id) { 
@@ -21,4 +21,4 @@ class TimeControlRepository{
     }
 }
 
-module.exports = TimeControlRepository;
+export default TimeControlRepository;

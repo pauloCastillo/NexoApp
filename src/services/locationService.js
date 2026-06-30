@@ -31,4 +31,4 @@ class LocationService{
     }
 }
 
-module.exports = LocationService;
+export default LocationService;

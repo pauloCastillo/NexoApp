@@ -1,4 +1,4 @@
-const UserService = require("./userService");
+import UserService from './userService.js';
 
 class Manager extends UserService {
   constructor(manager, repository) {
@@ -46,4 +46,4 @@ class Manager extends UserService {
   }
 }
 
-module.exports = Manager;
+export default Manager;

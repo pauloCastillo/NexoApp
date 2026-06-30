@@ -1,4 +1,4 @@
-exports.httpStatusCode = {
+export const httpStatusCode = {
   CONTINUE: 100,
   OK: 200,
   CREATED: 201,

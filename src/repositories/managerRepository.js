@@ -1,5 +1,5 @@
-const { ManagerModel } = require("../db/models");
-const { checkingPassword } = require("../utils/utils");
+import {  ManagerModel  } from '../db/models/index.js';
+import {  checkingPassword  } from '../utils/utils.js';
 
 class ManagerRepository {
     async getAllManagers() {
@@ -42,4 +42,4 @@ class ManagerRepository {
     }
 }
 
-module.exports = ManagerRepository;
+export default ManagerRepository;

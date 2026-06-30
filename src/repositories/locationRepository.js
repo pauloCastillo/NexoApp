@@ -1,6 +1,5 @@
-require("dotenv").config();
-const axios = require("axios");
-const { Location } = require("../db/models");
+import axios from 'axios';
+import {  Location  } from '../db/models/index.js';
 
 class LocationRepository {
     async #verifyingLocation(doc){
@@ -77,4 +76,4 @@ class LocationRepository {
     }
 }
 
-module.exports = LocationRepository;
+export default LocationRepository;

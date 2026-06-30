@@ -1,5 +1,5 @@
-const { createReport } = require("../report");
-const { ControlTime } = require("../db/models");
+import { createReport } from '../report/index.js';
+import {  ControlTime  } from '../db/models/index.js';
 
 class Report {
   async createReport() {
@@ -8,6 +8,4 @@ class Report {
   }
 }
 
-module.exports = {
-  Report,
-};
+export { Report,  };

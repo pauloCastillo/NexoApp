@@ -1,4 +1,4 @@
-const {Employee, JobTitle, ControlTime} = require("../db/models");
+import { Employee, JobTitle, ControlTime } from '../db/models/index.js';
 
 class EmployeeRepository {
     async getAllEmployees() {
@@ -15,6 +15,11 @@ class EmployeeRepository {
 
     async getEmployeeById(id) {
         const employee = await Employee.findById(id);
+        return employee;
+    }
+
+    async getEmployeeByEmail(email) {
+        const employee = await Employee.findOne({ email });
         return employee;
     }
     
@@ -52,4 +57,4 @@ class EmployeeRepository {
     }
 }
 
-module.exports = EmployeeRepository;
+export default EmployeeRepository;

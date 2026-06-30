@@ -1,7 +1,7 @@
-const { Location } = require("../db/models");
-const ServiceFactory = require("../factories/serviceFactory");
-const { httpStatusCode } = require("../utils/httpStatus");
-const { DateTime } = require("luxon");
+import {  Location  } from '../db/models/index.js';
+import ServiceFactory from '../factories/serviceFactory.js';
+import {  httpStatusCode  } from '../utils/httpStatus.js';
+import {  DateTime  } from 'luxon';
 
 async function getTimeLocationEmployee(req, res) {
   try {
@@ -47,7 +47,4 @@ async function registerEmployeesTimeLocation(req, res) {
   }
 }
 
-module.exports = {
-  getTimeLocationEmployee,
-  registerEmployeesTimeLocation,
-};
+export { getTimeLocationEmployee, registerEmployeesTimeLocation,  };

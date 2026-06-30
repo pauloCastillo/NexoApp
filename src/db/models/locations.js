@@ -1,5 +1,5 @@
-const { Schema, model } = require("mongoose");
-const { DateTime } = require("luxon");
+import {  Schema, model  } from 'mongoose';
+import {  DateTime  } from 'luxon';
 
 const locationSchema = new Schema({
   date: {
@@ -40,4 +40,4 @@ const EmployeesLocationSchema = new Schema(
 );
 
 const Location = model("Location", EmployeesLocationSchema, "locations");
-module.exports = Location;
+export default Location;

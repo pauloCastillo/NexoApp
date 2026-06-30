@@ -1,26 +1,30 @@
-require("dotenv").config();
-const express = require("express");
-const { createServer} = require("https");
-const fs = require("fs");
-const cors = require("cors");
-const router = require("./src/routes");
-const dbConnection = require("./src/db/config/db");
-const setupSocketIO = require("./src/utils/socketManager");
-const { setupEmployeeNamespace } = require("./src/routes/employees");
-const { setupEmployeeLocationNamespace } = require("./src/routes/locations");
+import "dotenv/config";
+import express from "express";
+import { createServer } from "https";
+import fs from "fs";
+import cors from "cors";
+import router from "./src/routes/index.js";
+import dbConnection from "./src/db/config/db.js";
+import setupSocketIO from "./src/utils/socketManager.js";
+import { setupEmployeeLocationNamespace } from "./src/routes/locations.js";
+import { setupEmployeeNamespace } from "./src/routes/employees.js";
+
 const app = express();
 let port = "";
 
-if(process.env.DEV_STATUS === "development"){
-  port = process.env.PORT_DEV;
-}else{
+if (process.env.DEV_STATUS === "development") {
+  port = process.env.PORT_DEV || 8080;
+} else {
   port = process.env.PORT_PROD;
 }
 
-const server = createServer({
-  key: fs.readFileSync(process.env.SSL_KEY, "utf-8"),
-  cert: fs.readFileSync(process.env.SSL_CERT, "utf-8"),
-}, app);
+const server = createServer(
+  {
+    key: fs.readFileSync(process.env.SSL_KEY, "utf-8"),
+    cert: fs.readFileSync(process.env.SSL_CERT, "utf-8"),
+  },
+  app
+);
 
 app.use(cors());
 app.use(express.json());
@@ -29,7 +33,6 @@ app.use("/api", router);
 
 dbConnection();
 
-// Socket.io setup
 const io = setupSocketIO(server);
 setupEmployeeNamespace(io);
 setupEmployeeLocationNamespace(io);

@@ -1,5 +1,5 @@
-const { Server } = require("socket.io");
-const dotenv = require("dotenv");
+import {  Server  } from 'socket.io';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -16,4 +16,4 @@ const setupSocketIO = (server) => {
     return io;  
 }
 
-module.exports = setupSocketIO;
+export default setupSocketIO;

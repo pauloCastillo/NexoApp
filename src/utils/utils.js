@@ -1,6 +1,5 @@
-require("dotenv").config();
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 const saltRounds = 12;
 
 const encryptPassword = async (password) => {
@@ -33,9 +32,4 @@ const verifyingSession = (token) => {
   }
 };
 
-module.exports = {
-  encryptPassword,
-  checkingPassword,
-  signSession,
-  verifyingSession,
-};
+export { encryptPassword, checkingPassword, signSession, verifyingSession,  };

@@ -1,15 +1,9 @@
-const Employee = require("./employee");
-const JobTitle = require("./jobTitle");
-const ControlTime = require("./timeControl");
-const Location = require("./locations");
-const ManagerModel = require("./manager");
-
-const model = {
-  Employee,
-  JobTitle,
-  ControlTime,
-  Location,
-  ManagerModel,
-};
-
-module.exports = model;
+export { default as Employee } from './employee.js';
+export { default as JobTitle } from './jobTitle.js';
+export { default as ControlTime } from './timeControl.js';
+export { default as Location } from './locations.js';
+export { default as ManagerModel } from './manager.js';
+export { default as Client } from './client.js';
+export { default as Permission } from './permission.js';
+export { default as Vacation } from './vacation.js';
+export { default as WorkOrder } from './workOrder.js';

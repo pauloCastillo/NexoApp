@@ -1,4 +1,4 @@
-const { verifyingSession } = require("../utils/utils");
+import {  verifyingSession  } from '../utils/utils.js';
 
 const verifiedToken = (req, res, next) => {
   const { authorization } = req.headers;
@@ -11,6 +11,4 @@ const verifiedToken = (req, res, next) => {
   }
 };
 
-module.exports = {
-  verifiedToken,
-};
+export { verifiedToken,  };

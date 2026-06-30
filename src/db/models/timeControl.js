@@ -1,5 +1,5 @@
-const { Schema, model } = require("mongoose");
-const { DateTime } = require("luxon");
+import {  Schema, model  } from 'mongoose';
+import {  DateTime  } from 'luxon';
 
 const controlTimeSchema = new Schema(
   {
@@ -36,4 +36,4 @@ const controlTimeSchema = new Schema(
 );
 
 const ControlTime = model("ControlTime", controlTimeSchema, "timeControls");
-module.exports = ControlTime;
+export default ControlTime;

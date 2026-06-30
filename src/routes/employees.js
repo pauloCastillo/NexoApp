@@ -1,12 +1,12 @@
-const express = require("express");
-const {
+import express from 'express';
+import { 
   getAllEmployees,
   getEmployeeById,
   createEmployee,
   deleteEmployee,
-} = require("../controllers/employeeController");
-const ServiceFactory = require("../factories/serviceFactory");
-const { verifiedToken } = require("../middlewares/verifyToken");
+ } from '../controllers/employeeController.js';
+import ServiceFactory from '../factories/serviceFactory.js';
+import {  verifiedToken  } from '../middlewares/verifyToken.js';
 
 const router = express.Router();
 
@@ -32,4 +32,4 @@ function setupEmployeeNamespace(io) {
   return employeeNamespace;
 }
 
-module.exports = {router, setupEmployeeNamespace};
+export { router, setupEmployeeNamespace };

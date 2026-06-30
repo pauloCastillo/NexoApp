@@ -1,14 +1,14 @@
-const express = require("express");
-const {
+import express from 'express';
+import { 
   registerEmployee,
   loginEmployee,
-} = require("../controllers/authsController");
+ } from '../controllers/authsController.js';
 
-const { verifiedToken } = require("../middlewares/verifyToken");
+import {  verifiedToken  } from '../middlewares/verifyToken.js';
 
 const router = express.Router();
 
 router.post("/register", registerEmployee);
 router.post("/login", verifiedToken, loginEmployee);
 
-module.exports = {router};
+export { router };

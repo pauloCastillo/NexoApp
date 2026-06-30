@@ -1,9 +1,9 @@
-const { Schema, model } = require("mongoose");
-const {
+import {  Schema, model  } from 'mongoose';
+import { 
   encryptPassword,
   checkingPassword,
   signSession,
-} = require("../../utils/utils");
+ } from '../../utils/utils.js';
 
 const employeeSchema = new Schema(
   {
@@ -34,6 +34,11 @@ const employeeSchema = new Schema(
     phone: {
       type: String,
       trim: true,
+    },
+    role: {
+      type: String,
+      enum: ["employee", "manager", "admin"],
+      default: "employee",
     },
     controlTimeID: {
       type: Schema.Types.ObjectId,
@@ -70,6 +75,7 @@ employeeSchema.methods = {
       id: this._id,
       username: this.username,
       email: this.email,
+      role: this.role,
       controlTimeID: this.controlTimeID,
       token: `${this.createToken()}`,
     };
@@ -77,4 +83,4 @@ employeeSchema.methods = {
 };
 
 const Employee = model("Employee", employeeSchema, "employees");
-module.exports = Employee;
+export default Employee;

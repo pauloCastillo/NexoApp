@@ -1,9 +1,9 @@
-const { Schema, model } = require("mongoose");
-const {
+import {  Schema, model  } from 'mongoose';
+import { 
   encryptPassword,
   checkingPassword,
   signSession,
-} = require("../../utils/utils");
+ } from '../../utils/utils.js';
 
 const managerSchema = new Schema(
   {
@@ -69,4 +69,4 @@ managerSchema.methods = {
 };
 
 const Manager = model("Manager", managerSchema, "admins");
-module.exports = Manager;
+export default Manager;

@@ -1,4 +1,4 @@
-const UserService = require("./userService");
+import UserService from './userService.js';
 
 class EmployeeService extends UserService {
   
@@ -65,4 +65,4 @@ class EmployeeService extends UserService {
     }
 }
 
-module.exports = EmployeeService;
+export default EmployeeService;

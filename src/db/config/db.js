@@ -1,5 +1,4 @@
-require("dotenv").config();
-const mongoose = require("mongoose");
+import mongoose from 'mongoose';
 
 async function dbConnection() {
   try {
@@ -14,4 +13,4 @@ async function dbConnection() {
   }
 }
 
-module.exports = dbConnection;
+export default dbConnection;
