@@ -9,29 +9,50 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "2.1.2",
-    "@reduxjs/toolkit": "^2.5.0",
-    "axios": "^1.7.9",
-    "expo": "^53.0.7",
-    "expo-constants": "~17.1.5",
-    "expo-dev-client": "~5.1.8",
-    "expo-linking": "~7.1.4",
-    "expo-location": "~18.1.4",
-    "expo-router": "~5.0.5",
-    "expo-status-bar": "~2.2.3",
-    "luxon": "^3.6.1",
-    "react": "19.0.0",
-    "react-native": "0.79.2",
-    "react-native-gesture-handler": "~2.24.0",
-    "react-native-reanimated": "~3.17.4",
-    "react-native-safe-area-context": "5.4.0",
-    "react-native-screens": "~4.10.0",
-    "react-redux": "^9.2.0",
-    "socket.io-client": "^4.8.1"
+    "@expo/metro-runtime": "~56.0.15",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@reduxjs/toolkit": "^2.12.0",
+    "axios": "^1.16.1",
+    "expo": "^56.0.12",
+    "expo-constants": "~56.0.18",
+    "expo-dev-client": "~56.0.20",
+    "expo-linking": "~56.0.14",
+    "expo-location": "~56.0.18",
+    "expo-router": "~56.2.11",
+    "expo-secure-store": "~56.0.4",
+    "expo-status-bar": "~56.0.4",
+    "luxon": "^3.7.2",
+    "nativewind": "^4.2.5",
+    "prop-types": "^15.8.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.85.3",
+    "react-native-css-interop": "^0.2.5",
+    "react-native-gesture-handler": "~2.31.2",
+    "react-native-reanimated": "~4.3.1",
+    "react-native-safe-area-context": "5.7.0",
+    "react-native-screens": "~4.25.2",
+    "react-native-web": "^0.21.2",
+    "react-native-worklets": "0.8.3",
+    "react-redux": "^9.3.0",
+    "socket.io-client": "^4.8.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.26.0",
-    "metro": "^0.82.0"
+    "@babel/core": "^7.29.7",
+    "@react-native/typescript-config": "^0.86.0",
+    "@types/jest": "29.5.14",
+    "@types/prop-types": "^15.7.15",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@types/react-test-renderer": "^19.1.0",
+    "metro": "^0.84.4",
+    "tailwindcss": "^3.4.19",
+    "typescript": "~6.0.3"
   },
-  "private": true
+  "private": true,
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "msgpackr-extract"
+    ]
+  }
 }

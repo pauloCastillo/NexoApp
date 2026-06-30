@@ -1,27 +1,20 @@
 {
   "expo": {
-    "name": "personal-app",
-    "scheme": "mobile-t2",
-    "slug": "personal-app",
+    "name": "Nexo",
+    "scheme": "nexo",
+    "slug": "nexo-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#E8612C"
       },
-      "enableHermes": "true",
       "package": "com.t2project.personalapp",
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
@@ -29,16 +22,18 @@
       ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
     },
     "plugins": [
       "expo-router",
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+          "locationAlwaysAndWhenInUsePermission": "Nexo necesita acceder a tu ubicación para registrar tus marcaciones."
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "extra": {
       "router": {
