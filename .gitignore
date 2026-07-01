@@ -3,3 +3,9 @@ node_modules/
 
 # local env files
 .env
+
+# build output
+dist/
+
+# excel reports
+asistencia.xlsx

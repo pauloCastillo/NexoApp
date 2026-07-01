@@ -1,11 +1,19 @@
 {
   "name": "back",
   "version": "1.0.0",
-  "main": "main.js",
+  "main": "main.ts",
   "scripts": {
-    "start": "nodemon main.js"
+    "dev": "tsx watch main.ts",
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "migrate": "tsx scripts/migrate-multi-tenant.ts"
   },
   "type": "module",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
   "engines": {
     "node": ">= 22.14.0"
   },
@@ -14,7 +22,15 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/luxon": "^3.7.2",
+    "@types/node": "^26.0.1",
+    "nodemon": "^3.1.14",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
   },
   "dependencies": {
     "axios": "^1.18.1",
