@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Input from "../../components/auth/Input";
 import LoadingOverlay from "../../components/ui/loading";
 import verify from "../../constants/verify";
+import { registerPushToken } from "../../services/notifications";
 import {
   registerNewEmployee,
   selectMessage,
@@ -27,6 +28,7 @@ export default function RegisterLayout() {
   const [username, setUsername] = useState("");
   const [userLastName, setUserLastName] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
   const [email, setEmail] = useState("");
   const [jobTitle, setJobTitle] = useState("");
   const [phone, setPhone] = useState("");
@@ -43,6 +45,7 @@ export default function RegisterLayout() {
 
   useEffect(() => {
     if (status === "succeeded") {
+      registerPushToken();
       ToastAndroid.show("Registro exitoso!", ToastAndroid.LONG);
       router.replace("/(main)/home");
     } else if (status === "rejected") {
@@ -54,13 +57,17 @@ export default function RegisterLayout() {
     const userFullName = username + " " + userLastName;
     const employeeData: RegisterEmployeePayload = {
       username: userFullName,
-      companyName,
       email,
       jobTitle,
       phone: `+591-${phone}`,
       password,
       confirmPassword,
     };
+    if (inviteCode) {
+      employeeData.inviteCode = inviteCode;
+    } else {
+      employeeData.companyName = companyName;
+    }
     const errs = verify(employeeData, "sign-up");
     setError(errs);
     if (Object.keys(errs).length > 0) {
@@ -120,6 +127,14 @@ export default function RegisterLayout() {
               checkError={checkError}
               error={error.companyName}
             />
+            <Text className="text-xs text-center text-textSecondary my-1">— o —</Text>
+            <Input
+              label="Código de invitación"
+              onUpdateValue={setInviteCode}
+              value={inviteCode}
+              placeholder={"Código de invitación"}
+              checkError={checkError}
+            />
             <Input
               label="Correo"
               onUpdateValue={setEmail}
@@ -173,7 +188,7 @@ export default function RegisterLayout() {
           </View>
 
           <Text className="text-center font-normal text-textSecondary my-[20]">
-            ¿Ya tienes una cuenta?{" "}
+            ¿Ya tienes una cuenta?{" "}<br/>
             <Link
               replace
               href={"Login"}

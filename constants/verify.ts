@@ -9,8 +9,8 @@ export default function verify(data: any, mode: string): Record<string, string> 
     if (!data?.username || data.username === "") {
       error.username = "Introduzca su(s) nombre(s) y apellido(s)";
     }
-    if (!data?.companyName || data.companyName === "") {
-      error.companyName = "Introduzca el nombre de la empresa";
+    if ((!data?.companyName || data.companyName === "") && (!data?.inviteCode || data.inviteCode === "")) {
+      error.companyName = "Introduzca el nombre de la empresa o un código de invitación";
     }
     if (
       !data?.email ||

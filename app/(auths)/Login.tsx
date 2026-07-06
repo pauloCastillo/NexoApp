@@ -15,6 +15,7 @@ import Input from "../../components/auth/Input";
 import LoadingOverlay from "../../components/ui/loading";
 import verify from "../../constants/verify";
 import { loginEmployee } from "../../store/employees";
+import { registerPushToken } from "../../services/notifications";
 import { COLORS } from "../../constants/theme";
 import type { AppDispatch, RootState } from "../../types/store";
 
@@ -43,6 +44,7 @@ export default function LoginLayout() {
     ) {
       try {
         await dispatch(loginEmployee({ mail, password })).unwrap();
+        registerPushToken();
         ToastAndroid.show("Inicio de sesión exitoso", ToastAndroid.LONG);
         router.replace("/(main)/home");
       } catch (err: unknown) {
@@ -119,7 +121,7 @@ export default function LoginLayout() {
           </View>
 
           <Text className="text-center font-normal text-textSecondary my-[20]">
-            ¿No tienes una cuenta?{" "}
+            ¿No tienes una cuenta?{" "}<br/>
             <Link
               replace
               href={"Register"}

@@ -14,7 +14,8 @@ export interface Employee {
 /** Payload sent when registering a new employee */
 export interface RegisterEmployeePayload {
   username: string;
-  companyName: string;
+  companyName?: string;
+  inviteCode?: string;
   email: string;
   jobTitle: string;
   phone: string;
