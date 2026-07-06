@@ -6,7 +6,7 @@ const clientSchema = new Schema(
     companyName: {
       type: String,
       trim: true,
-      require: true,
+      required: true,
     },
     company: {
       type: Schema.Types.ObjectId,
@@ -16,12 +16,12 @@ const clientSchema = new Schema(
     contactName: {
       type: String,
       trim: true,
-      require: true,
+      required: true,
     },
     contactLastName: {
       type: String,
       trim: true,
-      require: true,
+      required: true,
     },
     email: {
       type: String,

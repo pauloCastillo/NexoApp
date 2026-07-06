@@ -12,7 +12,8 @@ class Manager extends UserService {
   async getAll() {
     const employees = await this._repository.getAllManagers(this._context!);
       return employees.map((employee) => {
-        const { password, ...rest } = employee.toObject();
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password: _password, ...rest } = employee.toObject();
         return rest
       });
     }

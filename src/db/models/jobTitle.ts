@@ -7,7 +7,7 @@ const jobSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Employee",
       trim: true,
-      require: true,
+      required: true,
     },
     company: {
       type: Schema.Types.ObjectId,
@@ -17,11 +17,11 @@ const jobSchema = new Schema(
     job_title: {
       type: String,
       trim: true,
-      require: true,
+      required: true,
     },
     department: {
       type: String,
-      require: true,
+      required: true,
     },
   },
   {

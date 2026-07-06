@@ -19,6 +19,14 @@ class PermissionService {
   async create() {
     return await this._repository.createPermission(this._data, this._context!);
   }
+
+  async update(id: string) {
+    return await this._repository.updatePermission(id, this._data, this._context!);
+  }
+
+  async delete(id: string) {
+    return await this._repository.deletePermission(id, this._context!);
+  }
 }
 
 export default PermissionService;

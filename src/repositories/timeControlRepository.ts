@@ -1,5 +1,5 @@
 import { ControlTime } from '@/db/models/index.js';
-import { IControlTime, ITimeControlData, TenantContext } from '@/types/models.js';
+import { ITimeControlData, TenantContext } from '@/types/models.js';
 
 class TimeControlRepository {
     #companyFilter(context: TenantContext): Record<string, any> {

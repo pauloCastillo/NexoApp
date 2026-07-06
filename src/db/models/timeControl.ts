@@ -1,5 +1,4 @@
 import { Schema, model } from 'mongoose';
-import { DateTime } from 'luxon';
 import { IControlTime } from '@/types/models.js';
 
 const controlTimeSchema = new Schema(
@@ -16,7 +15,7 @@ const controlTimeSchema = new Schema(
     date: {
       type: Schema.Types.Date,
       required: true,
-      default: () => DateTime.now().setZone("America/La_Paz").toISO(),
+      default: () => new Date(),
     },
     entrada: {
       type: String,

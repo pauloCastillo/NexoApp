@@ -6,7 +6,7 @@ const permissionSchema = new Schema(
     employee: {
       type: Schema.Types.ObjectId,
       ref: "Employee",
-      require: true,
+      required: true,
     },
     company: {
       type: Schema.Types.ObjectId,
@@ -17,20 +17,20 @@ const permissionSchema = new Schema(
       type: String,
       enum: ["permiso", "licencia", "otro"],
       default: "permiso",
-      require: true,
+      required: true,
     },
     startDate: {
       type: Date,
-      require: true,
+      required: true,
     },
     endDate: {
       type: Date,
-      require: true,
+      required: true,
     },
     reason: {
       type: String,
       trim: true,
-      require: true,
+      required: true,
     },
     status: {
       type: String,

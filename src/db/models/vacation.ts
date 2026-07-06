@@ -6,7 +6,7 @@ const vacationSchema = new Schema(
     employee: {
       type: Schema.Types.ObjectId,
       ref: "Employee",
-      require: true,
+      required: true,
     },
     company: {
       type: Schema.Types.ObjectId,
@@ -15,11 +15,11 @@ const vacationSchema = new Schema(
     },
     startDate: {
       type: Date,
-      require: true,
+      required: true,
     },
     endDate: {
       type: Date,
-      require: true,
+      required: true,
     },
     status: {
       type: String,

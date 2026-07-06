@@ -1,5 +1,4 @@
 import xlsx from 'xlsx';
-import fs from 'fs';
 
 const filePath = "asistencia.xlsx";
 const currentDate = new Date();
@@ -15,7 +14,7 @@ interface IReportRow {
 
 function createReport(data: IReportRow[]) {
   const register = data;
-  let rows = register.map((row) => {
+  const rows = register.map((row) => {
     return {
       name: row.employee.username,
       entrada: row.entrada,

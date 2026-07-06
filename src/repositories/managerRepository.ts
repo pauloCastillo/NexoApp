@@ -1,5 +1,4 @@
 import { ManagerModel } from '@/db/models/index.js';
-import { checkingPassword } from '@/utils/utils.js';
 import { IManager, TenantContext } from '@/types/models.js';
 
 class ManagerRepository {

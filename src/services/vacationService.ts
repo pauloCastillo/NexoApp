@@ -19,6 +19,14 @@ class VacationService {
   async create() {
     return await this._repository.createVacation(this._data, this._context!);
   }
+
+  async update(id: string) {
+    return await this._repository.updateVacation(id, this._data, this._context!);
+  }
+
+  async delete(id: string) {
+    return await this._repository.deleteVacation(id, this._context!);
+  }
 }
 
 export default VacationService;

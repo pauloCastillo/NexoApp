@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import logger from '@/utils/logger.js';
 
 async function dbConnection() {
   try {
@@ -7,9 +8,9 @@ async function dbConnection() {
       minPoolSize: 50,
       family: 4,
     });
-    console.log(`Successfully Connection with ${db.connection.name}`);
+    logger.info({ name: db.connection.name }, 'Database connected');
   } catch (error: any) {
-    console.log(error.message);
+    logger.error({ err: error }, 'Database connection failed');
   }
 }
 

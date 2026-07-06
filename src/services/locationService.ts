@@ -16,7 +16,7 @@ class LocationService{
         try {
             return await this._repository.createLocation(this._location, this._context!);
         } catch (error: any) {
-            throw new Error("Error creating location: " + error.message);
+            throw new Error("Error creating location: " + error.message, { cause: error });
         }
     }
 
@@ -25,7 +25,7 @@ class LocationService{
             const location = await this._repository.getLocationById(this._location as { employee: string }, this._context!);
             return location;
         } catch (error: any) {
-            throw new Error("Error getting location: " + error.message);
+            throw new Error("Error getting location: " + error.message, { cause: error });
         }
     }
 

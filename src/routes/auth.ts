@@ -1,14 +1,14 @@
 import express from 'express';
-import { 
+import {
   registerEmployee,
   loginEmployee,
- } from '@/controllers/authsController.js';
-
-import { verifiedToken } from '@/middlewares/verifyToken.js';
+  refreshTokenEndpoint,
+} from '@/controllers/authsController.js';
 
 const router = express.Router();
 
 router.post("/register", registerEmployee);
 router.post("/login", loginEmployee);
+router.post("/refresh", refreshTokenEndpoint);
 
 export { router };

@@ -1,5 +1,5 @@
 import { Permission } from '@/db/models/index.js';
-import { IPermission, TenantContext } from '@/types/models.js';
+import { TenantContext } from '@/types/models.js';
 
 class PermissionRepository {
   #companyFilter(context: TenantContext): Record<string, any> {
@@ -14,6 +14,18 @@ class PermissionRepository {
     permissionData.company = context.companyId;
     const newPermission = new Permission(permissionData);
     return await newPermission.save();
+  }
+
+  async updatePermission(id: string, data: Record<string, any>, context: TenantContext) {
+    return await Permission.findOneAndUpdate(
+      { _id: id, ...this.#companyFilter(context) },
+      data,
+      { new: true }
+    );
+  }
+
+  async deletePermission(id: string, context: TenantContext) {
+    return await Permission.findOneAndDelete({ _id: id, ...this.#companyFilter(context) });
   }
 }
 

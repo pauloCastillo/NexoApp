@@ -11,18 +11,18 @@ const managerSchema = new Schema(
     username: {
       type: String,
       trim: true,
-      require: true,
+      required: true,
     },
     email: {
       type: String,
       trim: true,
-      require: true,
+      required: true,
     },
     password: {
       type: String,
       trim: true,
       select: false,
-      require: true,
+      required: true,
     },
     phone: {
       type: String,
@@ -34,8 +34,11 @@ const managerSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ["superuser", "admin", "employee"],
-      default: "admin",
+      enum: ["superuser", "editor", "manager", "viewer"],
+      default: "editor",
+    },
+    refreshTokenHash: {
+      type: String,
     },
   },
   {

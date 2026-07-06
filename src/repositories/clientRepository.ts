@@ -1,5 +1,5 @@
 import { Client } from '@/db/models/index.js';
-import { IClient, TenantContext } from '@/types/models.js';
+import { TenantContext } from '@/types/models.js';
 
 class ClientRepository {
   #companyFilter(context: TenantContext): Record<string, any> {
@@ -18,6 +18,18 @@ class ClientRepository {
     clientData.company = context.companyId;
     const newClient = new Client(clientData);
     return await newClient.save();
+  }
+
+  async updateClient(id: string, data: Record<string, any>, context: TenantContext) {
+    return await Client.findOneAndUpdate(
+      { _id: id, ...this.#companyFilter(context) },
+      data,
+      { new: true }
+    );
+  }
+
+  async deleteClient(id: string, context: TenantContext) {
+    return await Client.findOneAndDelete({ _id: id, ...this.#companyFilter(context) });
   }
 }
 

@@ -24,7 +24,7 @@ class LocationRepository {
             const allLocations = await Location.find(this.#companyFilter(context));
             return allLocations;
         } catch (error: any) {
-            throw new Error("Error fetching locations: " + error.message);
+            throw new Error("Error fetching locations: " + error.message, { cause: error });
         }
     }
 
@@ -36,20 +36,21 @@ class LocationRepository {
             }
             return location;
         } catch (error: any) {
-            throw new Error("Error fetching location: " + error.message);
+            throw new Error("Error fetching location: " + error.message, { cause: error });
         }
     }
 
     async createLocation(locationData: Record<string, any>, context: TenantContext) {
         locationData.company = context.companyId;
         const existLocation = await this.#verifyingLocation(locationData as any);
-        const apiResponse = await axios.get(
-            `https://discover.search.hereapi.com/v1/discover?at=${locationData.latitude},${locationData.longitude}&q=${locationData.latitude},${locationData.longitude}&in=countryCode%3ABOL&apiKey=${process.env.API_KEY}`
-        );
-        const streetName = apiResponse.data.items[0].title;
-        locationData.street = streetName;
 
         try {
+            const apiResponse = await axios.get(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${locationData.latitude}&lon=${locationData.longitude}&addressdetails=1`,
+                { headers: { 'User-Agent': 'RRHH-App/1.0' } }
+            );
+            locationData.street = apiResponse.data.display_name || `${locationData.latitude}, ${locationData.longitude}`;
+
             if (existLocation) {
                 return await Location.findOne(
                     { employee: locationData.employee },
@@ -62,7 +63,7 @@ class LocationRepository {
                 );
             }
         } catch (error: any) {
-            throw new Error("Error creating location: " + error.message);
+            throw new Error("Error creating location: " + error.message, { cause: error });
         }
     }
 
@@ -74,7 +75,7 @@ class LocationRepository {
             }
             return deletedLocation;
         } catch (error: any) {
-            throw new Error("Error deleting location: " + error.message);
+            throw new Error("Error deleting location: " + error.message, { cause: error });
         }
     }
 }

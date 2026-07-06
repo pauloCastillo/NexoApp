@@ -23,6 +23,14 @@ class ClientService {
   async create() {
     return await this._repository.createClient(this._data, this._context!);
   }
+
+  async update(id: string) {
+    return await this._repository.updateClient(id, this._data, this._context!);
+  }
+
+  async delete(id: string) {
+    return await this._repository.deleteClient(id, this._context!);
+  }
 }
 
 export default ClientService;

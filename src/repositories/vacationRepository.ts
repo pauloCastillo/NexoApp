@@ -1,5 +1,5 @@
 import { Vacation } from '@/db/models/index.js';
-import { IVacation, TenantContext } from '@/types/models.js';
+import { TenantContext } from '@/types/models.js';
 
 class VacationRepository {
   #companyFilter(context: TenantContext): Record<string, any> {
@@ -14,6 +14,18 @@ class VacationRepository {
     vacationData.company = context.companyId;
     const newVacation = new Vacation(vacationData);
     return await newVacation.save();
+  }
+
+  async updateVacation(id: string, data: Record<string, any>, context: TenantContext) {
+    return await Vacation.findOneAndUpdate(
+      { _id: id, ...this.#companyFilter(context) },
+      data,
+      { new: true }
+    );
+  }
+
+  async deleteVacation(id: string, context: TenantContext) {
+    return await Vacation.findOneAndDelete({ _id: id, ...this.#companyFilter(context) });
   }
 }
 

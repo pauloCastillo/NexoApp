@@ -1,10 +1,10 @@
-import { Document, Model } from 'mongoose';
+import { Document } from 'mongoose';
 
 export interface TenantContext {
   employeeId?: string;
   companyId: string | null;
   role: string;
-  userType: 'employee' | 'manager';
+  userType: string;
 }
 
 export interface ICompany extends Document {
@@ -21,8 +21,9 @@ export interface IEmployee extends Document {
   jobTitle?: string;
   password: string;
   phone?: string;
-  role: 'employee' | 'manager' | 'admin';
+  role: 'employee' | 'editor' | 'manager';
   controlTimeID?: string;
+  refreshTokenHash?: string;
   authenticateUser(password: string, id: string): Promise<boolean>;
   createToken(): string;
   toJSON(): {
@@ -75,7 +76,8 @@ export interface IManager extends Document {
   password: string;
   phone?: string;
   company?: string;
-  role: 'superuser' | 'admin' | 'employee';
+  role: 'viewer' | 'editor' | 'manager' | 'superuser';
+  refreshTokenHash?: string;
   authenticateUser(password: string, id: string): Promise<boolean>;
   createToken(): string;
   toJSON(): {
@@ -115,6 +117,23 @@ export interface IWorkOrder extends Document {
   };
   description?: string;
   date: Date;
+  status: 'pendiente' | 'en_progreso' | 'completado' | 'cancelado';
+  completedAt?: Date;
+  cancelledAt?: Date;
+  cancellationReason?: string;
+}
+
+export interface IAuditLog extends Document {
+  action: string;
+  entityType: string;
+  entityId?: string;
+  userId?: string;
+  companyId?: string;
+  previousValue?: any;
+  newValue?: any;
+  ipAddress?: string;
+  metadata?: any;
+  createdAt: Date;
 }
 
 export interface IJobTitle extends Document {

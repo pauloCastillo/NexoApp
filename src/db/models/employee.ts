@@ -11,12 +11,12 @@ const employeeSchema = new Schema(
     username: {
       type: String,
       trim: true,
-      require: true,
+      required: true,
     },
     companyName:{
       type: String,
       trim: true,
-      require: true,
+      required: true,
     },
     company: {
       type: Schema.Types.ObjectId,
@@ -26,7 +26,7 @@ const employeeSchema = new Schema(
     email: {
       type: String,
       trim: true,
-      require: true,
+      required: true,
     },
     jobTitle: {
       type: String,
@@ -35,7 +35,7 @@ const employeeSchema = new Schema(
       type: String,
       trim: true,
       select: false,
-      require: true,
+      required: true,
     },
     phone: {
       type: String,
@@ -43,12 +43,15 @@ const employeeSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ["employee", "manager", "admin"],
+      enum: ["employee", "editor", "manager"],
       default: "employee",
     },
     controlTimeID: {
       type: Schema.Types.ObjectId,
       ref: "ControlTime",
+    },
+    refreshTokenHash: {
+      type: String,
     },
   },
   {

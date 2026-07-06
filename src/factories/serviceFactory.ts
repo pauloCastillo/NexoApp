@@ -16,6 +16,7 @@ import VacationService from '@/services/vacationService.js';
 import WorkOrderRepository from '@/repositories/workOrderRepository.js';
 import WorkOrderService from '@/services/workOrderService.js';
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 class ServiceFactory {
   static getService(serviceType: string, data: Record<string, any> | null = null, context?: TenantContext): any {
     switch (serviceType) {

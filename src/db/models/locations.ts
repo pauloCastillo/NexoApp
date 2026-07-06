@@ -1,23 +1,22 @@
 import { Schema, model } from 'mongoose';
-import { DateTime } from 'luxon';
-import { ILocation, ISubLocation } from '@/types/models.js';
+import { ILocation } from '@/types/models.js';
 
 const locationSchema = new Schema({
   date: {
     type: Date,
     trim: true,
-    require: true,
-    default: () => DateTime.now().setZone("America/La_Paz").toISO(),
+    required: true,
+    default: () => new Date(),
   },
   latitude: {
     type: Number,
     trim: true,
-    require: true,
+    required: true,
   },
   longitude: {
     type: Number,
     trim: true,
-    require: true,
+    required: true,
   },
   street: {
     type: String,

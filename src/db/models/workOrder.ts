@@ -1,5 +1,4 @@
 import { Schema, model } from 'mongoose';
-import { DateTime } from 'luxon';
 import { IWorkOrder } from '@/types/models.js';
 
 const workOrderSchema = new Schema(
@@ -7,7 +6,7 @@ const workOrderSchema = new Schema(
     employee: {
       type: Schema.Types.ObjectId,
       ref: "Employee",
-      require: true,
+      required: true,
     },
     company: {
       type: Schema.Types.ObjectId,
@@ -32,7 +31,22 @@ const workOrderSchema = new Schema(
     },
     date: {
       type: Date,
-      default: () => DateTime.now().setZone("America/La_Paz").toISO(),
+      default: () => new Date(),
+    },
+    status: {
+      type: String,
+      enum: ["pendiente", "en_progreso", "completado", "cancelado"],
+      default: "pendiente",
+    },
+    completedAt: {
+      type: Date,
+    },
+    cancelledAt: {
+      type: Date,
+    },
+    cancellationReason: {
+      type: String,
+      trim: true,
     },
   },
   {

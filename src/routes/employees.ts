@@ -3,6 +3,7 @@ import {
   getAllEmployees,
   getEmployeeById,
   createEmployee,
+  updateEmployee,
   deleteEmployee,
  } from '@/controllers/employeeController.js';
 import ServiceFactory from '@/factories/serviceFactory.js';
@@ -17,6 +18,7 @@ router.route("/")
 
 router.route("/:employee_id")
 .get(verifiedToken, getEmployeeById)
+.put(verifiedToken, updateEmployee)
 .delete(verifiedToken, deleteEmployee);
 
 import { verifyingSession } from '@/utils/utils.js';
