@@ -29,9 +29,6 @@ export default function verify(data: any, mode: string): Record<string, string> 
     if (!data?.confirmPassword || data.confirmPassword !== data.password) {
       error.confirmPassword = "Las contraseñas no coinciden";
     }
-    if (!data?.jobTitle || data.jobTitle === "") {
-      error.jobTitle = "Introduzca su cargo";
-    }
     if (
       !data?.phone ||
       typeof data.phone !== "string" ||

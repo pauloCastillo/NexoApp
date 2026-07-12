@@ -45,7 +45,7 @@ export default function RegisterLayout() {
 
   useEffect(() => {
     if (status === "succeeded") {
-      registerPushToken();
+      registerPushToken().catch(() => {});
       ToastAndroid.show("Registro exitoso!", ToastAndroid.LONG);
       router.replace("/(main)/home");
     } else if (status === "rejected") {
@@ -58,7 +58,6 @@ export default function RegisterLayout() {
     const employeeData: RegisterEmployeePayload = {
       username: userFullName,
       email,
-      jobTitle,
       phone: `+591-${phone}`,
       password,
       confirmPassword,
@@ -127,14 +126,6 @@ export default function RegisterLayout() {
               checkError={checkError}
               error={error.companyName}
             />
-            <Text className="text-xs text-center text-textSecondary my-1">— o —</Text>
-            <Input
-              label="Código de invitación"
-              onUpdateValue={setInviteCode}
-              value={inviteCode}
-              placeholder={"Código de invitación"}
-              checkError={checkError}
-            />
             <Input
               label="Correo"
               onUpdateValue={setEmail}
@@ -142,14 +133,6 @@ export default function RegisterLayout() {
               placeholder={"correo@empresa.com"}
               checkError={checkError}
               error={error.email}
-            />
-            <Input
-              label="Cargo"
-              onUpdateValue={setJobTitle}
-              value={jobTitle}
-              placeholder={"Ej: Vendedor"}
-              checkError={checkError}
-              error={error.jobTitle}
             />
             <Input
               label="Celular"
@@ -178,6 +161,16 @@ export default function RegisterLayout() {
               error={error.confirmPassword}
             />
 
+            <Text className="text-xs text-center text-textSecondary my-1">— o —</Text>
+            
+            <Input
+              label="Código de invitación"
+              onUpdateValue={setInviteCode}
+              value={inviteCode}
+              placeholder={"Código de invitación"}
+              checkError={checkError}
+            />
+
             <View className="mt-[16] rounded-[6] overflow-hidden">
               <Button
                 title="REGISTRARSE"
@@ -188,7 +181,7 @@ export default function RegisterLayout() {
           </View>
 
           <Text className="text-center font-normal text-textSecondary my-[20]">
-            ¿Ya tienes una cuenta?{" "}<br/>
+            ¿Ya tienes una cuenta?{"\n "}
             <Link
               replace
               href={"Login"}

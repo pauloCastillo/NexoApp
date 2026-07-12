@@ -15,7 +15,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#E8612C"
       },
-      "package": "com.t2project.personalapp",
+      "package": "com.t2project.nexoapp",
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
@@ -40,7 +40,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "34e2f084-b791-4979-9d99-d907df29c74b"
+        "projectId": "38cfbd0a-b2d8-4d69-b4e0-4127d663684d"
       }
     },
     "owner": "pollomonroy"

@@ -17,7 +17,7 @@ export interface RegisterEmployeePayload {
   companyName?: string;
   inviteCode?: string;
   email: string;
-  jobTitle: string;
+  jobTitle?: string;
   phone: string;
   password: string;
   confirmPassword: string;

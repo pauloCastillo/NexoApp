@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, Text } from "react-native";
+import { View, Pressable, Text } from "react-native";
 import { useRouter, usePathname } from "expo-router";
 
 interface TabItem {
@@ -38,7 +38,7 @@ export default function TabBar({ role }: TabBarProps) {
       {visibleTabs.map((tab: TabItem) => {
         const isActive = pathname === tab.route;
         return (
-          <TouchableOpacity
+          <Pressable
             key={tab.route}
             className={`flex-1 items-center py-2 ${
               isActive ? "border-t-2 border-primary" : ""
@@ -55,7 +55,7 @@ export default function TabBar({ role }: TabBarProps) {
             >
               {tab.label}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         );
       })}
     </View>

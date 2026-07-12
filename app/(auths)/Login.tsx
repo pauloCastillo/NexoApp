@@ -44,7 +44,7 @@ export default function LoginLayout() {
     ) {
       try {
         await dispatch(loginEmployee({ mail, password })).unwrap();
-        registerPushToken();
+        registerPushToken().catch(() => {});
         ToastAndroid.show("Inicio de sesión exitoso", ToastAndroid.LONG);
         router.replace("/(main)/home");
       } catch (err: unknown) {
@@ -121,7 +121,7 @@ export default function LoginLayout() {
           </View>
 
           <Text className="text-center font-normal text-textSecondary my-[20]">
-            ¿No tienes una cuenta?{" "}<br/>
+            ¿No tienes una cuenta?{"\n "}
             <Link
               replace
               href={"Register"}
