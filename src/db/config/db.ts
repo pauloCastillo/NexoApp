@@ -3,6 +3,7 @@ import logger from '@/utils/logger.js';
 
 async function dbConnection() {
   try {
+    console.log(process.env.DB_URI);
     const db = await mongoose.connect(process.env.DB_URI!, {
       dbName: "NexoDB",
       minPoolSize: 50,

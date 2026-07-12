@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import { createServer, Server as HttpsServer } from "https";
+import { createServer as createHttpServer, Server as HttpServer } from "http";
 import fs from "fs";
 import cors from "cors";
 import helmet from "helmet";
@@ -24,10 +25,7 @@ if (process.env.DEV_STATUS === "development") {
   port = process.env.PORT_PROD || 8080;
 }
 
-const key = fs.readFileSync(process.env.SSL_KEY!, "utf-8");
-const cert = fs.readFileSync(process.env.SSL_CERT!, "utf-8");
-
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+app.use(cors({ origin: "*", credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
@@ -56,17 +54,25 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   res.status(500).json({ message: err.message });
 });
 
-const server: HttpsServer = createServer(
-  { key, cert },
-  app
-);
+const isDev = process.env.DEV_STATUS === "development";
+
+let server: HttpServer | HttpsServer;
+
+if (isDev) {
+  server = createHttpServer(app);
+} else {
+  const key = fs.readFileSync(process.env.SSL_KEY!, "utf-8");
+  const cert = fs.readFileSync(process.env.SSL_CERT!, "utf-8");
+  server = createServer({ key, cert }, app);
+}
 
 dbConnection();
 
-const io = setupSocketIO(server);
+const io = setupSocketIO(server as any);
 setupEmployeeNamespace(io);
 setupEmployeeLocationNamespace(io);
 
-server.listen(port, () =>
-  logger.info({ port }, `Server listening on https://localhost:${port}`)
-);
+server.listen(port, () => {
+  const proto = isDev ? "http" : "https";
+  logger.info({ port }, `Server listening on ${proto}://0.0.0.0:${port}`);
+});

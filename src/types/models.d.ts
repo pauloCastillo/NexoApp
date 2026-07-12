@@ -139,7 +139,7 @@ export interface IAuditLog extends Document {
 export interface IJobTitle extends Document {
   employee: string;
   company: string;
-  job_title: string;
+  job_title?: string;
   department: string;
 }
 

@@ -35,8 +35,9 @@ class EmployeeRepository {
 
         const createATimeControl = new ControlTime({
             employee: savedUser._id,
+            company: context.companyId,
         });
-        const newJob = new JobTitle({ employee: savedUser._id, job_Title: savedUser.jobTitle });
+        const newJob = new JobTitle({ employee: savedUser._id, company: context.companyId, job_title: savedUser.jobTitle });
         await newJob.save();
         await createATimeControl.save();
         savedUser.controlTimeID = String(createATimeControl._id);

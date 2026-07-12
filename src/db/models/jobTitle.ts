@@ -17,11 +17,9 @@ const jobSchema = new Schema(
     job_title: {
       type: String,
       trim: true,
-      required: true,
     },
     department: {
       type: String,
-      required: true,
     },
   },
   {
