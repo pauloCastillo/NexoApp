@@ -1,0 +1,9 @@
+{
+  "extends": "@react-native/typescript-config",
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "babel.config.js",
+    "nativewind-env.d.ts"
+  ]
+}
