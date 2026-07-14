@@ -1,5 +1,11 @@
 # dependencies
 node_modules/
+.claude/
+.github/
+.idea/
+.opencode/
+.dockerignore
+dockerfile
 
 # local env files
 .env
