@@ -1,0 +1,41 @@
+@page "/login"
+@inject LoginViewModel ViewModel
+
+<PageTitle>Iniciar Sesión</PageTitle>
+
+<div class="login-container">
+    <div class="login-card">
+        <h2 class="login-title">Nexo - Control de Asistencia</h2>
+
+        @if (!string.IsNullOrEmpty(ViewModel.ErrorMessage))
+        {
+            <div class="alert alert-danger">@ViewModel.ErrorMessage</div>
+        }
+
+        <div class="mb-3">
+            <label class="form-label">Correo electrónico</label>
+            <input type="email" class="form-control" @bind="ViewModel.Email"
+                   @bind:event="oninput" disabled="@ViewModel.IsBusy" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            <input type="password" class="form-control" @bind="ViewModel.Password"
+                   @bind:event="oninput" disabled="@ViewModel.IsBusy" />
+        </div>
+
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" @bind="ViewModel.RememberMe" />
+            <label class="form-check-label">Recordarme</label>
+        </div>
+
+        <button class="btn btn-primary w-100" @onclick="() => ViewModel.LoginCommand.Execute(null)"
+                disabled="@ViewModel.IsBusy">
+            @if (ViewModel.IsBusy)
+            {
+                <span class="spinner-border spinner-border-sm me-1"></span>
+            }
+            Iniciar Sesión
+        </button>
+    </div>
+</div>

@@ -1,0 +1,55 @@
+@page "/employees/{EmployeeId}"
+@inject EmployeeDetailViewModel ViewModel
+
+<PageTitle>@(ViewModel.Employee?.Username ?? "Empleado")</PageTitle>
+
+<button class="btn btn-outline-secondary mb-3" @onclick="() => ViewModel.GoBackCommand.Execute(null)">
+    ← Volver
+</button>
+
+@if (ViewModel.IsBusy)
+{
+    <div class="text-center py-5"><div class="spinner-border"></div></div>
+}
+else if (ViewModel.Employee != null)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h4>@ViewModel.Employee.Username</h4>
+            <p class="mb-1">📧 @ViewModel.Employee.Email</p>
+            <p class="mb-1">🔑 @ViewModel.Employee.Role</p>
+            <p class="mb-0">💼 @ViewModel.Employee.JobTitle</p>
+        </div>
+    </div>
+
+    <h5>Marcaciones de Hoy</h5>
+    <div class="list-group">
+        @foreach (var tc in ViewModel.TodayTimeControls)
+        {
+            <div class="list-group-item d-flex justify-content-between">
+                <span>Entrada: @tc.Entrada</span>
+                @if (!string.IsNullOrEmpty(tc.Salida))
+                {
+                    <span>Salida: @tc.Salida</span>
+                }
+                else
+                {
+                    <span class="badge bg-success">En curso</span>
+                }
+            </div>
+        }
+        @if (!ViewModel.TodayTimeControls.Any())
+        {
+            <div class="list-group-item text-muted">Sin marcaciones hoy</div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public string EmployeeId { get; set; } = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        ViewModel.EmployeeId = EmployeeId;
+    }
+}

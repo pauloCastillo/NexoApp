@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Nexo.Desktop.ViewModels"
+             x:Class="Nexo.Desktop.Views.EmployeeDetailPage"
+             x:DataType="vm:EmployeeDetailViewModel"
+             Title="Detalle de Empleado">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="16" Padding="16">
+            <Label Text="{Binding Employee.Username}" Style="{StaticResource Headline}" />
+            <Label Text="{Binding Employee.Email}" Style="{StaticResource Subheadline}" />
+            <Label Text="{Binding Employee.Role}" Style="{StaticResource Caption}" />
+
+            <Label Text="Marcajes de Hoy" Style="{StaticResource Subheadline}" Margin="0,16,0,0" />
+            <CollectionView ItemsSource="{Binding TodayTimeControls}"
+                            EmptyView="Sin marcajes hoy">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="x:Object">
+                        <Frame Style="{StaticResource Card}" Margin="0,4">
+                            <HorizontalStackLayout Spacing="16">
+                                <Label Text="{Binding Entrada}" FontSize="14" />
+                                <Label Text="{Binding Salida, TargetNullValue='En curso'}"
+                                       FontSize="14" />
+                            </HorizontalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

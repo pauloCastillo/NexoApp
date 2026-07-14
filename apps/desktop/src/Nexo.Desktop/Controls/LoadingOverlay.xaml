@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Nexo.Desktop.Controls.LoadingOverlay"
+             IsVisible="{Binding IsVisible, Source={x:Reference Overlay}}">
+    <Grid BackgroundColor="#80000000">
+        <Frame HorizontalOptions="Center" VerticalOptions="Center"
+               CornerRadius="16" Padding="32"
+               BackgroundColor="White" HasShadow="True">
+            <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
+                <ActivityIndicator IsRunning="True" HeightRequest="40" WidthRequest="40"
+                                   Color="{StaticResource Primary}" />
+                <Label Text="{Binding Message, Source={x:Reference Overlay}}"
+                       FontSize="14" HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </Frame>
+    </Grid>
+</ContentView>

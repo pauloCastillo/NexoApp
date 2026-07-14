@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                    xmlns:converters="clr-namespace:Nexo.Desktop.Converters">
+
+    <converters:StatusToColorConverter x:Key="StatusToColorConverter" />
+    <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
+    <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+    <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    <converters:RoleToIconConverter x:Key="RoleToIconConverter" />
+    <converters:DateTimeFormatConverter x:Key="DateTimeFormatConverter" />
+    <converters:TimeOnlyConverter x:Key="TimeOnlyConverter" />
+
+    <!-- Ponytail: custom converter for string not empty -->
+    <converters:BoolToVisibilityConverter x:Key="StringNotEmptyConverter" IsInverted="False" />
+
+    <Style TargetType="Label" x:Key="Headline">
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+    </Style>
+
+    <Style TargetType="Label" x:Key="Subheadline">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="TextColor" Value="{StaticResource TextSecondary}" />
+    </Style>
+
+    <Style TargetType="Label" x:Key="Caption">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="TextColor" Value="{StaticResource TextLight}" />
+    </Style>
+
+    <Style TargetType="Button" x:Key="PrimaryButton">
+        <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+        <Setter Property="TextColor" Value="White" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="Padding" Value="24,12" />
+    </Style>
+
+    <Style TargetType="Button" x:Key="DangerButton">
+        <Setter Property="BackgroundColor" Value="{StaticResource Danger}" />
+        <Setter Property="TextColor" Value="White" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="24,12" />
+    </Style>
+
+    <Style TargetType="Entry" x:Key="FormEntry">
+        <Setter Property="BackgroundColor" Value="White" />
+        <Setter Property="PlaceholderColor" Value="{StaticResource TextLight}" />
+        <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+    </Style>
+
+    <Style TargetType="Frame" x:Key="Card">
+        <Setter Property="BackgroundColor" Value="{StaticResource CardBackground}" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="HasShadow" Value="True" />
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="BorderColor" Value="Transparent" />
+    </Style>
+
+    <Style TargetType="ActivityIndicator">
+        <Setter Property="Color" Value="{StaticResource Primary}" />
+    </Style>
+
+    <Style TargetType="Page" ApplyToDerivedTypes="True">
+        <Setter Property="BackgroundColor" Value="{StaticResource Surface}" />
+    </Style>
+</ResourceDictionary>

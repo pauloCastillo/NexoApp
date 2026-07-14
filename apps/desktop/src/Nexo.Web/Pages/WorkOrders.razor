@@ -1,0 +1,51 @@
+@page "/work-orders"
+@inject WorkOrderViewModel ViewModel
+
+<PageTitle>Órdenes de Trabajo</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Órdenes de Trabajo</h3>
+    <select class="form-select form-select-sm w-auto" @bind="ViewModel.SelectedStatus"
+            @bind:after="() => ViewModel.LoadCommand.ExecuteAsync(null)">
+        <option value="">Todos</option>
+        @foreach (var s in ViewModel.StatusFilters.Skip(1))
+        {
+            <option value="@s">@s</option>
+        }
+    </select>
+</div>
+
+@if (ViewModel.IsBusy && !ViewModel.WorkOrders.Any())
+{
+    <div class="text-center py-5"><div class="spinner-border"></div></div>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var wo in ViewModel.WorkOrders)
+        {
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="fw-bold">@wo.ClientName</div>
+                        <small class="text-muted">@wo.Description</small>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge @GetStatusBadge(wo.Status)">@wo.Status</span>
+                        <div><small class="text-muted">@wo.Date.ToString("dd/MM/yy")</small></div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    static string GetStatusBadge(string s) => s switch
+    {
+        "completado" => "bg-success",
+        "cancelado" => "bg-danger",
+        "en_progreso" => "bg-primary",
+        _ => "bg-warning text-dark"
+    };
+}

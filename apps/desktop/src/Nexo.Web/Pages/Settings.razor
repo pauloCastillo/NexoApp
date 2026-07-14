@@ -1,0 +1,30 @@
+@page "/settings"
+@inject SettingsViewModel ViewModel
+
+<PageTitle>Configuración</PageTitle>
+
+<h3>Configuración</h3>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5>Sesión</h5>
+        @if (ViewModel.Session != null)
+        {
+            <p><strong>Usuario:</strong> @ViewModel.Session.Username</p>
+            <p><strong>Email:</strong> @ViewModel.Session.Email</p>
+            <p><strong>Rol:</strong> @ViewModel.Session.Role</p>
+        }
+        <p class="text-muted">Versión: @ViewModel.AppVersion</p>
+    </div>
+</div>
+
+<button class="btn btn-danger" @onclick="() => ViewModel.LogoutCommand.Execute(null)">
+    Cerrar Sesión
+</button>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewModel.LoadCommand.ExecuteAsync(null);
+    }
+}

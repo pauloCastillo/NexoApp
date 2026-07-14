@@ -1,0 +1,49 @@
+@page "/vacations"
+@inject VacationViewModel ViewModel
+
+<PageTitle>Vacaciones</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Vacaciones</h3>
+    <select class="form-select form-select-sm w-auto" @bind="ViewModel.SelectedStatus"
+            @bind:after="() => ViewModel.LoadCommand.ExecuteAsync(null)">
+        <option value="">Todos</option>
+        @foreach (var s in ViewModel.StatusFilters.Skip(1))
+        {
+            <option value="@s">@s</option>
+        }
+    </select>
+</div>
+
+@if (ViewModel.IsBusy && !ViewModel.Vacations.Any())
+{
+    <div class="text-center py-5"><div class="spinner-border"></div></div>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var v in ViewModel.Vacations)
+        {
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="fw-bold">@v.Employee</div>
+                        <small class="text-muted">
+                            @v.StartDate.ToString("dd/MM/yy") - @v.EndDate.ToString("dd/MM/yy")
+                        </small>
+                    </div>
+                    <span class="badge @GetStatusBadge(v.Status)">@v.Status</span>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    static string GetStatusBadge(string s) => s switch
+    {
+        "aprobado" => "bg-success",
+        "rechazado" => "bg-danger",
+        _ => "bg-warning text-dark"
+    };
+}

@@ -1,0 +1,60 @@
+@page "/employees"
+@inject EmployeeListViewModel ViewModel
+
+<PageTitle>Empleados</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Empleados</h3>
+    <span class="text-muted small">@ViewModel.TotalText</span>
+</div>
+
+<div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="Buscar empleado..."
+           @bind="ViewModel.SearchQuery" @bind:event="oninput"
+           @onkeyup="OnSearchKeyUp" />
+    <button class="btn btn-outline-secondary" @onclick="() => ViewModel.SearchCommand.Execute(null)">
+        Buscar
+    </button>
+</div>
+
+@if (ViewModel.IsBusy && !ViewModel.Employees.Any())
+{
+    <div class="text-center py-5"><div class="spinner-border"></div></div>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var emp in ViewModel.Employees)
+        {
+            <a href="/employees/@emp.Id" class="list-group-item list-group-item-action">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="fw-bold">@emp.Username</div>
+                        <small class="text-muted">@emp.Email</small>
+                    </div>
+                    <div class="text-end">
+                        <div>@emp.Role</div>
+                        <small class="text-muted">@emp.JobTitle</small>
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+
+    @if (ViewModel.Employees.Any())
+    {
+        <button class="btn btn-outline-primary w-100 mt-2"
+                @onclick="() => ViewModel.LoadMoreCommand.Execute(null)"
+                disabled="@ViewModel.IsBusy">
+            Cargar más
+        </button>
+    }
+}
+
+@code {
+    private async Task OnSearchKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            await ViewModel.SearchCommand.ExecuteAsync(null);
+    }
+}

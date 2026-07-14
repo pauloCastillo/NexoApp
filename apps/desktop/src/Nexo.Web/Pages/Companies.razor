@@ -1,0 +1,40 @@
+@page "/companies"
+@inject CompanyViewModel ViewModel
+
+<PageTitle>Empresas</PageTitle>
+
+<h3>Empresas</h3>
+
+@if (ViewModel.IsBusy)
+{
+    <div class="text-center py-5"><div class="spinner-border"></div></div>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var c in ViewModel.Companies)
+        {
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="fw-bold">@c.Name</div>
+                        @if (!string.IsNullOrEmpty(c.InviteCode))
+                        {
+                            <small class="text-muted">Código: @c.InviteCode</small>
+                        }
+                    </div>
+                    <span class="badge @(c.IsActive ? "bg-success" : "bg-secondary")">
+                        @(c.IsActive ? "Activa" : "Inactiva")
+                    </span>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewModel.LoadCommand.ExecuteAsync(null);
+    }
+}

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Nexo.Desktop.ViewModels"
+             x:Class="Nexo.Desktop.Views.WorkOrdersPage"
+             x:DataType="vm:WorkOrderViewModel"
+             Title="Órdenes de Trabajo">
+
+    <RefreshView IsRefreshing="{Binding IsRefreshing}"
+                 Command="{Binding RefreshCommand}">
+        <VerticalStackLayout Spacing="12" Padding="16">
+            <HorizontalStackLayout Spacing="8">
+                <Label Text="Filtrar:" Style="{StaticResource Caption}" VerticalOptions="Center" />
+                <Picker ItemsSource="{Binding StatusFilters}"
+                        SelectedItem="{Binding SelectedStatus}"
+                        WidthRequest="140" />
+            </HorizontalStackLayout>
+
+            <Label Text="{Binding TotalText}" Style="{StaticResource Caption}" />
+
+            <CollectionView ItemsSource="{Binding WorkOrders}"
+                            RemainingItemsThreshold="5"
+                            RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="x:Object">
+                        <Frame Style="{StaticResource Card}" Margin="0,4">
+                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                <Label Text="{Binding Description}" FontSize="14"
+                                       FontAttributes="Bold" LineBreakMode="TailTruncation" />
+                                <Label Grid.Row="1" Text="{Binding Date}"
+                                       FontSize="11" TextColor="{StaticResource TextSecondary}" />
+                                <Frame Grid.Column="1" Grid.RowSpan="2"
+                                       Padding="8,4" CornerRadius="8"
+                                       BackgroundColor="{StaticResource Surface}"
+                                       HasShadow="False" VerticalOptions="Center">
+                                    <Label Text="{Binding Status}" FontSize="11" />
+                                </Frame>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+        </VerticalStackLayout>
+    </RefreshView>
+</ContentPage>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Nexo.Desktop.ViewModels"
+             x:Class="Nexo.Desktop.Views.VacationsPage"
+             x:DataType="vm:VacationViewModel"
+             Title="Vacaciones">
+
+    <RefreshView IsRefreshing="{Binding IsRefreshing}"
+                 Command="{Binding RefreshCommand}">
+        <VerticalStackLayout Spacing="12" Padding="16">
+            <HorizontalStackLayout Spacing="8">
+                <Label Text="Estado:" Style="{StaticResource Caption}" VerticalOptions="Center" />
+                <Picker ItemsSource="{Binding StatusFilters}"
+                        SelectedItem="{Binding SelectedStatus}"
+                        WidthRequest="140" />
+            </HorizontalStackLayout>
+
+            <Label Text="{Binding TotalText}" Style="{StaticResource Caption}" />
+
+            <CollectionView ItemsSource="{Binding Vacations}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="x:Object">
+                        <Frame Style="{StaticResource Card}" Margin="0,4">
+                            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="{Binding Employee}" FontSize="14"
+                                           FontAttributes="Bold" />
+                                    <Label Text="{Binding StartDate}" FontSize="11"
+                                           TextColor="{StaticResource TextSecondary}" />
+                                </VerticalStackLayout>
+                                <Frame Grid.Column="1" Padding="8,4" CornerRadius="8"
+                                       BackgroundColor="{StaticResource Surface}" HasShadow="False">
+                                    <Label Text="{Binding Status}" FontSize="11" />
+                                </Frame>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+        </VerticalStackLayout>
+    </RefreshView>
+</ContentPage>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:views="clr-namespace:Nexo.Desktop.Views"
+       x:Class="Nexo.Desktop.AppShell"
+       Shell.FlyoutBehavior="Disabled">
+
+    <ShellContent x:Name="LoginShell"
+                  Title="Iniciar Sesión"
+                  Route="login"
+                  ContentTemplate="{DataTemplate views:LoginPage}" />
+
+    <FlyoutItem Title="Dashboard" Icon="{x:Null}" x:Name="DashboardItem">
+        <ShellContent Route="dashboard"
+                      ContentTemplate="{DataTemplate views:DashboardPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Empleados" Icon="{x:Null}" x:Name="EmployeesItem">
+        <ShellContent Route="employees"
+                      ContentTemplate="{DataTemplate views:EmployeeListPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Órdenes de Trabajo" Icon="{x:Null}" x:Name="WorkOrdersItem">
+        <ShellContent Route="workorders"
+                      ContentTemplate="{DataTemplate views:WorkOrdersPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Vacaciones" Icon="{x:Null}" x:Name="VacationsItem">
+        <ShellContent Route="vacations"
+                      ContentTemplate="{DataTemplate views:VacationsPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Permisos" Icon="{x:Null}" x:Name="PermissionsItem">
+        <ShellContent Route="permissions"
+                      ContentTemplate="{DataTemplate views:PermissionsPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Reportes" Icon="{x:Null}" x:Name="ReportsItem">
+        <ShellContent Route="reports"
+                      ContentTemplate="{DataTemplate views:ReportsPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Configuración" Icon="{x:Null}" x:Name="SettingsItem">
+        <ShellContent Route="settings"
+                      ContentTemplate="{DataTemplate views:SettingsPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Administrar Empresa" Icon="{x:Null}" x:Name="CompanyItem">
+        <ShellContent Route="company"
+                      ContentTemplate="{DataTemplate views:CompanyPage}" />
+    </FlyoutItem>
+
+</Shell>

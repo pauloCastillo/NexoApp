@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Nexo.Desktop.ViewModels"
+             x:Class="Nexo.Desktop.Views.ReportsPage"
+             x:DataType="vm:ReportViewModel"
+             Title="Reportes">
+
+    <VerticalStackLayout Spacing="16" Padding="16">
+        <Label Text="Exportar Reporte" Style="{StaticResource Headline}" />
+
+        <Label Text="Tipo de Reporte" Style="{StaticResource Caption}" />
+        <Picker ItemsSource="{Binding ReportTypes}"
+                SelectedItem="{Binding SelectedReportType}" />
+
+        <Label Text="Desde" Style="{StaticResource Caption}" />
+        <DatePicker Date="{Binding FromDate}" />
+
+        <Label Text="Hasta" Style="{StaticResource Caption}" />
+        <DatePicker Date="{Binding ToDate}" />
+
+        <Button Text="Exportar CSV" Command="{Binding ExportCsvCommand}"
+                Style="{StaticResource PrimaryButton}" />
+
+        <Label Text="{Binding ExportStatus}"
+               IsVisible="{Binding ExportStatus, Converter={StaticResource StringNotEmptyConverter}}" />
+
+        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+    </VerticalStackLayout>
+</ContentPage>

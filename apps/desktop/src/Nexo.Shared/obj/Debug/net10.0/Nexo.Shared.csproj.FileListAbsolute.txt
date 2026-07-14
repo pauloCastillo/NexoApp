@@ -1,0 +1,12 @@
+/home/pollomonroy/Documentos/work/clients/pauloCastillo/projects/rr-hh_app/desktop/src/Nexo.Shared/obj/Debug/net10.0/Nexo.Shared.csproj.AssemblyReference.cache
+/home/pollomonroy/Documentos/work/clients/pauloCastillo/projects/rr-hh_app/desktop/src/Nexo.Shared/obj/Debug/net10.0/Nexo.Shared.GeneratedMSBuildEditorConfig.editorconfig
+/home/pollomonroy/Documentos/work/clients/pauloCastillo/projects/rr-hh_app/desktop/src/Nexo.Shared/obj/Debug/net10.0/Nexo.Shared.AssemblyInfoInputs.cache
+/home/pollomonroy/Documentos/work/clients/pauloCastillo/projects/rr-hh_app/desktop/src/Nexo.Shared/obj/Debug/net10.0/Nexo.Shared.AssemblyInfo.cs
+/home/pollomonroy/Documentos/work/clients/pauloCastillo/projects/rr-hh_app/desktop/src/Nexo.Shared/obj/Debug/net10.0/Nexo.Shared.csproj.CoreCompileInputs.cache
+/home/pollomonroy/Documentos/work/clients/pauloCastillo/projects/rr-hh_app/desktop/src/Nexo.Shared/bin/Debug/net10.0/Nexo.Shared.deps.json
+/home/pollomonroy/Documentos/work/clients/pauloCastillo/projects/rr-hh_app/desktop/src/Nexo.Shared/bin/Debug/net10.0/Nexo.Shared.dll
+/home/pollomonroy/Documentos/work/clients/pauloCastillo/projects/rr-hh_app/desktop/src/Nexo.Shared/bin/Debug/net10.0/Nexo.Shared.pdb
+/home/pollomonroy/Documentos/work/clients/pauloCastillo/projects/rr-hh_app/desktop/src/Nexo.Shared/obj/Debug/net10.0/Nexo.Shared.dll
+/home/pollomonroy/Documentos/work/clients/pauloCastillo/projects/rr-hh_app/desktop/src/Nexo.Shared/obj/Debug/net10.0/refint/Nexo.Shared.dll
+/home/pollomonroy/Documentos/work/clients/pauloCastillo/projects/rr-hh_app/desktop/src/Nexo.Shared/obj/Debug/net10.0/Nexo.Shared.pdb
+/home/pollomonroy/Documentos/work/clients/pauloCastillo/projects/rr-hh_app/desktop/src/Nexo.Shared/obj/Debug/net10.0/ref/Nexo.Shared.dll

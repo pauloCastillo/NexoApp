@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Nexo.Desktop.ViewModels"
+             x:Class="Nexo.Desktop.Views.SettingsPage"
+             x:DataType="vm:SettingsViewModel"
+             Title="Configuración">
+
+    <VerticalStackLayout Spacing="16" Padding="16">
+        <Label Text="Configuración" Style="{StaticResource Headline}" />
+
+        <Frame Style="{StaticResource Card}">
+            <VerticalStackLayout Spacing="8">
+                <Label Text="{Binding Session.Username, StringFormat='Usuario: {0}'}"
+                       FontSize="16" />
+                <Label Text="{Binding Session.Email, StringFormat='Email: {0}'}"
+                       FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                <Label Text="{Binding Session.Role, StringFormat='Rol: {0}'}"
+                       FontSize="14" TextColor="{StaticResource TextSecondary}" />
+            </VerticalStackLayout>
+        </Frame>
+
+        <Label Text="{Binding AppVersion, StringFormat='Versión: {0}'}"
+               Style="{StaticResource Caption}" />
+
+        <Button Text="Cerrar Sesión"
+                Command="{Binding LogoutCommand}"
+                Style="{StaticResource DangerButton}" />
+    </VerticalStackLayout>
+</ContentPage>

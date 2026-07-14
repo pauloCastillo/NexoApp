@@ -1,0 +1,88 @@
+@page "/"
+@inject DashboardViewModel ViewModel
+@implements IAsyncDisposable
+
+<PageTitle>Dashboard</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Dashboard</h3>
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge @(ViewModel.IsSocketConnected ? "bg-success" : "bg-danger")">
+            @ViewModel.SocketStatusText
+        </span>
+        <select class="form-select form-select-sm w-auto" @bind="ViewModel.SelectedPeriod"
+                @bind:after="() => ViewModel.ChangePeriodCommand.Execute(ViewModel.SelectedPeriod)">
+            @foreach (var p in ViewModel.Periods)
+            {
+                <option value="@p">@p</option>
+            }
+        </select>
+        <button class="btn btn-outline-secondary btn-sm" @onclick="() => ViewModel.RefreshCommand.Execute(null)">
+            Actualizar
+        </button>
+    </div>
+</div>
+
+@if (ViewModel.IsBusy && !ViewModel.TimeControls.Any())
+{
+    <div class="text-center py-5">
+        <div class="spinner-border" role="status"></div>
+    </div>
+}
+else
+{
+    <div class="row g-3 mb-4">
+        @foreach (var card in ViewModel.KpiCards)
+        {
+            <div class="col-md-3 col-6">
+                <div class="card h-100" style="background: @card.CardColor;">
+                    <div class="card-body text-center">
+                        <div style="font-size: 2rem;">@card.Icon</div>
+                        <h3 style="color: @card.TextColor;">@card.Value</h3>
+                        <div class="small" style="color: @card.TextColor;">@card.Subtitle</div>
+                        <div class="fw-bold mt-1" style="color: @card.TextColor;">@card.Title</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <span>Marcaciones Recientes</span>
+            <span class="badge bg-secondary">@ViewModel.TimeControls.Count</span>
+        </div>
+        <div class="list-group list-group-flush">
+            @foreach (var tc in ViewModel.TimeControls)
+            {
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <div>@tc.Employee?.Username</div>
+                        <small class="text-muted">@tc.Entrada</small>
+                    </div>
+                    @if (tc.Late == true)
+                    {
+                        <span class="badge bg-warning text-dark">Atrasado</span>
+                    }
+                </div>
+            }
+            @if (!ViewModel.TimeControls.Any())
+            {
+                <div class="list-group-item text-muted text-center">Sin marcaciones hoy</div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewModel.LoadCommand.ExecuteAsync(null);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (ViewModel is IAsyncDisposable ad)
+            await ad.DisposeAsync();
+    }
+}
