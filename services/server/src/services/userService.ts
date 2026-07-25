@@ -8,6 +8,9 @@ class UserService {
   }
 
   validateUser(): boolean {
+
+    console.log(this.newUser)
+
     if (this.newUser.confirmPassword !== this.newUser.password) {
       throw new Error(
         "Por favor, revisa que las contraseñas sean escritas iguales"
@@ -17,6 +20,7 @@ class UserService {
     if(!this.newUser || Object.keys(this.newUser).length === 0) {
       throw new Error("No se han recibido datos del usuario");
     }
+
     return true;
   }
 

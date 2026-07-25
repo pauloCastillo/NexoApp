@@ -1,0 +1,44 @@
+flowchart LR
+    Employee(["👤 Empleado"])
+    Manager(["👤 Manager"])
+    Admin(["👤 Admin de Empresa"])
+    System(["⚙️ Sistema<br/>(Job Scheduler)"])
+
+    subgraph UC["Sistema de Control Horario"]
+        UC1(("Registrar Clock In/Out"))
+        UC2(("Consultar mi Timesheet"))
+        UC3(("Solicitar Tiempo Libre"))
+        UC4(("Ver Ubicación de Geofence"))
+        UC5(("Aprobar/Rechazar Timesheet"))
+        UC6(("Gestionar Turnos<br/>del Equipo"))
+        UC7(("Ver Reportes<br/>de Equipo"))
+        UC8(("Gestionar Empleados"))
+        UC9(("Configurar Geofences<br/>y Políticas"))
+        UC10(("Generar Reporte<br/>de Nómina"))
+        UC11(("Gestionar Suscripción<br/>y Facturación"))
+        UC12(("Enviar Recordatorios<br/>Automáticos"))
+        UC13(("Cerrar Timesheets<br/>al fin de periodo"))
+    end
+
+    Employee --> UC1
+    Employee --> UC2
+    Employee --> UC3
+    Employee --> UC4
+
+    Manager --> UC2
+    Manager --> UC5
+    Manager --> UC6
+    Manager --> UC7
+    Manager -.hereda.-> Employee
+
+    Admin --> UC8
+    Admin --> UC9
+    Admin --> UC10
+    Admin --> UC11
+    Admin -.hereda.-> Manager
+
+    System --> UC12
+    System --> UC13
+
+    UC1 -.include.-> UC4
+    UC10 -.include.-> UC7

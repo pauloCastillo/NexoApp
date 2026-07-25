@@ -1,0 +1,74 @@
+```mermaid 
+flowchart TB
+ subgraph LANE_CLIENT["🧑 Empleado / App"]
+        A1@{ label: "Empleado presiona<br>'Clock Out'" }
+        A2["Capturar ubicación GPS"]
+        A16["Mostrar resumen:<br>horas normales + extra"]
+  end
+ subgraph LANE_APP["⚙️ Time-Tracking Use Case"]
+        A3{"¿Dentro del<br>geofence?"}    
+        A4["Rechazar clock-out<br>ubicación inválida"]
+        A5["Buscar TimeEntry<br>abierto del empleado"]
+        A6{"¿Existe entry<br>abierto?"}
+        A7["Registrar clock-out<br>huérfano / alerta manual"]
+        A8["Calcular duración bruta<br>= clockOutAt - clockInAt"]
+        A9["Aplicar política de<br>redondeo (ej. 5 min)"]
+        A10["Sumar duración a horas<br>trabajadas del día"]
+        A11{"¿Horas del día<br>&gt; umbral diario?<br>ej. 8h"}
+        A12["Marcar exceso diario<br>como horas extra"]
+        A13["Sumar horas de la semana<br>desde Timesheet"]
+        A14{"¿Horas semana<br>&gt; umbral semanal?<br>ej. 40h"}
+        A15["Marcar exceso semanal<br>como horas extra<br>tipo = WEEKLY_OT"]
+        A17["Aplicar multiplicador<br>de overtime x1.5 / x2"]
+        A18["Calcular pago estimado<br>= horas x tarifa x multiplicador"]
+        A19{"¿Horas extra superan<br>límite legal/política<br>de la empresa?"}
+        A20["Generar alerta para<br>Manager: aprobación<br>requerida"]
+        A21["Persistir TimeEntry<br>con desglose:<br>regular / overtime"]
+        A22["Actualizar totales<br>en Timesheet del periodo"]
+        A23["Publicar evento<br>TimeEntryCompleted"]
+  end
+ subgraph LANE_NOTIF["🔔 Notification Service"]
+        A24["Notificar a Manager<br>si requiere aprobación"]
+        A25["Notificar a Empleado<br>resumen de jornada"]
+  end
+    Start(("●")) --> A1
+    A1 --> A2
+    A2 --> A3
+    A3 -- No --> A4
+    A4 --> End(("◉"))
+    A3 -- Sí --> A5
+    A5 --> A6
+    A6 -- No --> A7
+    A7 --> End
+    A6 -- Sí --> A8
+    A8 --> A9
+    A9 --> A10
+    A10 --> A11
+    A11 -- No --> A13
+    A11 -- Sí --> A12
+    A12 --> A13
+    A13 --> A14
+    A14 -- No --> A17
+    A14 -- Sí --> A15
+    A15 --> A17
+    A17 --> A18
+    A18 --> A19
+    A19 -- Sí --> A20
+    A20 --> A24
+    A19 -- No --> A21
+    A24 --> A21
+    A21 --> A22
+    A22 --> A23
+    A23 --> A25
+    A25 --> A16
+    A16 --> End
+
+    A1@{ shape: rect}
+    style Start fill:#22c55e,stroke:#16a34a
+    style A3 fill:#f59e0b,stroke:#b45309,color:#000
+    style A6 fill:#f59e0b,stroke:#b45309,color:#000
+    style A11 fill:#f59e0b,stroke:#b45309,color:#000
+    style A14 fill:#f59e0b,stroke:#b45309,color:#000
+    style A19 fill:#f59e0b,stroke:#b45309,color:#000
+    style End fill:#ef4444,stroke:#b91c1c
+```

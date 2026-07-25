@@ -1,7 +1,7 @@
 import { Document } from 'mongoose';
 
 export interface TenantContext {
-  employeeId?: string;
+  managerId?: string;
   companyId: string | null;
   role: string;
   userType: string;

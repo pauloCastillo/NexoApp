@@ -15,7 +15,10 @@
   "type": "module",
   "pnpm": {
     "onlyBuiltDependencies": [
-      "esbuild"
+      "bcrypt",
+      "bufferutil",
+      "unrs-resolver",
+      "utf-8-validate"
     ]
   },
   "engines": {

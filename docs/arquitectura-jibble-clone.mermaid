@@ -1,0 +1,76 @@
+flowchart TB
+    subgraph CLIENTS["Clientes"]
+        MOBILE["App Móvil<br/>(Flutter - iOS/Android)"]
+        DESKTOP["App Escritorio<br/>(Electron/Tauri)"]
+        WEB["App Web<br/>(React)"]
+    end
+
+    CDN["CDN / Edge<br/>(Cloudflare)"]
+
+    GATEWAY["API Gateway<br/>(Kong / Envoy)<br/>AuthN/AuthZ · Rate limiting · Routing"]
+
+    subgraph AUTH_BLOCK["Identidad"]
+        AUTHSVC["Auth & Identity<br/>Service"]
+        KEYCLOAK[("Keycloak<br/>OIDC")]
+    end
+
+    subgraph SERVICES["Microservicios (Clean Architecture)"]
+        TIMESVC["Time-Tracking Service<br/>(Clock in/out + Geofencing)"]
+        SCHEDSVC["Scheduling &<br/>Shifts Service"]
+        REPORTSVC["Reporting &<br/>Analytics Service"]
+        NOTIFSVC["Notification<br/>Service"]
+        BILLSVC["Billing &<br/>Subscriptions Service"]
+    end
+
+    BROKER["Message Broker (Kafka)<br/>TimeEntryCreated · ShiftAssigned · TimesheetApproved"]
+
+    subgraph STORAGE["Almacenamiento"]
+        PGTIME[("PostgreSQL<br/>Time Entries<br/>(shardeado)")]
+        PGSHIFT[("PostgreSQL<br/>Shifts")]
+        ANALYTICS[("ClickHouse /<br/>TimescaleDB<br/>(analítica)")]
+        REDIS[("Redis<br/>cache + push queue")]
+        BLOB[("S3 / Blob Storage<br/>fotos, exportes")]
+    end
+
+    subgraph OBS["Cross-cutting"]
+        OTEL["OpenTelemetry +<br/>Prometheus + Grafana + Loki"]
+        MESH["Service Mesh<br/>(Istio/Linkerd) - mTLS"]
+    end
+
+    MOBILE --> CDN
+    DESKTOP --> CDN
+    WEB --> CDN
+    CDN --> GATEWAY
+
+    GATEWAY --> AUTHSVC
+    AUTHSVC --> KEYCLOAK
+
+    GATEWAY --> TIMESVC
+    GATEWAY --> SCHEDSVC
+    GATEWAY --> REPORTSVC
+    GATEWAY --> NOTIFSVC
+    GATEWAY --> BILLSVC
+
+    TIMESVC --> BROKER
+    SCHEDSVC --> BROKER
+    REPORTSVC --> BROKER
+    NOTIFSVC --> BROKER
+    BILLSVC --> BROKER
+
+    BROKER --> PGTIME
+    BROKER --> PGSHIFT
+    BROKER --> ANALYTICS
+
+    TIMESVC --> REDIS
+    NOTIFSVC --> REDIS
+    TIMESVC --> BLOB
+    REPORTSVC --> BLOB
+
+    SERVICES -.instrumentado por.-> OTEL
+    SERVICES -.comunicación segura.-> MESH
+
+    style CLIENTS fill:#1e293b,stroke:#64748b,color:#fff
+    style SERVICES fill:#0f172a,stroke:#3b82f6,color:#fff
+    style STORAGE fill:#1e293b,stroke:#22c55e,color:#fff
+    style AUTH_BLOCK fill:#1e293b,stroke:#f59e0b,color:#fff
+    style OBS fill:#1e293b,stroke:#a855f7,color:#fff

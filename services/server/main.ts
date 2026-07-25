@@ -74,5 +74,5 @@ setupEmployeeLocationNamespace(io);
 
 server.listen(port, () => {
   const proto = isDev ? "http" : "https";
-  logger.info({ port }, `Server listening on ${proto}://0.0.0.0:${port}`);
+  logger.info({ port }, `Server listening on ${proto}://localhost:${port}`);
 });

@@ -1,0 +1,126 @@
+classDiagram
+    class Company {
+        +String id
+        +String name
+        +TimeZone timezone
+        +SubscriptionPlan plan
+        +addEmployee(Employee)
+        +configureGeoFence(GeoFence)
+    }
+
+    class Employee {
+        +String id
+        +String companyId
+        +String fullName
+        +String email
+        +Role role
+        +EmployeeStatus status
+        +clockIn(Coordinates) TimeEntry
+        +clockOut(Coordinates) TimeEntry
+        +requestTimeOff(DateRange) TimeOffRequest
+    }
+
+    class Role {
+        <<enumeration>>
+        EMPLOYEE
+        MANAGER
+        ADMIN
+    }
+
+    class TimeEntry {
+        +String id
+        +String employeeId
+        +DateTime clockInAt
+        +DateTime clockOutAt
+        +Coordinates clockInLocation
+        +Coordinates clockOutLocation
+        +TimeEntryStatus status
+        +Duration calculateDuration()
+        +boolean isWithinGeoFence(GeoFence)
+        +approve(Employee approver)
+        +reject(Employee approver, String reason)
+    }
+
+    class TimeEntryStatus {
+        <<enumeration>>
+        PENDING
+        APPROVED
+        REJECTED
+        EDITED
+    }
+
+    class GeoFence {
+        +String id
+        +String companyId
+        +Coordinates center
+        +double radiusMeters
+        +contains(Coordinates) boolean
+    }
+
+    class Coordinates {
+        +double latitude
+        +double longitude
+        +distanceTo(Coordinates) double
+    }
+
+    class Shift {
+        +String id
+        +String employeeId
+        +DateTime startsAt
+        +DateTime endsAt
+        +ShiftStatus status
+        +assignTo(Employee)
+        +overlapsWith(Shift) boolean
+    }
+
+    class Timesheet {
+        +String id
+        +String employeeId
+        +DateRange period
+        +List~TimeEntry~ entries
+        +TimesheetStatus status
+        +Duration totalHours()
+        +Duration overtimeHours(OvertimePolicy)
+        +submit()
+        +approve(Employee approver)
+    }
+
+    class OvertimePolicy {
+        +Duration weeklyThreshold
+        +double overtimeMultiplier
+        +calculate(Duration worked) Duration
+    }
+
+    class TimeOffRequest {
+        +String id
+        +String employeeId
+        +DateRange period
+        +TimeOffType type
+        +RequestStatus status
+        +approve(Employee approver)
+        +reject(Employee approver)
+    }
+
+    class Notification {
+        +String id
+        +String recipientId
+        +NotificationType type
+        +String message
+        +DateTime sentAt
+        +send()
+    }
+
+    Company "1" *-- "many" Employee : contiene
+    Company "1" *-- "many" GeoFence : configura
+    Employee "1" -- "many" TimeEntry : registra
+    Employee "1" -- "many" Shift : asignado a
+    Employee "1" -- "1" Timesheet : tiene por periodo
+    Employee --> Role
+    TimeEntry --> TimeEntryStatus
+    TimeEntry "1" --> "2" Coordinates : ubicaciones
+    TimeEntry ..> GeoFence : validado contra
+    Timesheet "1" o-- "many" TimeEntry : agrupa
+    Timesheet ..> OvertimePolicy : aplica
+    Employee "1" -- "many" TimeOffRequest : solicita
+    Employee "1" -- "many" Notification : recibe
+    GeoFence "1" -- "1" Coordinates : centro

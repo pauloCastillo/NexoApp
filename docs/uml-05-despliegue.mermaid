@@ -1,0 +1,66 @@
+flowchart TB
+    subgraph DEVICES["Dispositivos de Usuario"]
+        M["📱 Móvil<br/>Flutter App"]
+        D["🖥️ Desktop<br/>Electron/Tauri"]
+        B["🌐 Navegador<br/>React SPA"]
+    end
+
+    CDN["☁️ CDN Global<br/>Cloudflare"]
+
+    subgraph REGION_US["Región: us-east-1"]
+        subgraph K8S_US["Cluster Kubernetes"]
+            GW_US["API Gateway<br/>(pods x N, HPA)"]
+            SVC_US["Microservicios<br/>(pods x N, HPA)"]
+            MESH_US["Service Mesh<br/>(Istio sidecars)"]
+        end
+        PG_US[("PostgreSQL<br/>Primary + Réplicas")]
+        KAFKA_US["Kafka Cluster<br/>(3+ brokers)"]
+        REDIS_US[("Redis Cluster")]
+    end
+
+    subgraph REGION_EU["Región: eu-west-1"]
+        subgraph K8S_EU["Cluster Kubernetes"]
+            GW_EU["API Gateway<br/>(pods x N, HPA)"]
+            SVC_EU["Microservicios<br/>(pods x N, HPA)"]
+        end
+        PG_EU[("PostgreSQL<br/>Réplica de lectura")]
+        KAFKA_EU["Kafka Cluster<br/>(mirror)"]
+    end
+
+    subgraph SHARED["Servicios Compartidos Globales"]
+        S3["S3 / Blob Storage<br/>(multi-región)"]
+        KEYCLOAK["Keycloak<br/>(HA, 3 nodos)"]
+        OBS["Observabilidad<br/>Prometheus/Grafana/Loki"]
+    end
+
+    M --> CDN
+    D --> CDN
+    B --> CDN
+
+    CDN -->|GeoDNS: latencia más baja| GW_US
+    CDN -->|GeoDNS: latencia más baja| GW_EU
+
+    GW_US --> SVC_US
+    GW_EU --> SVC_EU
+
+    SVC_US --> PG_US
+    SVC_US --> KAFKA_US
+    SVC_US --> REDIS_US
+    SVC_US --> S3
+    SVC_US --> KEYCLOAK
+
+    SVC_EU --> PG_EU
+    SVC_EU --> KAFKA_EU
+    SVC_EU --> S3
+    SVC_EU --> KEYCLOAK
+
+    PG_US -.replicación asíncrona.-> PG_EU
+    KAFKA_US -.mirror maker.-> KAFKA_EU
+
+    SVC_US -.métricas/trazas.-> OBS
+    SVC_EU -.métricas/trazas.-> OBS
+
+    style DEVICES fill:#1e293b,stroke:#64748b,color:#fff
+    style REGION_US fill:#0f172a,stroke:#3b82f6,color:#fff
+    style REGION_EU fill:#0f172a,stroke:#3b82f6,color:#fff
+    style SHARED fill:#1e293b,stroke:#22c55e,color:#fff

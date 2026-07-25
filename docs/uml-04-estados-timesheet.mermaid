@@ -1,0 +1,27 @@
+stateDiagram-v2
+    [*] --> OPEN: se crea al inicio del periodo
+
+    OPEN --> OPEN: clockIn/clockOut agrega TimeEntry
+    OPEN --> SUBMITTED: empleado envía para aprobación
+
+    SUBMITTED --> APPROVED: manager aprueba
+    SUBMITTED --> REJECTED: manager rechaza
+    SUBMITTED --> OPEN: manager solicita edición
+
+    REJECTED --> OPEN: empleado corrige y reenvía
+
+    APPROVED --> LOCKED: cierre automático de periodo<br/>(job programado)
+    APPROVED --> DISPUTED: empleado disputa dentro de ventana
+
+    DISPUTED --> OPEN: se reabre para corrección
+    DISPUTED --> LOCKED: disputa rechazada, se bloquea
+
+    LOCKED --> [*]: incluido en nómina<br/>(inmutable, solo auditoría)
+
+    note right of LOCKED
+        Estado terminal.
+        Cualquier cambio posterior
+        requiere un TimeEntry de
+        ajuste, nunca editar el
+        registro original (auditoría).
+    end note

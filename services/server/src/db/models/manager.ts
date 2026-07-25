@@ -35,7 +35,7 @@ const managerSchema = new Schema(
     role: {
       type: String,
       enum: ["superuser", "editor", "manager", "viewer"],
-      default: "editor",
+      default: "manager",
     },
     refreshTokenHash: {
       type: String,

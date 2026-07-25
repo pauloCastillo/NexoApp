@@ -1,0 +1,41 @@
+sequenceDiagram
+    actor Emp as Empleado (App Móvil)
+    participant GW as API Gateway
+    participant Ctrl as ClockInController<br/>(Adapter)
+    participant UC as ClockInUseCase<br/>(Application)
+    participant GeoPort as GeoFenceValidator<br/>(Port)
+    participant RepoPort as TimeEntryRepository<br/>(Port)
+    participant Cache as Redis
+    participant Kafka as Kafka Broker
+    participant Consumer as TimeEntryConsumer
+    participant DB as PostgreSQL
+
+    Emp->>GW: POST /clock-in {coords, employeeId}
+    GW->>GW: Validar JWT / Rate limit
+    GW->>Ctrl: Forward request
+    Ctrl->>Ctrl: Mapear DTO -> ClockInInput
+    Ctrl->>UC: execute(ClockInInput)
+
+    UC->>GeoPort: isWithinGeoFence(coords)
+    GeoPort->>Cache: obtener geofence activa (cache)
+    Cache-->>GeoPort: GeoFence data
+    GeoPort-->>UC: true / false
+
+    alt fuera de geofence
+        UC-->>Ctrl: Error: OutOfGeoFenceException
+        Ctrl-->>Emp: 422 Ubicación inválida
+    else dentro de geofence
+        UC->>UC: crear entidad TimeEntry (PENDING)
+        UC->>RepoPort: save(TimeEntry) [async/optimista]
+        RepoPort->>Kafka: publish(TimeEntryCreated)
+        Kafka-->>RepoPort: ack
+        RepoPort-->>UC: eventId
+        UC-->>Ctrl: ClockInOutput{status: RECEIVED}
+        Ctrl-->>Emp: 202 Accepted {eventId}
+
+        Kafka->>Consumer: consume(TimeEntryCreated)
+        Consumer->>Consumer: validar idempotencia (eventId)
+        Consumer->>DB: INSERT time_entry
+        DB-->>Consumer: OK
+        Consumer->>Cache: invalidar cache de timesheet
+    end
