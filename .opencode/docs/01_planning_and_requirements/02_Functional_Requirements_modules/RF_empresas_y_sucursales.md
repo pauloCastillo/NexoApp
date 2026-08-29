@@ -1,0 +1,1 @@
+aqui vienen los requerimientos funcionales de las empresas y sucursales.

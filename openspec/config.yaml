@@ -1,0 +1,17 @@
+schema: spec-driven
+
+context: |
+  Objetivo: NexoApp es una plataforma multi-tenant de gestion operativa empresarial. Centraliza control de asistencia con geocerca GPS, gestion de empleados/clientes, ordenes de trabajo, permisos y vacaciones, y dashboard en tiempo real (Socket.io). Desktop para duenos/gerentes y mobile para empleados.
+  Tech stack: Node.js 22 + Express 5 + TypeScript + MongoDB Atlas/Mongoose + Socket.io + JWT | Flutter 3.12 (Riverpod, flutter_map, geolocator) + Expo/RN alternativo
+  Convenciones: API REST bajo /api + Zod + Pino, RBAC + tenantGuard, multi-tenant por company
+  Domain: workforce management / asistencia y operaciones en campo
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always include a "Non-goals" section
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
