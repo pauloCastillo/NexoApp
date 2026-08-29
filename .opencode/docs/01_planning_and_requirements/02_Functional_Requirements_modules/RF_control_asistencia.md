@@ -1,0 +1,3 @@
+- marcación o fichaje
+- geolocalización
+- horarios y turnos
