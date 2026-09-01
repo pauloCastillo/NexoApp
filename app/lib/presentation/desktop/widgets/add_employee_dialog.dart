@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:nexo_app/domain/employee/entities/employee_model.dart';
 
@@ -18,11 +16,7 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
   late final TextEditingController _emailCtrl;
   late final TextEditingController _phoneCtrl;
   late final TextEditingController _jobCtrl;
-  late final TextEditingController _passwordCtrl;
-  late final TextEditingController _confirmPasswordCtrl;
   late String _selectedRole;
-  bool _obscurePassword = true;
-  bool _obscureConfirm = true;
 
   @override
   void initState() {
@@ -31,8 +25,6 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
     _emailCtrl = TextEditingController(text: widget.employee?.email ?? '');
     _phoneCtrl = TextEditingController(text: widget.employee?.phone ?? '');
     _jobCtrl = TextEditingController(text: widget.employee?.jobTitle ?? '');
-    _passwordCtrl = TextEditingController();
-    _confirmPasswordCtrl = TextEditingController();
     _selectedRole = widget.employee?.role ?? 'employee';
   }
 
@@ -42,18 +34,7 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
     _emailCtrl.dispose();
     _phoneCtrl.dispose();
     _jobCtrl.dispose();
-    _passwordCtrl.dispose();
-    _confirmPasswordCtrl.dispose();
     super.dispose();
-  }
-
-  void _generatePassword() {
-    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    final pass = List.generate(12, (_) => chars[Random().nextInt(chars.length)]).join();
-    setState(() {
-      _passwordCtrl.text = pass;
-      _confirmPasswordCtrl.text = pass;
-    });
   }
 
   @override
@@ -92,23 +73,15 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
               _buildField('Teléfono', _phoneCtrl, cs, keyboardType: TextInputType.phone),
               const SizedBox(height: 16),
               _buildField('Cargo', _jobCtrl, cs),
-              if (!isEdit) ...[
-                const SizedBox(height: 16),
-                _buildPasswordField(cs),
-                const SizedBox(height: 16),
-                _buildConfirmPasswordField(cs),
-              ],
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 initialValue: _selectedRole,
                 decoration: const InputDecoration(labelText: 'Rol'),
                 items: const [
                   DropdownMenuItem(value: 'employee', child: Text('Colaborador')),
-                  DropdownMenuItem(value: 'distributor', child: Text('Distribuidor')),
-                  DropdownMenuItem(value: 'manager', child: Text('Gerente')),
+                  DropdownMenuItem(value: 'supervisor', child: Text('Supervisor')),
                   DropdownMenuItem(value: 'admin', child: Text('Administrador')),
-                  DropdownMenuItem(value: 'hr', child: Text('Recursos Humanos')),
-                  DropdownMenuItem(value: 'it', child: Text('Tecnología')),
+                  DropdownMenuItem(value: 'hr_manager', child: Text('Recursos Humanos')),
                 ],
                 onChanged: (v) {
                   if (v != null) setState(() => _selectedRole = v);
@@ -128,54 +101,6 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
           child: Text(isEdit ? 'Guardar' : 'Agregar'),
         ),
       ],
-    );
-  }
-
-  Widget _buildPasswordField(ColorScheme cs) {
-    return Row(
-      children: [
-        Expanded(
-          child: TextFormField(
-            controller: _passwordCtrl,
-            obscureText: _obscurePassword,
-            decoration: InputDecoration(
-              labelText: 'Contraseña',
-              suffixIcon: IconButton(
-                icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
-                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-              ),
-            ),
-            validator: (v) {
-              if (v == null || v.length < 6) return 'Mínimo 6 caracteres';
-              return null;
-            },
-          ),
-        ),
-        const SizedBox(width: 8),
-        IconButton(
-          icon: const Icon(Icons.shuffle),
-          tooltip: 'Generar contraseña',
-          onPressed: _generatePassword,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildConfirmPasswordField(ColorScheme cs) {
-    return TextFormField(
-      controller: _confirmPasswordCtrl,
-      obscureText: _obscureConfirm,
-      decoration: InputDecoration(
-        labelText: 'Confirmar contraseña',
-        suffixIcon: IconButton(
-          icon: Icon(_obscureConfirm ? Icons.visibility_off : Icons.visibility),
-          onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
-        ),
-      ),
-      validator: (v) {
-        if (v != _passwordCtrl.text) return 'Las contraseñas no coinciden';
-        return null;
-      },
     );
   }
 
@@ -203,10 +128,6 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
       'jobTitle': _jobCtrl.text.trim().isEmpty ? null : _jobCtrl.text.trim(),
       'role': _selectedRole,
     };
-    if (widget.employee == null) {
-      data['password'] = _passwordCtrl.text;
-      data['confirmPassword'] = _confirmPasswordCtrl.text;
-    }
     Navigator.pop(context, data);
   }
 }

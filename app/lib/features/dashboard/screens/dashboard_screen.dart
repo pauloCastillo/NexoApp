@@ -22,6 +22,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   bool _loading = true;
   final _socketService = DashboardSocketService();
   StreamSubscription<Map<String, dynamic>>? _socketSub;
+  StreamSubscription<Map<String, dynamic>>? _inviteSub;
 
   @override
   void initState() {
@@ -33,6 +34,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   @override
   void dispose() {
     _socketSub?.cancel();
+    _inviteSub?.cancel();
     _socketService.disconnect();
     super.dispose();
   }
@@ -52,6 +54,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     if (auth == null) return;
     _socketService.connect('http://localhost:8080', auth.userId ?? '');
     _socketSub = _socketService.attendanceUpdates.listen((_) => _loadAttendance());
+    _inviteSub = _socketService.invitationRequests.listen((data) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Solicitud de nuevo código: ${data['code'] ?? ''} (${data['email'] ?? data['phone'] ?? ''})')));
+    });
   }
 
   @override
@@ -97,12 +103,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Widget _buildKpiRow(DashboardSummaryModel s, int checkedIn, ColorScheme cs) {
+    // J2 Aqua/Graphite mapping — tokens, no hardcode pastels fuera de paleta
     return Wrap(spacing: 16, runSpacing: 16, children: [
-      KpiCard(title: 'Empleados activos', value: s.activeEmployees.toString(), icon: Icons.people, color: cs.primary),
-      KpiCard(title: 'Asistencias hoy', value: s.todayAttendances.toString(), icon: Icons.access_time, color: const Color(0xFF06D6A0)),
-      KpiCard(title: 'Permisos pendientes', value: s.pendingPermissions.toString(), icon: Icons.pending_actions, color: const Color(0xFFF59E0B)),
-      KpiCard(title: 'Órdenes activas', value: s.activeWorkOrders.toString(), icon: Icons.assignment, color: const Color(0xFF8B5CF6)),
-      KpiCard(title: 'En línea ahora', value: checkedIn.toString(), icon: Icons.person_pin, color: const Color(0xFF10B981)),
+      KpiCard(title: 'Empleados activos', value: s.activeEmployees.toString(), icon: Icons.people, color: cs.secondary), // navy 0F2A4A
+      KpiCard(title: 'Asistencias hoy', value: s.todayAttendances.toString(), icon: Icons.access_time, color: cs.primary), // teal 00A99D
+      KpiCard(title: 'Permisos pendientes', value: s.pendingPermissions.toString(), icon: Icons.pending_actions, color: const Color(0xFFFFC857)), // amber J2 accent
+      KpiCard(title: 'Órdenes activas', value: s.activeWorkOrders.toString(), icon: Icons.assignment, color: const Color(0xFF4F6DFF)), // indigo tertiary
+      KpiCard(title: 'En línea ahora', value: checkedIn.toString(), icon: Icons.person_pin, color: const Color(0xFF2CEAA3)), // light teal dark-mode primary
     ]);
   }
 

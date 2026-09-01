@@ -5,6 +5,7 @@ import '../auth/auth_state.dart';
 import '../../presentation/desktop/navigation/desktop_routes.dart';
 import '../../presentation/mobile/navigation/mobile_routes.dart';
 import '../../presentation/mobile/navigation/splash_screen.dart';
+import '../../features/auth/screens/register_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
@@ -15,8 +16,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final logged = authState != null;
       final role = authState?.role;
       final isEmployee = role == 'employee';
-      final isManager = role == 'business_owner' || role == 'manager';
-      final authRoute = path == '/splash' || path == '/login' || path == '/register';
+      final isManager = role != null && adminLikeRoles.contains(role) && !platformOnlyRoles.contains(role);
+      final authRoute = path == '/splash' || path == '/login' || path == '/register' || path.startsWith('/invite');
 
       if (path == '/splash') return null;
       if (!logged) return authRoute ? null : '/login';
@@ -36,6 +37,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       GoRoute(path: '/splash', builder: (_, _) => const SplashScreen()),
+      GoRoute(path: '/invite/:code', builder: (_, s) => RegisterScreen(initialCode: s.pathParameters['code'])),
       ...desktopRoutes,
       ...mobileRoutes,
     ],

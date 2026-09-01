@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:nexo_app/domain/employee/entities/employee_model.dart';
-import 'package:nexo_app/core/auth/auth_state.dart';
+import 'package:nexo_app/domain/invitation/entities/invitation_model.dart';
 import 'package:nexo_app/presentation/desktop/widgets/kpi_card.dart';
 import 'package:nexo_app/features/employees/providers/employee_provider.dart';
+import 'package:nexo_app/features/invitations/providers/invitation_provider.dart';
 import 'package:nexo_app/presentation/desktop/widgets/add_employee_dialog.dart';
 import 'package:nexo_app/presentation/desktop/widgets/employee_table.dart';
+import 'package:nexo_app/presentation/desktop/widgets/invite_employee_dialog.dart';
 
 class EmployeeListScreen extends ConsumerStatefulWidget {
   const EmployeeListScreen({super.key});
@@ -17,23 +19,59 @@ class EmployeeListScreen extends ConsumerStatefulWidget {
 
 class _EmployeeListScreenState extends ConsumerState<EmployeeListScreen> {
   Future<void> _addEmployee() async {
-    final data = await showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (_) => const AddEmployeeDialog(),
-    );
-    if (data == null) return;
+    await showDialog(context: context, builder: (_) => const InviteEmployeeDialog());
+    ref.invalidate(invitationListProvider);
+  }
 
-    try {
-      final repo = ref.read(employeeRepositoryProvider);
-      await repo.create(data);
-      if (!mounted) return;
-      ref.invalidate(employeeListProvider);
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al crear: $e')),
-      );
-    }
+  void _showCodeDialog(String code) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: const Text('Invitación creada'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Comparte este código con el colaborador para que cree su cuenta desde el móvil:'),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(code, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, letterSpacing: 2, color: Theme.of(context).colorScheme.onPrimaryContainer, fontFamily: 'monospace')),
+                  const SizedBox(width: 12),
+                  IconButton(
+                    icon: const Icon(Icons.copy_rounded),
+                    tooltip: 'Copiar',
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: code));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Código $code copiado')));
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cerrar')),
+          FilledButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: code));
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Código $code copiado')));
+            },
+            child: const Text('Copiar código'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _editEmployee(EmployeeModel employee) async {
@@ -88,47 +126,82 @@ class _EmployeeListScreenState extends ConsumerState<EmployeeListScreen> {
     }
   }
 
+  Future<void> _revokeInvitation(InvitationModel inv) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: const Text('Revocar invitación'),
+        content: Text('¿Revocar invitación ${inv.code} para ${inv.invitedName ?? inv.invitedEmail}?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
+            child: const Text('Revocar'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      final repo = ref.read(invitationRepositoryProvider);
+      await repo.revoke(inv.code);
+      if (!mounted) return;
+      ref.invalidate(invitationListProvider);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Invitación revocada')));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al revocar: $e')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final auth = ref.watch(authStateProvider);
     final employeesAsync = ref.watch(employeeListProvider);
+    final invitationsAsync = ref.watch(invitationListProvider);
     final cs = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: Builder(builder: (ctx) => IconButton(
-          icon: const Icon(Icons.menu_rounded),
-          onPressed: () => Scaffold.of(ctx).openDrawer(),
-        )),
-        title: const Text('Empleados', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
-      ),
-      drawer: _Drawer(authState: auth),
-      body: employeesAsync.when(
-        data: (employees) => SingleChildScrollView(
+    return employeesAsync.when(
+      data: (employees) {
+        final invitations = invitationsAsync.valueOrNull ?? [];
+        final isLoadingInv = invitationsAsync.isLoading;
+        return SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildPageHeader(employees.length, cs),
+              _buildPageHeader(employees.length + invitations.length, cs),
               if (employees.isNotEmpty) ...[
                 const SizedBox(height: 24),
                 _buildKpiRow(employees, cs),
               ],
               const SizedBox(height: 24),
-              if (employees.isEmpty)
+              if (isLoadingInv) const LinearProgressIndicator(),
+              if (employees.isEmpty && invitations.isEmpty)
                 _buildEmptyState(cs)
               else
                 EmployeeTable(
                   employees: employees,
+                  pendingInvitations: invitations,
                   onEdit: _editEmployee,
                   onDelete: _deleteEmployee,
+                  onRevokeInvitation: _revokeInvitation,
+                  onCopyCode: (inv) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Código ${inv.code} copiado')));
+                  },
+                ),
+              if (invitationsAsync.hasError)
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Text('Error cargando invitaciones: ${invitationsAsync.error}', style: TextStyle(color: cs.error, fontSize: 12)),
                 ),
             ],
           ),
-        ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
-      ),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Error: $e')),
     );
   }
 
@@ -154,12 +227,12 @@ class _EmployeeListScreenState extends ConsumerState<EmployeeListScreen> {
   }
 
   Widget _buildKpiRow(List<EmployeeModel> employees, ColorScheme cs) {
-    final managers = employees.where((e) => e.role == 'manager').length;
-    final editors = employees.where((e) => e.role == 'editor').length;
+    final supervisors = employees.where((e) => e.role == 'supervisor').length;
+    final admins = employees.where((e) => e.role == 'admin').length;
     return Wrap(spacing: 16, runSpacing: 16, children: [
       KpiCard(title: 'Total empleados', value: employees.length.toString(), icon: Icons.people, color: cs.primary),
-      KpiCard(title: 'Gerentes', value: managers.toString(), icon: Icons.supervisor_account, color: const Color(0xFF8B5CF6)),
-      KpiCard(title: 'Editores', value: editors.toString(), icon: Icons.edit_note, color: const Color(0xFF4F6DFF)),
+      KpiCard(title: 'Supervisores', value: supervisors.toString(), icon: Icons.supervisor_account, color: const Color(0xFF8B5CF6)),
+      KpiCard(title: 'Administradores', value: admins.toString(), icon: Icons.admin_panel_settings, color: const Color(0xFF4F6DFF)),
     ]);
   }
 
@@ -189,94 +262,6 @@ class _EmployeeListScreenState extends ConsumerState<EmployeeListScreen> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _Drawer extends ConsumerWidget {
-  final AuthState? authState;
-
-  const _Drawer({this.authState});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final cs = Theme.of(context).colorScheme;
-    final currentRoute = GoRouterState.of(context).uri.toString();
-
-    return Drawer(
-      child: Column(
-        children: [
-          DrawerHeader(
-            decoration: BoxDecoration(color: cs.primary),
-            margin: EdgeInsets.zero,
-            child: SizedBox(
-              width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  CircleAvatar(
-                    radius: 26,
-                    backgroundColor: Colors.white.withValues(alpha: 0.2),
-                    foregroundColor: Colors.white,
-                    child: Text(
-                      authState?.name != null
-                          ? authState!.name!.substring(0, 2).toUpperCase()
-                          : '??',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(authState?.name ?? '', style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
-                  if (authState?.email != null)
-                    Text(authState!.email!, style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 13)),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              children: [
-                _navItem(context, Icons.dashboard_rounded, 'Dashboard', '/', currentRoute),
-                _navItem(context, Icons.people_rounded, 'Empleados', '/employees', currentRoute),
-                _navItem(context, Icons.assignment_rounded, 'Órdenes', '/work-orders', currentRoute),
-                _navItem(context, Icons.business_rounded, 'Clientes', '/clients', currentRoute),
-                _navItem(context, Icons.description_rounded, 'Reportes', '/reports', currentRoute),
-              ],
-            ),
-          ),
-          const Divider(height: 1),
-          ListTile(
-            leading: Icon(Icons.logout_rounded, color: cs.onSurfaceVariant),
-            title: Text('Cerrar sesión', style: TextStyle(color: cs.onSurfaceVariant)),
-            onTap: () {
-              ref.read(authStateProvider.notifier).state = null;
-              context.go('/login');
-            },
-          ),
-          const SizedBox(height: 8),
-        ],
-      ),
-    );
-  }
-
-  Widget _navItem(BuildContext context, IconData icon, String label, String route, String current) {
-    final isActive = current == route;
-    final cs = Theme.of(context).colorScheme;
-    return ListTile(
-      leading: Icon(icon, color: isActive ? cs.primary : cs.onSurfaceVariant),
-      title: Text(label, style: TextStyle(
-        fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-        color: isActive ? cs.primary : cs.onSurface,
-      )),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      selected: isActive,
-      selectedTileColor: cs.primaryContainer.withValues(alpha: 0.4),
-      onTap: () {
-        if (current != route) context.pushReplacement(route);
-        Navigator.of(context).pop();
-      },
     );
   }
 }

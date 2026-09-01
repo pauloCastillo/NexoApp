@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:nexo_app/core/theme/nexo_theme.dart';
 
+// ponytail: unified theme — mobile now supports darkMode too
 class MobileAppTheme {
-  static ThemeData get light => ThemeData(
-        colorSchemeSeed: const Color(0xFF4F6DFF),
-        useMaterial3: true,
-        brightness: Brightness.light,
-        appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
-      );
+  static ThemeData get light => NexoTheme.light;
+  static ThemeData get dark => NexoTheme.dark;
 }

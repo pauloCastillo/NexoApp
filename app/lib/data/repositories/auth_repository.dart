@@ -10,7 +10,10 @@ abstract class AuthRepository {
     String? companyId,
     String? role,
     String? phone,
+    String? invitationCode,
   });
+  Future<Map<String, dynamic>> validateInvitation(String code);
+  Future<Map<String, dynamic>> requestNewCode(String code, {String? email, String? phone});
   Future<UserModel> getProfile();
   Future<void> logout();
   Future<void> changePassword(String currentPassword, String newPassword);
