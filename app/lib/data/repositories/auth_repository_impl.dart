@@ -30,6 +30,7 @@ class AuthRepositoryImpl implements AuthRepository {
     String? companyId,
     String? role,
     String? phone,
+    String? invitationCode,
   }) async {
     final data = await _source.register(
       username, email, password,
@@ -37,6 +38,7 @@ class AuthRepositoryImpl implements AuthRepository {
       companyId: companyId,
       role: role,
       phone: phone,
+      invitationCode: invitationCode,
     );
     final token = data['token'] as String?;
     final refresh = data['refreshToken'] as String?;
@@ -47,6 +49,12 @@ class AuthRepositoryImpl implements AuthRepository {
     user['name'] = user['username'] as String? ?? '';
     return UserModel.fromJson(user);
   }
+
+  @override
+  Future<Map<String, dynamic>> validateInvitation(String code) => _source.validateInvitation(code);
+
+  @override
+  Future<Map<String, dynamic>> requestNewCode(String code, {String? email, String? phone}) => _source.requestNewCode(code, email: email, phone: phone);
 
   @override
   Future<UserModel> getProfile() => _source.getProfile();

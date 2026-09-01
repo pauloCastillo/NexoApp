@@ -5,6 +5,7 @@ class EmployeeModel {
   final String? phone;
   final String? jobTitle;
   final String role;
+  final List<String> branches;
 
   EmployeeModel({
     required this.id,
@@ -13,6 +14,7 @@ class EmployeeModel {
     this.phone,
     this.jobTitle,
     this.role = 'employee',
+    this.branches = const [],
   });
 
   factory EmployeeModel.fromJson(Map<String, dynamic> json) => EmployeeModel(
@@ -22,6 +24,7 @@ class EmployeeModel {
     phone: json['phone'] as String?,
     jobTitle: json['jobTitle'] as String?,
     role: json['role'] as String? ?? 'employee',
+    branches: (json['branches'] as List?)?.map((e) => e is String ? e : (e['_id'] ?? e['id']).toString()).toList().cast<String>() ?? [],
   );
 
   Map<String, dynamic> toJson() => {

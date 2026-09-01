@@ -6,6 +6,8 @@ class DashboardSocketService {
   final _controller = StreamController<Map<String, dynamic>>.broadcast();
 
   Stream<Map<String, dynamic>> get attendanceUpdates => _controller.stream;
+  final _inviteController = StreamController<Map<String, dynamic>>.broadcast();
+  Stream<Map<String, dynamic>> get invitationRequests => _inviteController.stream;
 
   void connect(String serverUrl, String token) {
     _socket = io.io(
@@ -16,6 +18,9 @@ class DashboardSocketService {
     );
     _socket!.on('attendanceUpdate', (data) {
       _controller.add(data as Map<String, dynamic>);
+    });
+    _socket!.on('invitation:request_new', (data) {
+      _inviteController.add(data as Map<String, dynamic>);
     });
     _socket!.connect();
   }
