@@ -1,3 +1,4 @@
+// ponytail: legacy throw {statusCode, message} — normalized via normalizeError, migrate to AppError on next touch
 import { checkingPassword, signSession, signRefreshToken, hashToken, verifyTokenHash } from '@/utils/utils.js';
 import { User, Company } from '@/db/models/index.js';
 import auditLogService from '@/services/auditLogService.js';
@@ -30,8 +31,21 @@ class AuthService {
       throw { statusCode: 409, message: "La empresa ya está registrada" };
     }
 
-    const newCompany = await Company.create({ name: ownerCompanyName.trim() });
-    const owner = await User.create({ username: ownerName, email: ownerEmail, password: ownerPassword, phone: ownerPhone, role: 'business_owner', company: newCompany._id });
+    // ponytail: atomic Company+User creation (see auditoria #8)
+    const mongoose = (await import('mongoose')).default;
+    const session = await mongoose.startSession();
+    let newCompany: any;
+    let owner: any;
+    try {
+      await session.withTransaction(async () => {
+        const c = await Company.create([{ name: ownerCompanyName.trim() }], { session });
+        newCompany = c[0];
+        const u = await User.create([{ username: ownerName, email: ownerEmail, password: ownerPassword, phone: ownerPhone, role: 'business_owner', company: newCompany._id }], { session });
+        owner = u[0];
+      });
+    } finally {
+      await session.endSession();
+    }
     const userData = { _id: owner._id, email: owner.email, username: owner.username, company: newCompany._id, role: 'business_owner' };
     const token = signSession(userData);
     const refreshToken = signRefreshToken(userData);
@@ -49,10 +63,13 @@ class AuthService {
   }
 
   async registerUser(body: any) {
-    const { email, password, confirmPassword, username, companyName, phone, jobTitle, role } = body;
+    const { email, password, confirmPassword, username, companyName, phone, jobTitle, role, invitationCode } = body;
 
     if (confirmPassword !== password) {
       throw { statusCode: 400, message: "Las contraseñas no coinciden" };
+    }
+    if (!password || String(password).length < 6) {
+      throw { statusCode: 400, message: "La contraseña debe tener al menos 6 caracteres" };
     }
 
     const existing = await User.findOne({ email });
@@ -60,24 +77,62 @@ class AuthService {
       throw { statusCode: 409, message: "Ya existe un usuario registrado con esos datos, inicie sesión si es usted" };
     }
 
-    const normalizedName = companyName?.trim();
-    if (!normalizedName) {
-      throw { statusCode: 400, message: "Nombre de empresa requerido" };
+    // ponytail: invitationCode determines role, legacy flag removed
+    let company: any;
+    let finalRole = role || 'employee';
+
+    if (invitationCode) {
+      const { Invitation } = await import('@/db/models/index.js');
+      const code = String(invitationCode).toUpperCase().trim();
+      // atomic single-use consume
+      const inv: any = await Invitation.findOneAndUpdate(
+        { code, isActive: true, $expr: { $lt: ['$usedCount', '$maxUses'] }, $or: [{ expiresAt: { $gt: new Date() } }, { expiresAt: { $exists: false } }] },
+        { $inc: { usedCount: 1 }, $set: { usedBy: undefined, usedAt: new Date(), isActive: false } },
+        { new: true }
+      );
+      if (!inv) {
+        const exists = await Invitation.findOne({ code });
+        if (exists) throw { statusCode: 400, code: 'INVITATION_INVALID', message: "Código inválido o expirado" };
+        throw { statusCode: 400, code: 'INVITATION_INVALID', message: "Código inválido o expirado" };
+      }
+      if (inv.expiresAt && new Date(inv.expiresAt) < new Date()) throw { statusCode: 400, code: 'INVITATION_INVALID', message: "Código inválido o expirado" };
+      company = await Company.findById(inv.company);
+      if (!company) throw { statusCode: 404, message: "Empresa de la invitación no encontrada" };
+      finalRole = inv.role || 'employee';
+      (body as any)._invitation = inv;
+    } else {
+      // legacy: allow employee by companyName for backwards compat, but prefer invitation
+      const normalizedName = companyName?.trim();
+      if (!normalizedName) {
+        throw { statusCode: 400, message: "Código de invitación requerido para colaboradores. Solicítalo a tu administrador." };
+      }
+      let found = await Company.findOne({ name: new RegExp(`^${normalizedName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') });
+      if (!found) {
+        found = await Company.create({ name: normalizedName });
+      }
+      company = found;
     }
 
-    let company = await Company.findOne({ name: new RegExp(`^${normalizedName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') });
-    if (!company) {
-      company = await Company.create({ name: normalizedName });
+    const invMeta: any = (body as any)._invitation;
+    const userPayload: any = { username, email, password, phone, role: finalRole, company: company._id, jobTitle };
+    if (invMeta) {
+      if (invMeta.department) userPayload.department = invMeta.department;
+      if (invMeta.branchId) userPayload.branches = [invMeta.branchId];
+      else if (invMeta.branch) userPayload.branches = []; // string fallback, keep empty but log
+      // update usedBy now that user id known? will set after create via update
     }
-
-    const user = await User.create({ username, email, password, phone, role: role || 'employee', company: company._id, jobTitle });
+    const user = await User.create(userPayload);
+    if (invMeta) {
+      await (await import('@/db/models/index.js')).Invitation.updateOne({ _id: invMeta._id }, { $set: { usedBy: user._id, usedAt: new Date() } });
+      await auditLogService.log({ action: 'invitation.consumed', entityType: 'Invitation', entityId: invMeta.code, userId: user._id.toString(), companyId: company._id.toString(), metadata: { role: finalRole, department: invMeta.department, branchId: invMeta.branchId, branch: invMeta.branch } });
+    }
     const userData = { _id: user._id, email: user.email, username: user.username, company: company._id, role: user.role };
     const token = signSession(userData);
     const refreshToken = signRefreshToken(userData);
     user.refreshTokenHash = await hashToken(refreshToken);
     await user.save();
 
-    auditLogService.log({ action: 'auth.register', entityType: 'User', entityId: user._id.toString(), companyId: company._id.toString() });
+    auditLogService.log({ action: 'auth.register', entityType: 'User', entityId: user._id.toString(), companyId: company._id.toString(), metadata: invMeta ? { invitationCode: invMeta.code } : undefined });
 
     return {
       message: "Registro exitoso",

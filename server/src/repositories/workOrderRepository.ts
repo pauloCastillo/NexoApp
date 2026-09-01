@@ -33,6 +33,13 @@ class WorkOrderRepository {
   async deleteWorkOrder(id: string, context: TenantContext) {
     return await WorkOrder.findOneAndDelete({ _id: id, ...this.#companyFilter(context) });
   }
+
+  async transitionStatus(id: string, fromStatus: string, toStatus: string, extra: Record<string, any>, context: TenantContext) {
+    // ponytail: atomic transition to avoid TOCTOU race
+    const filter: any = { _id: id, status: fromStatus, ...this.#companyFilter(context) };
+    const update: any = { ...extra, status: toStatus };
+    return await WorkOrder.findOneAndUpdate(filter, update, { new: true });
+  }
 }
 
 export default WorkOrderRepository;

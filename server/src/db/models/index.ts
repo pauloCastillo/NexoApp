@@ -7,6 +7,8 @@ export { default as Client } from "./client.js";
 export { default as Permission } from "./permission.js";
 export { default as Vacation } from "./vacation.js";
 export { default as Company } from "./company.js";
+export { default as Branch } from "./branch.js";
 export { default as WorkOrder } from "./workOrder.js";
 export { default as AuditLog } from "./auditLog.js";
 export { default as PushToken } from "./pushToken.js";
+export { default as Invitation } from "./invitation.js";

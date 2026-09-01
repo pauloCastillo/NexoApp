@@ -8,7 +8,7 @@ class EmployeeRepository {
     }
 
     async getAllEmployees(context: TenantContext) {
-        return await User.find({ ...this.#companyFilter(context), role: { $in: ['employee', 'editor', 'manager', 'it', 'hr'] } }).populate({
+        return await User.find({ ...this.#companyFilter(context), role: { $in: ['employee', 'hr_manager', 'supervisor', 'admin'] } }).populate({
             path: "controlTimeID",
             populate: {
                 path: "location",

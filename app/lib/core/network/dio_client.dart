@@ -23,6 +23,10 @@ Dio createDio() {
   );
 
   dio.interceptors.add(AuthInterceptor(dio, _secureStorage));
-  dio.interceptors.add(LogInterceptor(requestBody: true, responseBody: true));
+  // ponytail: log only in debug to avoid leaking tokens/PII (see auditoria #10)
+  assert(() {
+    dio.interceptors.add(LogInterceptor(requestBody: true, responseBody: true));
+    return true;
+  }());
   return dio;
 }

@@ -7,12 +7,13 @@ dotenv.config();
 let io: SocketIOServer;
 
 const setupSocketIO = (server: HttpsServer): SocketIOServer => {
+    const allowedOrigins = process.env.CLIENT_URL?.split(",").map((s) => s.trim()).filter(Boolean);
     io = new SocketIOServer(server, {
         cors: {
-        origin: process.env.CLIENT_URL,
+        origin: allowedOrigins && allowedOrigins.length > 0 ? allowedOrigins : [],
         methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
-        credentials: true,
+        credentials: !!(allowedOrigins && allowedOrigins.length > 0),
         },
     });
 

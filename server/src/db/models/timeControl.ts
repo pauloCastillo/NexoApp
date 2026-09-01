@@ -33,6 +33,14 @@ const controlTimeSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Location",
     },
+    geofenceValidated: {
+      branchId: { type: Schema.Types.ObjectId, ref: "Branch" },
+      branchName: { type: String },
+      distance: { type: Number },
+      inside: { type: Boolean },
+      overriddenBy: { type: Schema.Types.ObjectId, ref: "User" },
+      overrideReason: { type: String },
+    },
   },
   {
     timestamps: true,

@@ -12,17 +12,19 @@ class TimeControlRepository {
     async getAllTimeControls(context: TenantContext) {
         return await ControlTime.find(this.#companyFilter(context)).populate("employee").populate("location");
     }
-    async createTimeControl(id: string, data: ITimeControlData, context: TenantContext) {
+    async createTimeControl(id: string, data: ITimeControlData & { geofenceResult?: any }, context: TenantContext) {
         const updateData: any = {
             $set: {
                 [`${data.label}`]: data.time,
                 location: data.location,
+                ...(data.geofenceResult ? { geofenceValidated: data.geofenceResult } : {}),
             },
         };
         if (context.role !== 'superuser') {
             updateData.$set.company = context.companyId;
         }
-        return await ControlTime.findByIdAndUpdate(id, updateData, { new: true }).populate("location", "locations");
+        // ponytail: enforce tenant to prevent IDOR (see auditoria #10)
+        return await ControlTime.findOneAndUpdate({ _id: id, ...this.#companyFilter(context) }, updateData, { new: true }).populate("location", "locations");
     }
 
     async deleteTimeControl(id: string, context: TenantContext) {

@@ -8,8 +8,8 @@ const encryptPassword = async (password: string): Promise<string> => {
   return await bcrypt.hash(password, saltRounds);
 };
 
-const checkingPassword = (plaintext: string, hash: string): boolean => {
-  return bcrypt.compareSync(plaintext, hash);
+const checkingPassword = (plaintext: string, hash: string): Promise<boolean> => {
+  return bcrypt.compare(plaintext, hash);
 };
 
 const getJwtSecret = (): string => {
@@ -52,16 +52,11 @@ const verifyTokenHash = async (token: string, hash: string): Promise<boolean> =>
 };
 
 const verifyingSession = (token: string): Record<string, any> => {
-  try {
-    const verifiedToken = jwt.verify(token, getJwtSecret()) as Record<string, string>;
-    if (!verifiedToken) {
-      throw new Error("Algo salio mal con el token");
-    }
-    return verifiedToken;
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
-    return { error: message };
+  const verifiedToken = jwt.verify(token, getJwtSecret()) as Record<string, string>;
+  if (!verifiedToken) {
+    throw new Error("Algo salio mal con el token");
   }
+  return verifiedToken;
 };
 
 export { 

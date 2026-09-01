@@ -1,13 +1,14 @@
 import { Request, Response } from 'express';
+import { proxyController } from '@/utils/proxyController.js';
 import { httpStatusCode } from '@/utils/httpStatus.js';
 import { Company } from '@/db/models/index.js';
 
-async function listPublicCompanies(req: Request, res: Response) {
+async function _raw_listPublicCompanies(req: Request, res: Response) {
   const companies = await Company.find({ isActive: true }).select('name');
   res.status(httpStatusCode.OK).json({ companies });
 }
 
-async function getAllCompanies(req: Request, res: Response) {
+async function _raw_getAllCompanies(req: Request, res: Response) {
   const role = (req as any).userRole;
   const companyId = (req as any).companyId;
 
@@ -21,7 +22,7 @@ async function getAllCompanies(req: Request, res: Response) {
   res.status(httpStatusCode.OK).json({ companies });
 }
 
-async function createCompany(req: Request, res: Response) {
+async function _raw_createCompany(req: Request, res: Response) {
   const { name } = req.body;
   if (!name) {
     return res.status(httpStatusCode.BAD_REQUEST).json({ message: "Nombre de empresa requerido" });
@@ -37,7 +38,7 @@ async function createCompany(req: Request, res: Response) {
   res.status(httpStatusCode.CREATED).json({ message: "Empresa creada exitosamente" });
 }
 
-async function getCompanyById(req: Request, res: Response) {
+async function _raw_getCompanyById(req: Request, res: Response) {
   const company = await Company.findById(req.params.id);
   if (!company) {
     return res.status(httpStatusCode.NOT_FOUND).json({ message: "Empresa no encontrada" });
@@ -52,7 +53,7 @@ async function getCompanyById(req: Request, res: Response) {
   res.status(httpStatusCode.OK).json({ company });
 }
 
-async function getMyCompany(req: Request, res: Response) {
+async function _raw_getMyCompany(req: Request, res: Response) {
   const companyId = (req as any).companyId;
   const company = await Company.findById(companyId);
   if (!company) {
@@ -61,7 +62,7 @@ async function getMyCompany(req: Request, res: Response) {
   res.status(httpStatusCode.OK).json({ company });
 }
 
-async function updateCompany(req: Request, res: Response) {
+async function _raw_updateCompany(req: Request, res: Response) {
   const companyId = (req as any).companyId;
   const role = (req as any).userRole;
   if (role !== 'business_owner' && role !== 'admin' && role !== 'platform_admin' && role !== 'superuser') {
@@ -76,4 +77,12 @@ async function updateCompany(req: Request, res: Response) {
   res.status(httpStatusCode.OK).json({ company });
 }
 
-export { listPublicCompanies, getAllCompanies, createCompany, getCompanyById, getMyCompany, updateCompany };
+const _handlers = { listPublicCompanies: _raw_listPublicCompanies, getAllCompanies: _raw_getAllCompanies, createCompany: _raw_createCompany, getCompanyById: _raw_getCompanyById, getMyCompany: _raw_getMyCompany, updateCompany: _raw_updateCompany };
+const _proxied: any = proxyController(_handlers as any);
+export const listPublicCompanies = _proxied.listPublicCompanies;
+export const getAllCompanies = _proxied.getAllCompanies;
+export const createCompany = _proxied.createCompany;
+export const getCompanyById = _proxied.getCompanyById;
+export const getMyCompany = _proxied.getMyCompany;
+export const updateCompany = _proxied.updateCompany;
+

@@ -1,15 +1,18 @@
 import UserService from '@/services/userService.js';
 import { User, ControlTime, JobTitle } from '@/db/models/index.js';
-import type { TenantContext } from '@/types/models.js';
 import { signSession, signRefreshToken, hashToken } from '@/utils/utils.js';
 
+// ponytail: composition over inheritance — keep extends for backward compat but delegate to UserService internally
 class EmployeeService extends UserService {
-  constructor(context?: TenantContext) {
+  private _userService: UserService;
+
+  constructor(context?: any) {
     super(context);
+    this._userService = new UserService(context);
   }
 
   async getAll() {
-    return await super.getAll(['employee', 'editor', 'manager', 'it', 'hr']);
+    return await this._userService.getAll(['employee', 'supervisor', 'admin', 'hr_manager', 'business_owner']);
   }
 
   async create(employeeData: Record<string, any>) {

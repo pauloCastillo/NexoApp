@@ -13,6 +13,9 @@ import setupSocketIO from "@/utils/socketManager.js";
 import { setupEmployeeLocationNamespace } from "@/routes/locations.js";
 import { setupEmployeeNamespace } from "@/routes/employees.js";
 import { requestLogger } from "@/middlewares/requestLogger.js";
+import { requestId } from "@/middlewares/requestId.js";
+import { normalizeError } from "@/utils/normalizeError.js";
+import { catalogEntry } from "@/utils/errorCatalog.js";
 import logger from "@/utils/logger.js";
 import mongoose from "mongoose";
 
@@ -25,18 +28,22 @@ if (process.env.DEV_STATUS === "development") {
   port = process.env.PORT_PROD || 8080;
 }
 
-app.use(cors({ origin: "*", credentials: true }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const allowedOrigins = process.env.CLIENT_URL?.split(",").map((s) => s.trim()).filter(Boolean);
+if (process.env.DEV_STATUS !== 'development' && (!allowedOrigins || allowedOrigins.length === 0)) {
+  throw new Error('CLIENT_URL must be set in production');
+}
+app.use(cors({ origin: allowedOrigins && allowedOrigins.length > 0 ? allowedOrigins : [], credentials: allowedOrigins && allowedOrigins.length > 0 }));
+app.use(express.json({ limit: '100kb' }));
+app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 app.use(helmet());
+app.use(requestId);
 app.use(requestLogger);
 
-if (process.env.DEV_STATUS !== "development") {
-  const generalLimiter = rateLimit({ windowMs: 60_000, max: 100, standardHeaders: true, legacyHeaders: false });
-  const authLimiter = rateLimit({ windowMs: 60_000, max: 20, standardHeaders: true, legacyHeaders: false });
-  app.use("/api", generalLimiter);
-  app.use("/api/auth", authLimiter);
-}
+// rate-limit always (auth even in dev to prevent brute-force)
+const generalLimiter = rateLimit({ windowMs: 60_000, max: 100, standardHeaders: true, legacyHeaders: false });
+const authLimiter = rateLimit({ windowMs: 60_000, max: 20, standardHeaders: true, legacyHeaders: false });
+app.use("/api", generalLimiter);
+app.use("/api/auth", authLimiter);
 
 app.get("/api/health", (_req: Request, res: Response) => {
   res.json({
@@ -49,9 +56,29 @@ app.get("/api/health", (_req: Request, res: Response) => {
 
 app.use("/api", router);
 
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-  logger.error({ err }, "Unhandled error");
-  res.status(500).json({ message: err.message });
+// 404 fallback — additive, returns unified contract
+app.use((req: Request, res: Response) => {
+  const requestId = (req as any).id;
+  const entry = catalogEntry('NOT_FOUND');
+  res.status(entry.statusCode).json({ message: entry.message, code: 'NOT_FOUND', requestId });
+});
+
+// safety net for errors outside proxies (express.json syntax, etc.)
+app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
+  const requestId = (req as any).id;
+  const appErr = normalizeError(err, requestId);
+  const entry = catalogEntry(appErr.code);
+  const message = appErr.message || entry.message;
+  const log = (req as any).log ?? logger.child({ requestId });
+  log.error({ err, code: appErr.code, statusCode: appErr.statusCode, requestId, technical: (appErr as any).technical ?? (err instanceof Error ? err.message : String(err)) }, 'Unhandled error');
+  const isDev = process.env.DEV_STATUS === 'development';
+  res.status(appErr.statusCode).json({
+    message,
+    code: appErr.code,
+    requestId,
+    ...(appErr.errors && { errors: appErr.errors }),
+    ...(isDev && { debug: { technical: (appErr as any).technical ?? (err instanceof Error ? err.message : String(err)), stack: err instanceof Error ? err.stack : undefined } }),
+  });
 });
 
 const isDev = process.env.DEV_STATUS === "development";

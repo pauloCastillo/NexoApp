@@ -3,8 +3,8 @@ import { z } from 'zod';
 export const createEmployeeSchema = z.object({
   username: z.string().min(2).max(50).trim(),
   email: z.string().email().trim().toLowerCase(),
-  password: z.string().min(6),
-  confirmPassword: z.string().min(6),
+  password: z.string().min(6).optional(),
+  confirmPassword: z.string().min(6).optional(),
   phone: z.string().optional(),
   jobTitle: z.string().optional(),
   role: z.enum(['employee', 'supervisor', 'admin', 'hr_manager', 'business_owner']).optional(),

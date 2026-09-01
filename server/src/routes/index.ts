@@ -10,18 +10,19 @@ const router = express.Router();
 const basedir = __dirname;
 
 function getFilename(file: string) {
-  return file.split(".").shift();
+  return path.parse(file).name;
 }
 
-const files = fs.readdirSync(basedir).filter((file) => {
-  return getFilename(file) !== "index";
-});
+const files = fs.readdirSync(basedir).filter((file) => path.parse(file).name !== "index");
 
-await Promise.all(
-  files.map(async (file) => {
+for (const file of files) {
+  try {
     const { router: subRouter }: { router: express.Router } = await import(`./${file}`);
-    router.use(`/${getFilename(file)}`, subRouter);
-  })
-);
+    router.use(`/${path.parse(file).name}`, subRouter);
+  } catch (err) {
+    const log = (await import('@/utils/logger.js')).default;
+    log.error({ err, file }, `Failed to mount route ${file}`);
+  }
+}
 
 export default router;

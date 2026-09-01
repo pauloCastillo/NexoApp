@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
+import { proxyController } from '@/utils/proxyController.js';
 import { httpStatusCode } from '@/utils/httpStatus.js';
 import ServiceFactory from '@/factories/serviceFactory.js';
 import auditLogService from '@/services/auditLogService.js';
 
-async function getAllClients(req: Request, res: Response) {
+async function _raw_getAllClients(req: Request, res: Response) {
   const companyId = (req as any).companyId;
   const userRole = (req as any).userRole;
   const clientService = ServiceFactory.getService("client", null, { companyId, role: userRole });
@@ -11,7 +12,7 @@ async function getAllClients(req: Request, res: Response) {
   res.status(httpStatusCode.OK).json({ clients });
 }
 
-async function createClient(req: Request, res: Response) {
+async function _raw_createClient(req: Request, res: Response) {
   const companyId = (req as any).companyId;
   const userRole = (req as any).userRole;
   const clientData = { ...req.body, createdBy: req.userId, company: companyId };
@@ -21,7 +22,7 @@ async function createClient(req: Request, res: Response) {
   res.status(httpStatusCode.CREATED).json({ client });
 }
 
-async function updateClient(req: Request, res: Response) {
+async function _raw_updateClient(req: Request, res: Response) {
   const { id } = req.params as { id: string };
   const companyId = (req as any).companyId;
   const userRole = (req as any).userRole;
@@ -34,7 +35,7 @@ async function updateClient(req: Request, res: Response) {
   res.status(httpStatusCode.OK).json({ client: updated });
 }
 
-async function deleteClient(req: Request, res: Response) {
+async function _raw_deleteClient(req: Request, res: Response) {
   const { id } = req.params as { id: string };
   const companyId = (req as any).companyId;
   const userRole = (req as any).userRole;
@@ -47,4 +48,10 @@ async function deleteClient(req: Request, res: Response) {
   res.status(httpStatusCode.OK).json({ message: "Client deleted successfully" });
 }
 
-export { getAllClients, createClient, updateClient, deleteClient };
+const _handlers = { getAllClients: _raw_getAllClients, createClient: _raw_createClient, updateClient: _raw_updateClient, deleteClient: _raw_deleteClient };
+const _proxied: any = proxyController(_handlers as any);
+export const getAllClients = _proxied.getAllClients;
+export const createClient = _proxied.createClient;
+export const updateClient = _proxied.updateClient;
+export const deleteClient = _proxied.deleteClient;
+

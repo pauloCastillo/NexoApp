@@ -1,7 +1,5 @@
 import type { TenantContext } from '@/types/models.js';
-import EmployeeRepository from '@/repositories/employeeRepository.js';
 import EmployeeService from '@/services/employeeService.js';
-import ManagerRepository from '@/repositories/managerRepository.js';
 import ManagerService from '@/services/managerService.js';
 import TimeControlRepository from '@/repositories/timeControlRepository.js';
 import TimeControlService from '@/services/timeControlService.js';
@@ -15,30 +13,28 @@ import VacationRepository from '@/repositories/vacationRepository.js';
 import VacationService from '@/services/vacationService.js';
 import WorkOrderRepository from '@/repositories/workOrderRepository.js';
 import WorkOrderService from '@/services/workOrderService.js';
+import { createErrorProxy } from '@/utils/createErrorProxy.js';
+
+export type ServiceType = "employee" | "manager" | "timeControl" | "location" | "client" | "permission" | "vacation" | "workOrder";
+
+const registry: Record<ServiceType, (data: Record<string, any> | null, context?: TenantContext) => object> = {
+  employee: (_data, context) => new EmployeeService(context),
+  manager: (_data, context) => new ManagerService(context),
+  timeControl: (data, context) => new TimeControlService(data as Record<string, any>, new TimeControlRepository(), context),
+  location: (data, context) => new LocationService(data as Record<string, any>, new LocationRepository(), context),
+  client: (data, context) => new ClientService(data as Record<string, any>, new ClientRepository(), context),
+  permission: (data, context) => new PermissionService(data as Record<string, any>, new PermissionRepository(), context),
+  vacation: (data, context) => new VacationService(data as Record<string, any>, new VacationRepository(), context),
+  workOrder: (data, context) => new WorkOrderService(data as Record<string, any>, new WorkOrderRepository(), context),
+};
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 class ServiceFactory {
-  static getService(serviceType: string, data: Record<string, any> | null = null, context?: TenantContext): any {
-    switch (serviceType) {
-      case "employee":
-        return new EmployeeService(context);
-      case "manager":
-        return new ManagerService(context);
-      case "timeControl":
-        return new TimeControlService(data as Record<string, any>, new TimeControlRepository(), context);
-      case "location":
-        return new LocationService(data as Record<string, any>, new LocationRepository(), context);
-      case "client":
-        return new ClientService(data as Record<string, any>, new ClientRepository(), context);
-      case "permission":
-        return new PermissionService(data as Record<string, any>, new PermissionRepository(), context);
-      case "vacation":
-        return new VacationService(data as Record<string, any>, new VacationRepository(), context);
-      case "workOrder":
-        return new WorkOrderService(data as Record<string, any>, new WorkOrderRepository(), context);
-      default:
-        throw new Error(`Service type ${serviceType} not recognized.`);
-    }
+  static getService(serviceType: ServiceType, data: Record<string, any> | null = null, context?: TenantContext): any {
+    const wrap = <T extends object>(svc: T) => createErrorProxy(svc);
+    const factory = registry[serviceType];
+    if (!factory) throw new Error(`Service type ${serviceType} not recognized.`);
+    return wrap(factory(data, context) as object);
   }
 }
 
