@@ -18,6 +18,26 @@ export interface ICompany extends Document {
   geofenceRadius?: number;
 }
 
+export interface IBranch extends Document {
+  name: string;
+  address?: string;
+  location: { lat: number; lng: number };
+  geofenceRadius: number;
+  geofenceType: 'circle';
+  company: string;
+  isActive: boolean;
+  createdBy?: string;
+}
+
+export interface IGeofenceResult {
+  branchId?: string;
+  branchName?: string;
+  distance: number;
+  inside: boolean;
+  overriddenBy?: string;
+  overrideReason?: string;
+}
+
 export interface IUser extends Document {
   username: string;
   email: string;
@@ -26,6 +46,7 @@ export interface IUser extends Document {
   role: UserRole;
   company: any;
   department?: any;
+  branches?: import('mongoose').Types.ObjectId[] | IBranch[];
   jobTitle?: string;
   controlTimeID?: any;
   refreshTokenHash?: string;
@@ -67,6 +88,7 @@ export interface IControlTime extends Document {
   retorno?: string;
   salida?: string;
   location?: string;
+  geofenceValidated?: IGeofenceResult;
 }
 
 export interface ISubLocation {
@@ -74,6 +96,7 @@ export interface ISubLocation {
   latitude: number;
   longitude: number;
   street: string;
+  geofenceResult?: IGeofenceResult;
 }
 
 export interface ILocation extends Document {
@@ -138,6 +161,31 @@ export interface IJobTitle extends Document {
   department: string;
 }
 
+export interface IInvitation extends Document {
+  code: string;
+  company: string;
+  createdBy: string;
+  role: UserRole;
+  maxUses: number;
+  usedCount: number;
+  expiresAt: Date;
+  isActive: boolean;
+  invitedName?: string;
+  invitedEmail?: string;
+  phone?: string;
+  jobTitle?: string;
+  targetEmail?: string;
+  targetPhone?: string;
+  department?: string;
+  branchId?: string;
+  branch?: string;
+  shiftLabel?: string;
+  shiftId?: string;
+  usedBy?: string;
+  usedAt?: Date;
+  requestedNewAt?: Date;
+}
+
 export type TimeLabels = 'entrada' | 'descanso' | 'retorno' | 'salida';
 
 export interface ITimeControlData {
@@ -157,6 +205,8 @@ export interface ILocationTimeData {
     latitude: number;
     longitude: number;
   };
+  override?: boolean;
+  overrideReason?: string;
 }
 
 export interface ILoginRequest {

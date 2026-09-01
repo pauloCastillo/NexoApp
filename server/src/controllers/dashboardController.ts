@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
+import { proxyController } from '@/utils/proxyController.js';
 import { httpStatusCode } from '@/utils/httpStatus.js';
 import User from '@/db/models/user.js';
 import ControlTime from '@/db/models/timeControl.js';
 import Permission from '@/db/models/permission.js';
 import WorkOrder from '@/db/models/workOrder.js';
 
-async function getSummary(req: Request, res: Response) {
+async function _raw_getSummary(req: Request, res: Response) {
   const companyId = (req as any).companyId;
   if (!companyId) {
     return res.status(httpStatusCode.BAD_REQUEST).json({ message: 'companyId requerido' });
@@ -26,7 +27,7 @@ async function getSummary(req: Request, res: Response) {
   res.json({ activeEmployees, todayAttendances, pendingPermissions, activeWorkOrders });
 }
 
-async function getTodayAttendance(req: Request, res: Response) {
+async function _raw_getTodayAttendance(req: Request, res: Response) {
   const companyId = (req as any).companyId;
   if (!companyId) {
     return res.status(httpStatusCode.BAD_REQUEST).json({ message: 'companyId requerido' });
@@ -40,7 +41,7 @@ async function getTodayAttendance(req: Request, res: Response) {
   const attendances = await ControlTime.find({ company: companyId, date: { $gte: today, $lt: tomorrow } })
     .populate('employee', 'username email');
 
-  const result = attendances.map((record) => ({
+  const result = attendances.map((record: any) => ({
     _id: record._id,
     employee: { _id: record.employee?._id, username: record.employee?.username, email: record.employee?.email },
     date: record.date,
@@ -53,4 +54,8 @@ async function getTodayAttendance(req: Request, res: Response) {
   res.json({ attendances: result });
 }
 
-export { getSummary, getTodayAttendance };
+const _handlers = { getSummary: _raw_getSummary, getTodayAttendance: _raw_getTodayAttendance };
+const _proxied: any = proxyController(_handlers as any);
+export const getSummary = _proxied.getSummary;
+export const getTodayAttendance = _proxied.getTodayAttendance;
+

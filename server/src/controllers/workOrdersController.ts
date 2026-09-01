@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
+import { proxyController } from '@/utils/proxyController.js';
 import { httpStatusCode } from '@/utils/httpStatus.js';
 import ServiceFactory from '@/factories/serviceFactory.js';
 import auditLogService from '@/services/auditLogService.js';
 
-async function getWorkOrdersByEmployee(req: Request, res: Response) {
+async function _raw_getWorkOrdersByEmployee(req: Request, res: Response) {
   const { employee_id } = req.params;
   const companyId = (req as any).companyId;
   const userRole = (req as any).userRole;
@@ -12,7 +13,7 @@ async function getWorkOrdersByEmployee(req: Request, res: Response) {
   res.status(httpStatusCode.OK).json({ workOrders });
 }
 
-async function createWorkOrder(req: Request, res: Response) {
+async function _raw_createWorkOrder(req: Request, res: Response) {
   const companyId = (req as any).companyId;
   const userRole = (req as any).userRole;
   const workOrderService = ServiceFactory.getService("workOrder", req.body, { companyId, role: userRole });
@@ -24,7 +25,7 @@ async function createWorkOrder(req: Request, res: Response) {
   });
 }
 
-async function updateWorkOrder(req: Request, res: Response) {
+async function _raw_updateWorkOrder(req: Request, res: Response) {
   const { id } = req.params as { id: string };
   const companyId = (req as any).companyId;
   const userRole = (req as any).userRole;
@@ -37,7 +38,7 @@ async function updateWorkOrder(req: Request, res: Response) {
   res.status(httpStatusCode.OK).json({ workOrder: updated });
 }
 
-async function deleteWorkOrder(req: Request, res: Response) {
+async function _raw_deleteWorkOrder(req: Request, res: Response) {
   const { id } = req.params as { id: string };
   const companyId = (req as any).companyId;
   const userRole = (req as any).userRole;
@@ -50,7 +51,7 @@ async function deleteWorkOrder(req: Request, res: Response) {
   res.status(httpStatusCode.OK).json({ message: "Work order deleted successfully" });
 }
 
-async function startWorkOrder(req: Request, res: Response) {
+async function _raw_startWorkOrder(req: Request, res: Response) {
   const { id } = req.params as { id: string };
   const companyId = (req as any).companyId;
   const userRole = (req as any).userRole;
@@ -64,7 +65,7 @@ async function startWorkOrder(req: Request, res: Response) {
   }
 }
 
-async function completeWorkOrder(req: Request, res: Response) {
+async function _raw_completeWorkOrder(req: Request, res: Response) {
   const { id } = req.params as { id: string };
   const companyId = (req as any).companyId;
   const userRole = (req as any).userRole;
@@ -78,7 +79,7 @@ async function completeWorkOrder(req: Request, res: Response) {
   }
 }
 
-async function cancelWorkOrder(req: Request, res: Response) {
+async function _raw_cancelWorkOrder(req: Request, res: Response) {
   const { id } = req.params as { id: string };
   const { reason } = req.body;
   const companyId = (req as any).companyId;
@@ -93,4 +94,13 @@ async function cancelWorkOrder(req: Request, res: Response) {
   }
 }
 
-export { getWorkOrdersByEmployee, createWorkOrder, updateWorkOrder, deleteWorkOrder, startWorkOrder, completeWorkOrder, cancelWorkOrder };
+const _handlers = { getWorkOrdersByEmployee: _raw_getWorkOrdersByEmployee, createWorkOrder: _raw_createWorkOrder, updateWorkOrder: _raw_updateWorkOrder, deleteWorkOrder: _raw_deleteWorkOrder, startWorkOrder: _raw_startWorkOrder, completeWorkOrder: _raw_completeWorkOrder, cancelWorkOrder: _raw_cancelWorkOrder };
+const _proxied: any = proxyController(_handlers as any);
+export const getWorkOrdersByEmployee = _proxied.getWorkOrdersByEmployee;
+export const createWorkOrder = _proxied.createWorkOrder;
+export const updateWorkOrder = _proxied.updateWorkOrder;
+export const deleteWorkOrder = _proxied.deleteWorkOrder;
+export const startWorkOrder = _proxied.startWorkOrder;
+export const completeWorkOrder = _proxied.completeWorkOrder;
+export const cancelWorkOrder = _proxied.cancelWorkOrder;
+

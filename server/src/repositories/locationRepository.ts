@@ -1,32 +1,14 @@
-import axios from 'axios';
-import { Location, Company } from '@/db/models/index.js';
+import { Location, Company, Branch, User } from '@/db/models/index.js';
 import { TenantContext } from '@/types/models.js';
-
-function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371000;
-  const toRad = (deg: number) => (deg * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
+import { evaluateGeofence } from '@/utils/geofence.js';
+import { reverseGeocode } from '@/utils/geocoding.js';
 
 class LocationRepository {
     #companyFilter(context: TenantContext): Record<string, any> {
         return context.role === 'superuser' ? {} : { company: context.companyId };
     }
 
-    async #verifyingLocation(doc: { employee: string; latitude: number; longitude: number }) {
-        const getDoc = await Location.findOne({ employee: doc.employee })
-        if (!getDoc) {
-            return false;
-        }
-        const existLocation = getDoc.locations.some((location) =>
-            location.latitude === doc.latitude &&
-            location.longitude === doc.longitude
-        )
-        return existLocation;
-    }
+  // ponytail: removed exact === dedup (GPS jitter never hits) + race — always push atomically
 
     async getAllLocations(context: TenantContext) {
         try {
@@ -52,37 +34,36 @@ class LocationRepository {
     async createLocation(locationData: Record<string, any>, context: TenantContext) {
         locationData.company = context.companyId;
 
-        const company = await Company.findById(context.companyId);
-        if (company?.location?.lat && company?.location?.lng && company?.geofenceRadius) {
-          const dist = haversineDistance(
-            locationData.latitude, locationData.longitude,
-            company.location.lat, company.location.lng,
-          );
-          if (dist > company.geofenceRadius) {
-            throw { statusCode: 403, message: `Fuera del área permitida (${Math.round(dist)}m, máximo ${company.geofenceRadius}m)` };
-          }
-        }
-
-        const existLocation = await this.#verifyingLocation(locationData as any);
+        // --- geofence: branch-aware warning (no throw) ---
+        const user = await User.findOne({ _id: locationData.employee, company: context.companyId }).select('branches').lean() as any;
+        if (!user) throw { statusCode: 404, message: 'Empleado no encontrado en esta empresa' };
+        const branchIds: string[] = user?.branches || [];
+        const branches: any[] = branchIds.length > 0
+          ? await Branch.find({ _id: { $in: branchIds }, company: context.companyId, isActive: true }).lean()
+          : await Branch.find({ company: context.companyId, isActive: true }).lean();
+        const company = await Company.findById(context.companyId).lean() as any;
+        const companyLoc = company?.location?.lat ? { lat: company.location.lat, lng: company.location.lng, geofenceRadius: company.geofenceRadius } : null;
+        const evalRes = evaluateGeofence(locationData.latitude, locationData.longitude, branches, companyLoc, company?.name);
+        const override = locationData.override === true && ['supervisor', 'business_owner', 'admin', 'superuser', 'platform_admin'].includes(context.role);
+        locationData.geofenceResult = {
+          branchId: evalRes.branchId && evalRes.branchId !== 'company' ? evalRes.branchId : undefined,
+          branchName: evalRes.branchName,
+          distance: evalRes.distance,
+          inside: override ? true : evalRes.inside,
+          ...(override ? { overriddenBy: context.userId, overrideReason: locationData.overrideReason } : {}),
+        };
+        // clean override flags from push
+        delete locationData.override;
+        delete locationData.overrideReason;
 
         try {
-            const apiResponse = await axios.get(
-                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${locationData.latitude}&lon=${locationData.longitude}&addressdetails=1`,
-                { headers: { 'User-Agent': 'RRHH-App/1.0' } }
-            );
-            locationData.street = apiResponse.data.display_name || `${locationData.latitude}, ${locationData.longitude}`;
+            locationData.street = await reverseGeocode(locationData.latitude, locationData.longitude);
 
-            if (existLocation) {
-                return await Location.findOne(
-                    { employee: locationData.employee },
-                );
-            } else {
-                return await Location.findOneAndUpdate(
-                    { employee: locationData.employee },
-                    { $push: { locations: locationData } },
-                    { new: true, upsert: true }
-                );
-            }
+            return await Location.findOneAndUpdate(
+                { employee: locationData.employee, company: context.companyId },
+                { $push: { locations: locationData } },
+                { new: true, upsert: true }
+            );
         } catch (error: any) {
             throw new Error("Error creating location: " + error.message, { cause: error });
         }

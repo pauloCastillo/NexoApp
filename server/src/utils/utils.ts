@@ -8,8 +8,8 @@ const encryptPassword = async (password: string): Promise<string> => {
   return await bcrypt.hash(password, saltRounds);
 };
 
-const checkingPassword = (plaintext: string, hash: string): boolean => {
-  return bcrypt.compareSync(plaintext, hash);
+const checkingPassword = (plaintext: string, hash: string): Promise<boolean> => {
+  return bcrypt.compare(plaintext, hash);
 };
 
 const getJwtSecret = (): string => {

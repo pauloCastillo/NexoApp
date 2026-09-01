@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
+import { proxyController } from '@/utils/proxyController.js';
 import { httpStatusCode } from '@/utils/httpStatus.js';
 import ServiceFactory from '@/factories/serviceFactory.js';
 import auditLogService from '@/services/auditLogService.js';
 
-async function getPermissionsByEmployee(req: Request, res: Response) {
+async function _raw_getPermissionsByEmployee(req: Request, res: Response) {
   const { employee_id } = req.params;
   const companyId = (req as any).companyId;
   const userRole = (req as any).userRole;
@@ -12,7 +13,7 @@ async function getPermissionsByEmployee(req: Request, res: Response) {
   res.status(httpStatusCode.OK).json({ permissions });
 }
 
-async function createPermission(req: Request, res: Response) {
+async function _raw_createPermission(req: Request, res: Response) {
   const companyId = (req as any).companyId;
   const userRole = (req as any).userRole;
   const permissionService = ServiceFactory.getService("permission", req.body, { companyId, role: userRole });
@@ -24,7 +25,7 @@ async function createPermission(req: Request, res: Response) {
   });
 }
 
-async function updatePermission(req: Request, res: Response) {
+async function _raw_updatePermission(req: Request, res: Response) {
   const { id } = req.params as { id: string };
   const companyId = (req as any).companyId;
   const userRole = (req as any).userRole;
@@ -41,7 +42,7 @@ async function updatePermission(req: Request, res: Response) {
   res.status(httpStatusCode.OK).json({ permission: updated });
 }
 
-async function deletePermission(req: Request, res: Response) {
+async function _raw_deletePermission(req: Request, res: Response) {
   const { id } = req.params as { id: string };
   const companyId = (req as any).companyId;
   const userRole = (req as any).userRole;
@@ -54,4 +55,10 @@ async function deletePermission(req: Request, res: Response) {
   res.status(httpStatusCode.OK).json({ message: "Permission deleted successfully" });
 }
 
-export { getPermissionsByEmployee, createPermission, updatePermission, deletePermission };
+const _handlers = { getPermissionsByEmployee: _raw_getPermissionsByEmployee, createPermission: _raw_createPermission, updatePermission: _raw_updatePermission, deletePermission: _raw_deletePermission };
+const _proxied: any = proxyController(_handlers as any);
+export const getPermissionsByEmployee = _proxied.getPermissionsByEmployee;
+export const createPermission = _proxied.createPermission;
+export const updatePermission = _proxied.updatePermission;
+export const deletePermission = _proxied.deletePermission;
+

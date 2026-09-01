@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
+import { proxyController } from '@/utils/proxyController.js';
 import { httpStatusCode } from '@/utils/httpStatus.js';
 import ServiceFactory from '@/factories/serviceFactory.js';
 import auditLogService from '@/services/auditLogService.js';
 
-async function getVacationsByEmployee(req: Request, res: Response) {
+async function _raw_getVacationsByEmployee(req: Request, res: Response) {
   const { employee_id } = req.params;
   const companyId = (req as any).companyId;
   const userRole = (req as any).userRole;
@@ -12,7 +13,7 @@ async function getVacationsByEmployee(req: Request, res: Response) {
   res.status(httpStatusCode.OK).json({ vacations });
 }
 
-async function createVacation(req: Request, res: Response) {
+async function _raw_createVacation(req: Request, res: Response) {
   const companyId = (req as any).companyId;
   const userRole = (req as any).userRole;
   const vacationService = ServiceFactory.getService("vacation", req.body, { companyId, role: userRole });
@@ -24,7 +25,7 @@ async function createVacation(req: Request, res: Response) {
   });
 }
 
-async function updateVacation(req: Request, res: Response) {
+async function _raw_updateVacation(req: Request, res: Response) {
   const { id } = req.params as { id: string };
   const companyId = (req as any).companyId;
   const userRole = (req as any).userRole;
@@ -40,7 +41,7 @@ async function updateVacation(req: Request, res: Response) {
   res.status(httpStatusCode.OK).json({ vacation: updated });
 }
 
-async function deleteVacation(req: Request, res: Response) {
+async function _raw_deleteVacation(req: Request, res: Response) {
   const { id } = req.params as { id: string };
   const companyId = (req as any).companyId;
   const userRole = (req as any).userRole;
@@ -53,4 +54,10 @@ async function deleteVacation(req: Request, res: Response) {
   res.status(httpStatusCode.OK).json({ message: "Vacation deleted successfully" });
 }
 
-export { getVacationsByEmployee, createVacation, updateVacation, deleteVacation };
+const _handlers = { getVacationsByEmployee: _raw_getVacationsByEmployee, createVacation: _raw_createVacation, updateVacation: _raw_updateVacation, deleteVacation: _raw_deleteVacation };
+const _proxied: any = proxyController(_handlers as any);
+export const getVacationsByEmployee = _proxied.getVacationsByEmployee;
+export const createVacation = _proxied.createVacation;
+export const updateVacation = _proxied.updateVacation;
+export const deleteVacation = _proxied.deleteVacation;
+

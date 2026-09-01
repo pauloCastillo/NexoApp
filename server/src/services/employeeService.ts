@@ -1,15 +1,10 @@
 import UserService from '@/services/userService.js';
 import { User, ControlTime, JobTitle } from '@/db/models/index.js';
-import type { TenantContext } from '@/types/models.js';
 import { signSession, signRefreshToken, hashToken } from '@/utils/utils.js';
 
 class EmployeeService extends UserService {
-  constructor(context?: TenantContext) {
-    super(context);
-  }
-
   async getAll() {
-    return await super.getAll(['employee', 'editor', 'manager', 'it', 'hr']);
+    return await super.getAll(['employee', 'supervisor', 'admin', 'hr_manager', 'business_owner']);
   }
 
   async create(employeeData: Record<string, any>) {

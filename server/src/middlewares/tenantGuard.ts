@@ -27,7 +27,7 @@ const requireDeptScope = async (req: Request, res: Response, next: NextFunction)
       res.status(403).json({ message: 'Acceso denegado: fuera de tu departamento' });
       return;
     }
-  } catch (_) {}
+  } catch (err) { (await import('@/utils/logger.js')).default.debug({ err }, 'requireDeptScope check failed'); }
   next();
 };
 

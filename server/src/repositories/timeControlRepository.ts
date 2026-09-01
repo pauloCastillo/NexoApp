@@ -12,11 +12,12 @@ class TimeControlRepository {
     async getAllTimeControls(context: TenantContext) {
         return await ControlTime.find(this.#companyFilter(context)).populate("employee").populate("location");
     }
-    async createTimeControl(id: string, data: ITimeControlData, context: TenantContext) {
+    async createTimeControl(id: string, data: ITimeControlData & { geofenceResult?: any }, context: TenantContext) {
         const updateData: any = {
             $set: {
                 [`${data.label}`]: data.time,
                 location: data.location,
+                ...(data.geofenceResult ? { geofenceValidated: data.geofenceResult } : {}),
             },
         };
         if (context.role !== 'superuser') {

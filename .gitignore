@@ -1,2 +1,30 @@
+# Env — never commit secrets
+server/.env
+app/.env
+**/.env
+!**/.env.example
+!**/.env.template
+server/.env.local
+app/.env.local
+
 # Archivos
+design-system/
+server/node_modules/
+server/.github/
+server/.vscode/
+server/.idea/
+server/docs/
+
+
+# docs
+server/*.env
+server/*.*.env
+server/*.log
+server/dockerfile
+server/docker-compose.yml
+server/.dockerignore
+server/.gitignore
 NexoActivity.drawio
+server/.DS_Store
+server/pnpm-lock.yaml
+server/eslint.config.js

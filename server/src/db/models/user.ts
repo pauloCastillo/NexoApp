@@ -42,6 +42,12 @@ const userSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Department',
     },
+    branches: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Branch',
+      },
+    ],
     jobTitle: {
       type: String,
       trim: true,

@@ -4,24 +4,29 @@ import { ILocation } from '@/types/models.js';
 const locationSchema = new Schema({
   date: {
     type: Date,
-    trim: true,
     required: true,
     default: () => new Date(),
   },
   latitude: {
     type: Number,
-    trim: true,
     required: true,
   },
   longitude: {
     type: Number,
-    trim: true,
     required: true,
   },
   street: {
     type: String,
     trim: true,
     require: true
+  },
+  geofenceResult: {
+    branchId: { type: Schema.Types.ObjectId, ref: "Branch" },
+    branchName: { type: String },
+    distance: { type: Number },
+    inside: { type: Boolean },
+    overriddenBy: { type: Schema.Types.ObjectId, ref: "User" },
+    overrideReason: { type: String },
   },
 })
 
