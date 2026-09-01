@@ -20,15 +20,21 @@ final desktopRouterProvider = Provider<GoRouter>((ref) {
     redirect: (ctx, state) {
       final auth = ref.read(authStateProvider);
       final loc = state.matchedLocation;
-      if (loc == '/splash') return null;
-      if (auth == null) return (loc == '/login' || loc == '/register') ? null : '/login';
-      if (loc == '/login' || loc == '/register') return '/';
+      if (loc == '/splash' || loc.startsWith('/invite')) return null;
+      if (auth == null) return (loc == '/login' || loc == '/register' || loc.startsWith('/invite')) ? null : '/login';
+      final role = auth.role;
+      if (loc == '/login' || loc == '/register') return role == 'employee' ? '/login' : '/';
+      // ponytail: desktop is manager view — employee blocked, platform_only allowed
+      if (role == 'employee') return '/login';
       return null;
     },
     routes: [
       GoRoute(path: '/splash', builder: (_, _) => const SplashScreen()),
       GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
       GoRoute(path: '/register', builder: (_, _) => const RegisterScreen()),
+      GoRoute(path: '/invite/:code', builder: (_, s) => RegisterScreen(initialCode: s.pathParameters['code'])),
+      GoRoute(path: '/admin', redirect: (_, _) => '/'),
+      GoRoute(path: '/home', redirect: (_, _) => '/'),
       ShellRoute(builder: (_, _, child) => DesktopShell(child: child), routes: [
         GoRoute(path: '/', builder: (_, _) => const DashboardScreen()),
         GoRoute(path: '/employees', builder: (_, _) => const EmployeeListScreen()),

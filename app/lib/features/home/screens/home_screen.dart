@@ -103,7 +103,7 @@ class HomeScreen extends ConsumerWidget {
     Position? pos;
     bool isCached = false;
     try {
-      pos = await Geolocator.getCurrentPosition(timeLimit: const Duration(seconds: 5));
+      pos = await Geolocator.getCurrentPosition(locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, timeLimit: Duration(seconds: 5)));
       await cache.savePosition(pos.latitude, pos.longitude, pos.accuracy);
     } catch (_) {
       final cached = await cache.getLastPosition();
@@ -127,8 +127,30 @@ class HomeScreen extends ConsumerWidget {
       },
     };
     try {
-      await dio.post('/locations', data: payload);
-      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(isCached ? '$label registrada (cache)' : '$label registrada')));
+      final resp = await dio.post('/locations', data: payload);
+      final warning = resp.data?['warning'] as String?;
+      if (context.mounted) {
+        if (warning != null) {
+          final isSupervisor = auth?.role == 'supervisor' || auth?.role == 'business_owner';
+          if (isSupervisor) {
+            final override = await showDialog<bool>(context: context, builder: (_) => AlertDialog(title: const Text('Fuera de zona'), content: Text(warning), actions: [TextButton(onPressed: ()=> Navigator.pop(context,false), child: const Text('Aceptar warning')), FilledButton(onPressed: ()=> Navigator.pop(context,true), child: const Text('Override supervisor'))]));
+            if (override == true) {
+              final reasonCtrl = TextEditingController();
+              final reason = await showDialog<String>(context: context, builder: (_) => AlertDialog(title: const Text('Motivo override'), content: TextField(controller: reasonCtrl, decoration: const InputDecoration(hintText:'Motivo')), actions: [TextButton(onPressed: ()=> Navigator.pop(context), child: const Text('Cancelar')), FilledButton(onPressed: ()=> Navigator.pop(context, reasonCtrl.text), child: const Text('Confirmar'))]));
+              if (reason!=null && reason.trim().isNotEmpty) {
+                (payload['locationTimeData'] as Map<String,dynamic>)['override']=true;
+                (payload['locationTimeData'] as Map<String,dynamic>)['overrideReason']=reason.trim();
+                await dio.post('/locations', data: payload);
+                if(context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Registro con override exitoso')));
+                return;
+              }
+            }
+          }
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(warning), backgroundColor: Colors.orange[800]));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(isCached ? '$label registrada (cache)' : '$label registrada')));
+        }
+      }
     } on DioException catch (e) {
       // offline → queue
       if (e.type == DioExceptionType.connectionError || e.response == null) {

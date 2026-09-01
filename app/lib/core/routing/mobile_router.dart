@@ -32,8 +32,8 @@ final mobileRouterProvider = Provider<GoRouter>((ref) {
     redirect: (ctx, state) {
       final auth = ref.read(authStateProvider);
       final loc = state.matchedLocation;
-      if (loc == '/splash') return null;
-      if (auth == null) return (loc == '/login' || loc == '/register') ? null : '/login';
+      if (loc == '/splash' || loc.startsWith('/invite')) return null;
+      if (auth == null) return (loc == '/login' || loc == '/register' || loc.startsWith('/invite')) ? null : '/login';
       final role = auth.role;
       if (loc == '/login' || loc == '/register') {
         if (platformOnlyRoles.contains(role)) return '/login';
@@ -53,6 +53,11 @@ final mobileRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/splash', builder: (_, _) => const SplashScreen()),
       GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
       GoRoute(path: '/register', builder: (_, _) => const RegisterScreen()),
+      GoRoute(path: '/invite/:code', builder: (_, s) => RegisterScreen(initialCode: s.pathParameters['code'])),
+      GoRoute(path: '/', redirect: (_, _) {
+        final r = ref.read(authStateProvider)?.role;
+        return isAdminLike(r) ? '/admin' : '/home';
+      }),
       ShellRoute(builder: (_, _, child) => EmployeeShell(child: child), routes: [
         GoRoute(path: '/home', builder: (_, _) => const HomeScreen()),
         GoRoute(path: '/order-day', builder: (_, _) => const OrderDayScreen()),
