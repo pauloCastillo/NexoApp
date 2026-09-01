@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { proxyController } from '@/utils/proxyController.js';
-import { Location } from '@/db/models/index.js';
 import ServiceFactory from '@/factories/serviceFactory.js';
 import { httpStatusCode } from '@/utils/httpStatus.js';
 import { ILocationTimeData } from '@/types/models.js';
@@ -9,14 +8,11 @@ import { getIO } from '@/utils/socketManager.js';
 import logger from '@/utils/logger.js';
 
 async function _raw_getTimeLocationEmployee(req: Request, res: Response) {
-  const { id } = req.params;
-  const companyId = (req as any).companyId;
-  const userRole = (req as any).userRole;
-  const filter: Record<string, any> = { employee: id };
-  if (userRole !== 'superuser' && companyId) {
-    filter.company = companyId;
-  }
-  const allLocationsEmployee = await Location.find(filter);
+  const { id } = req.params as { id: string };
+  const context: any = { companyId: (req as any).companyId, role: (req as any).userRole, userId: (req as any).userId };
+  // ponytail: enforce tenant via repository (see auditoria #7)
+  const repo = new (await import('@/repositories/locationRepository.js')).default();
+  const allLocationsEmployee = await repo.getLocationById({ employee: id }, context);
   res
     .status(httpStatusCode.OK)
     .json({ employeeLocations: allLocationsEmployee });

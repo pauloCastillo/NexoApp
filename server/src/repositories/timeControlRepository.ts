@@ -23,7 +23,8 @@ class TimeControlRepository {
         if (context.role !== 'superuser') {
             updateData.$set.company = context.companyId;
         }
-        return await ControlTime.findByIdAndUpdate(id, updateData, { new: true }).populate("location", "locations");
+        // ponytail: enforce tenant to prevent IDOR (see auditoria #10)
+        return await ControlTime.findOneAndUpdate({ _id: id, ...this.#companyFilter(context) }, updateData, { new: true }).populate("location", "locations");
     }
 
     async deleteTimeControl(id: string, context: TenantContext) {

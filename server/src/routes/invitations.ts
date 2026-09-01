@@ -20,8 +20,11 @@ const validateLimiter = rateLimit({
   message: { message: 'Demasiadas validaciones, intenta en 1 minuto', canRequestNew: true },
 });
 
+const createLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 20, standardHeaders: true, legacyHeaders: false, message: { message: 'Demasiadas invitaciones, intenta en 1 hora' } });
+const requestNewLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 20, standardHeaders: true, legacyHeaders: false, message: { message: 'Demasiadas solicitudes, intenta en 1 hora' } });
+
 // POST /api/invitations — crear código enriquecido
-router.post('/', verifiedToken, requireRole('business_owner', 'admin', 'hr_manager', 'supervisor'), async (req: any, res) => {
+router.post('/', verifiedToken, requireRole('business_owner', 'admin', 'hr_manager', 'supervisor'), createLimiter, async (req: any, res) => {
   try {
     const parsed = createInvitationSchema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ message: 'Datos inválidos', errors: parsed.error.flatten() });
@@ -113,7 +116,7 @@ router.get('/validate/:code', validateLimiter, async (req, res) => {
 });
 
 // POST /api/invitations/request-new — público genérico
-router.post('/request-new', async (req, res) => {
+router.post('/request-new', requestNewLimiter, async (req, res) => {
   try {
     const parsed = requestNewSchema.safeParse(req.body);
     if (!parsed.success) {

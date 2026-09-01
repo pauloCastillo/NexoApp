@@ -29,9 +29,12 @@ if (process.env.DEV_STATUS === "development") {
 }
 
 const allowedOrigins = process.env.CLIENT_URL?.split(",").map((s) => s.trim()).filter(Boolean);
-app.use(cors({ origin: allowedOrigins && allowedOrigins.length > 0 ? allowedOrigins : true, credentials: true }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+if (process.env.DEV_STATUS !== 'development' && (!allowedOrigins || allowedOrigins.length === 0)) {
+  throw new Error('CLIENT_URL must be set in production');
+}
+app.use(cors({ origin: allowedOrigins && allowedOrigins.length > 0 ? allowedOrigins : [], credentials: allowedOrigins && allowedOrigins.length > 0 }));
+app.use(express.json({ limit: '100kb' }));
+app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 app.use(helmet());
 app.use(requestId);
 app.use(requestLogger);

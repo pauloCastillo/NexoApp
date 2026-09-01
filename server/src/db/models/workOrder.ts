@@ -35,8 +35,9 @@ const workOrderSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["pendiente", "en_progreso", "completado", "cancelado"],
-      default: "pendiente",
+      // domain: pendiente (ES) — WorkOrder status; stored in English
+      enum: ["pending", "in_progress", "completed", "cancelled"],
+      default: "pending",
     },
     completedAt: {
       type: Date,

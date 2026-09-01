@@ -52,16 +52,11 @@ const verifyTokenHash = async (token: string, hash: string): Promise<boolean> =>
 };
 
 const verifyingSession = (token: string): Record<string, any> => {
-  try {
-    const verifiedToken = jwt.verify(token, getJwtSecret()) as Record<string, string>;
-    if (!verifiedToken) {
-      throw new Error("Algo salio mal con el token");
-    }
-    return verifiedToken;
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
-    return { error: message };
+  const verifiedToken = jwt.verify(token, getJwtSecret()) as Record<string, string>;
+  if (!verifiedToken) {
+    throw new Error("Algo salio mal con el token");
   }
+  return verifiedToken;
 };
 
 export { 

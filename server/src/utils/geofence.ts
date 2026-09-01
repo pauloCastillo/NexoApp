@@ -27,8 +27,8 @@ export function evaluateGeofence(
       ? [{ _id: 'company', name: companyName || 'Sede principal', location: { lat: companyLocation.lat, lng: companyLocation.lng }, geofenceRadius: companyLocation.geofenceRadius || 200 }]
       : [];
 
-  // ponytail: open geofence when no branches/company loc — intentional fallback (closed would block all)
-  if (candidates.length === 0) return { inside: true, distance: 0 };
+  // ponytail: closed geofence when no candidates — open would allow spoofed coordinates (see auditoria #1)
+  if (candidates.length === 0) return { inside: false, distance: Infinity };
 
   let best: BranchLike | null = null;
   let minDist = Infinity;
@@ -39,7 +39,7 @@ export function evaluateGeofence(
       best = b;
     }
   }
-  if (!best) return { inside: true, distance: 0 };
+  if (!best) return { inside: false, distance: Infinity };
   const inside = minDist <= best.geofenceRadius;
   return { inside, distance: Math.round(minDist), branchId: String(best._id), branchName: best.name };
 }

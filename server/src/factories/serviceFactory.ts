@@ -15,31 +15,26 @@ import WorkOrderRepository from '@/repositories/workOrderRepository.js';
 import WorkOrderService from '@/services/workOrderService.js';
 import { createErrorProxy } from '@/utils/createErrorProxy.js';
 
+export type ServiceType = "employee" | "manager" | "timeControl" | "location" | "client" | "permission" | "vacation" | "workOrder";
+
+const registry: Record<ServiceType, (data: Record<string, any> | null, context?: TenantContext) => object> = {
+  employee: (_data, context) => new EmployeeService(context),
+  manager: (_data, context) => new ManagerService(context),
+  timeControl: (data, context) => new TimeControlService(data as Record<string, any>, new TimeControlRepository(), context),
+  location: (data, context) => new LocationService(data as Record<string, any>, new LocationRepository(), context),
+  client: (data, context) => new ClientService(data as Record<string, any>, new ClientRepository(), context),
+  permission: (data, context) => new PermissionService(data as Record<string, any>, new PermissionRepository(), context),
+  vacation: (data, context) => new VacationService(data as Record<string, any>, new VacationRepository(), context),
+  workOrder: (data, context) => new WorkOrderService(data as Record<string, any>, new WorkOrderRepository(), context),
+};
+
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 class ServiceFactory {
-  static getService(serviceType: string, data: Record<string, any> | null = null, context?: TenantContext): any {
+  static getService(serviceType: ServiceType, data: Record<string, any> | null = null, context?: TenantContext): any {
     const wrap = <T extends object>(svc: T) => createErrorProxy(svc);
-    const wrapRepo = <T extends object>(repo: T) => createErrorProxy(repo);
-    switch (serviceType) {
-      case "employee":
-        return wrap(new EmployeeService(context));
-      case "manager":
-        return wrap(new ManagerService(context));
-      case "timeControl":
-        return wrap(new TimeControlService(data as Record<string, any>, wrapRepo(new TimeControlRepository()), context));
-      case "location":
-        return wrap(new LocationService(data as Record<string, any>, wrapRepo(new LocationRepository()), context));
-      case "client":
-        return wrap(new ClientService(data as Record<string, any>, wrapRepo(new ClientRepository()), context));
-      case "permission":
-        return wrap(new PermissionService(data as Record<string, any>, wrapRepo(new PermissionRepository()), context));
-      case "vacation":
-        return wrap(new VacationService(data as Record<string, any>, wrapRepo(new VacationRepository()), context));
-      case "workOrder":
-        return wrap(new WorkOrderService(data as Record<string, any>, wrapRepo(new WorkOrderRepository()), context));
-      default:
-        throw new Error(`Service type ${serviceType} not recognized.`);
-    }
+    const factory = registry[serviceType];
+    if (!factory) throw new Error(`Service type ${serviceType} not recognized.`);
+    return wrap(factory(data, context) as object);
   }
 }
 

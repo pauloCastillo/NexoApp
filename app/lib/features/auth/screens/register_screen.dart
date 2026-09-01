@@ -385,7 +385,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
     );
   }
 
-  Widget _chip(IconData i, String l) => Container(
+  // domain: chip (Es) — tag; helper for brand panel
+  Widget _chip(IconData icon, String label) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
     decoration: BoxDecoration(
       color: Colors.white.withValues(alpha: 0.14),
@@ -394,9 +395,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(i, size: 14, color: Colors.white),
+        Icon(icon, size: 14, color: Colors.white),
         const SizedBox(width: 6),
-        Text(l, style: const TextStyle(color: Colors.white, fontSize: 12)),
+        Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
       ],
     ),
   );

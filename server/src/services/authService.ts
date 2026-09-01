@@ -31,8 +31,21 @@ class AuthService {
       throw { statusCode: 409, message: "La empresa ya está registrada" };
     }
 
-    const newCompany = await Company.create({ name: ownerCompanyName.trim() });
-    const owner = await User.create({ username: ownerName, email: ownerEmail, password: ownerPassword, phone: ownerPhone, role: 'business_owner', company: newCompany._id });
+    // ponytail: atomic Company+User creation (see auditoria #8)
+    const mongoose = (await import('mongoose')).default;
+    const session = await mongoose.startSession();
+    let newCompany: any;
+    let owner: any;
+    try {
+      await session.withTransaction(async () => {
+        const c = await Company.create([{ name: ownerCompanyName.trim() }], { session });
+        newCompany = c[0];
+        const u = await User.create([{ username: ownerName, email: ownerEmail, password: ownerPassword, phone: ownerPhone, role: 'business_owner', company: newCompany._id }], { session });
+        owner = u[0];
+      });
+    } finally {
+      await session.endSession();
+    }
     const userData = { _id: owner._id, email: owner.email, username: owner.username, company: newCompany._id, role: 'business_owner' };
     const token = signSession(userData);
     const refreshToken = signRefreshToken(userData);

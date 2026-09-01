@@ -1,12 +1,22 @@
 import type { TenantContext } from '@/types/models.js';
 import WorkOrderRepository from '@/repositories/workOrderRepository.js';
 
+// domain: pendiente (ES) -> pending, en_progreso -> in_progress, etc. Stored in English.
 const VALID_TRANSITIONS: Record<string, string[]> = {
-  pendiente: ['en_progreso', 'cancelado'],
-  en_progreso: ['completado', 'cancelado'],
-  completado: [],
-  cancelado: [],
+  pending: ['in_progress', 'cancelled'],
+  in_progress: ['completed', 'cancelled'],
+  completed: [],
+  cancelled: [],
 };
+
+// Back-compat: map legacy ES values to English
+const LEGACY_STATUS_MAP: Record<string, string> = {
+  pendiente: 'pending',
+  en_progreso: 'in_progress',
+  completado: 'completed',
+  cancelado: 'cancelled',
+};
+const normalizeStatus = (s: string) => LEGACY_STATUS_MAP[s] ?? s;
 
 class WorkOrderService {
   private _data: Record<string, any>;
@@ -36,32 +46,38 @@ class WorkOrderService {
   }
 
   async start(id: string) {
-    return await this._transitionStatus(id, 'en_progreso');
+    return await this._transitionStatus(id, 'in_progress');
   }
 
   async complete(id: string) {
-    const doc = await this._repository.getById(id, this._context!);
-    if (!doc) throw new Error('WorkOrder not found');
-    if (doc.status !== 'en_progreso') throw new Error('Solo órdenes en progreso pueden completarse');
-    return await this._repository.updateWorkOrder(id, { status: 'completado', completedAt: new Date() }, this._context!);
+    // ponytail: atomic transition to avoid TOCTOU
+    const doc = await this._repository.transitionStatus(id, 'in_progress', 'completed', { completedAt: new Date() }, this._context!);
+    if (!doc) throw new Error('WorkOrder not found or invalid transition');
+    return doc;
   }
 
   async cancel(id: string, reason: string) {
     const doc = await this._repository.getById(id, this._context!);
     if (!doc) throw new Error('WorkOrder not found');
-    if (!VALID_TRANSITIONS[doc.status]?.includes('cancelado')) {
+    const status = normalizeStatus(doc.status);
+    if (!VALID_TRANSITIONS[status]?.includes('cancelled')) {
       throw new Error(`No se puede cancelar una orden en estado ${doc.status}`);
     }
-    return await this._repository.updateWorkOrder(id, { status: 'cancelado', cancelledAt: new Date(), cancellationReason: reason }, this._context!);
+    // ponytail: atomic where possible, fallback to update if legacy status present
+    const updated = await this._repository.transitionStatus(id, status, 'cancelled', { cancelledAt: new Date(), cancellationReason: reason }, this._context!);
+    return updated ?? await this._repository.updateWorkOrder(id, { status: 'cancelled', cancelledAt: new Date(), cancellationReason: reason }, this._context!);
   }
 
   async _transitionStatus(id: string, newStatus: string) {
     const doc = await this._repository.getById(id, this._context!);
     if (!doc) throw new Error('WorkOrder not found');
-    if (!VALID_TRANSITIONS[doc.status]?.includes(newStatus)) {
+    const status = normalizeStatus(doc.status);
+    if (!VALID_TRANSITIONS[status]?.includes(newStatus)) {
       throw new Error(`Transición inválida de ${doc.status} a ${newStatus}`);
     }
-    return await this._repository.updateWorkOrder(id, { status: newStatus }, this._context!);
+    const updated = await this._repository.transitionStatus(id, status, newStatus, { status: newStatus }, this._context!);
+    if (!updated) throw new Error(`Transición inválida de ${doc.status} a ${newStatus} (conflicto concurrente)`);
+    return updated;
   }
 }
 

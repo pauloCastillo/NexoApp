@@ -45,13 +45,22 @@ class LocationRepository {
         const companyLoc = company?.location?.lat ? { lat: company.location.lat, lng: company.location.lng, geofenceRadius: company.geofenceRadius } : null;
         const evalRes = evaluateGeofence(locationData.latitude, locationData.longitude, branches, companyLoc, company?.name);
         const override = locationData.override === true && ['supervisor', 'business_owner', 'admin', 'superuser', 'platform_admin'].includes(context.role);
+        if (override && (!locationData.overrideReason || String(locationData.overrideReason).trim().length < 10)) {
+          throw { statusCode: 400, message: 'overrideReason requerido (mín 10 caracteres) para geofence override' };
+        }
         locationData.geofenceResult = {
           branchId: evalRes.branchId && evalRes.branchId !== 'company' ? evalRes.branchId : undefined,
           branchName: evalRes.branchName,
           distance: evalRes.distance,
           inside: override ? true : evalRes.inside,
-          ...(override ? { overriddenBy: context.userId, overrideReason: locationData.overrideReason } : {}),
+          ...(override ? { overriddenBy: context.userId, overrideReason: String(locationData.overrideReason).trim() } : {}),
         };
+        if (override) {
+          try {
+            const { default: auditLogService } = await import('@/services/auditLogService.js');
+            await auditLogService.log({ action: 'geofence.overridden', entityType: 'Location', entityId: locationData.employee, userId: context.userId, companyId: String(context.companyId), metadata: { distance: evalRes.distance, branchName: evalRes.branchName, overrideReason: locationData.overrideReason } });
+          } catch {}
+        }
         // clean override flags from push
         delete locationData.override;
         delete locationData.overrideReason;

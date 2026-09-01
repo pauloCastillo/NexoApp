@@ -28,9 +28,9 @@ describe('evaluateGeofence', () => {
     expect(r.inside).toBe(true);
     expect(r.branchName).toBe('Sede');
   });
-  it('no candidates → inside true', () => {
+  it('no candidates → inside false (closed geofence, see auditoria #1)', () => {
     const r = evaluateGeofence(0,0, [], null);
-    expect(r.inside).toBe(true);
+    expect(r.inside).toBe(false);
   });
   it('picks closest branch', () => {
     const r = evaluateGeofence(19.4326, -99.1332, [

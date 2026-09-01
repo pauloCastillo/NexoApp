@@ -33,24 +33,26 @@ import logger from '@/utils/logger.js';
 function setupEmployeeNamespace(io: Server) {
   const employeeNamespace = io.of('/api/employees');
 
-  // socket auth middleware with requestId
+  // ponytail: socket auth — reject unauthenticated listeners (see auditoria #11)
   employeeNamespace.use((socket, next) => {
     (socket.data as any).requestId = (socket.handshake.auth?.requestId as string) || randomUUID();
-    next();
+    const token = socket.handshake.auth?.token || (socket.handshake.headers as any)?.authorization?.replace('Bearer ', '');
+    if (!token) return next(new Error('UNAUTHORIZED'));
+    try {
+      const decoded: any = verifyingSession(token);
+      (socket.data as any).user = decoded;
+      next();
+    } catch {
+      next(new Error('UNAUTHORIZED'));
+    }
   });
 
   employeeNamespace.on('connection', async (socket) => {
     const requestId = (socket.data as any).requestId as string;
     const log = logger.child({ requestId });
     try {
-      const token = socket.handshake.auth?.token || (socket.handshake.headers as any)?.authorization?.replace('Bearer ', '');
-      if (!token) {
-        const e = catalogEntry('UNAUTHORIZED');
-        socket.emit('error', { message: e.message, code: 'UNAUTHORIZED', requestId });
-        return;
-      }
-      const decoded = verifyingSession(token);
-      if ((decoded as any).error) {
+      const decoded: any = (socket.data as any).user;
+      if (!decoded) {
         const e = catalogEntry('UNAUTHORIZED');
         socket.emit('error', { message: e.message, code: 'UNAUTHORIZED', requestId });
         return;

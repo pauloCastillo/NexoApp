@@ -43,8 +43,15 @@ const requireCompanyAccess = (req: Request, res: Response, next: NextFunction) =
     return next();
   }
 
-  const targetCompany = req.params.companyId || req.body.company || req.query.company;
-  if (targetCompany && targetCompany !== companyId) {
+  // ponytail: strip company injection from body/query — tenant comes from JWT only
+  if (req.body && typeof req.body === 'object' && 'company' in req.body) {
+    delete (req.body as any).company;
+  }
+  if (req.query && typeof req.query === 'object' && 'company' in req.query) {
+    delete (req.query as any).company;
+  }
+  const targetCompany = (req.params as any).companyId || (req.params as any).company_id;
+  if (targetCompany && String(targetCompany) !== String(companyId)) {
     res.status(403).json({ message: "Acceso denegado: no pertenece a esta empresa" });
     return;
   }
