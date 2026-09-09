@@ -5,16 +5,16 @@ import ServiceFactory from '@/factories/serviceFactory.js';
 import auditLogService from '@/services/auditLogService.js';
 
 async function _raw_getAllClients(req: Request, res: Response) {
-  const companyId = (req as any).companyId;
-  const userRole = (req as any).userRole;
+  const companyId = req.companyId!;
+  const userRole = req.userRole!;
   const clientService = ServiceFactory.getService("client", null, { companyId, role: userRole });
   const clients = await clientService.getAll();
   res.status(httpStatusCode.OK).json({ clients });
 }
 
 async function _raw_createClient(req: Request, res: Response) {
-  const companyId = (req as any).companyId;
-  const userRole = (req as any).userRole;
+  const companyId = req.companyId!;
+  const userRole = req.userRole!;
   const clientData = { ...req.body, createdBy: req.userId, company: companyId };
   const clientService = ServiceFactory.getService("client", clientData, { companyId, role: userRole });
   const client = await clientService.create();
@@ -24,8 +24,8 @@ async function _raw_createClient(req: Request, res: Response) {
 
 async function _raw_updateClient(req: Request, res: Response) {
   const { id } = req.params as { id: string };
-  const companyId = (req as any).companyId;
-  const userRole = (req as any).userRole;
+  const companyId = req.companyId!;
+  const userRole = req.userRole!;
   const clientService = ServiceFactory.getService("client", req.body, { companyId, role: userRole });
   const updated = await clientService.update(id);
   if (!updated) {
@@ -37,8 +37,8 @@ async function _raw_updateClient(req: Request, res: Response) {
 
 async function _raw_deleteClient(req: Request, res: Response) {
   const { id } = req.params as { id: string };
-  const companyId = (req as any).companyId;
-  const userRole = (req as any).userRole;
+  const companyId = req.companyId!;
+  const userRole = req.userRole!;
   const clientService = ServiceFactory.getService("client", null, { companyId, role: userRole });
   const deleted = await clientService.delete(id);
   if (!deleted) {

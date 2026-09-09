@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,6 +16,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
     with SingleTickerProviderStateMixin {
   final _formKey1 = GlobalKey<FormState>();
   final _formKey2 = GlobalKey<FormState>();
+  final _formKey3 = GlobalKey<FormState>();
   final _name = TextEditingController();
   final _lastName = TextEditingController();
   final _email = TextEditingController();
@@ -36,6 +38,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
   bool _requestingNew = false;
   String? _errorSummary;
   final _errorFocus = FocusNode();
+  Timer? _debounce;
   late final AnimationController _anim;
   late final Animation<double> _fade;
   late final Animation<Offset> _slide;
@@ -56,8 +59,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
         .instance
         .platformDispatcher
         .accessibilityFeatures
-        .disableAnimations)
+        .disableAnimations) {
       _anim.forward();
+    }
     if (widget.initialCode != null && widget.initialCode!.isNotEmpty) {
       _invitationCode.text = widget.initialCode!.toUpperCase();
       _isEmployee = true;
@@ -81,6 +85,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
     ]) {
       c.dispose();
     }
+    _debounce?.cancel();
     _errorFocus.dispose();
     _anim.dispose();
     super.dispose();
@@ -90,8 +95,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
       (v == null || v.trim().isEmpty) ? '$label requerido' : null;
   String? _emailV(String? v) {
     if (v == null || v.trim().isEmpty) return 'Correo requerido';
-    if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(v.trim()))
+    if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(v.trim())) {
       return 'Correo no válido';
+    }
     return null;
   }
 
@@ -130,7 +136,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
         if (company?['name'] != null) company!['name'],
         if (dept?['name'] != null) dept!['name'],
         if (branch?['name'] != null) branch!['name'],
-        if (shift != null) shift,
+        ?shift,
       ];
       setState(() {
         _invitationPreview = parts.join(' · ');
@@ -163,7 +169,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
             code,
             email: _email.text.trim().isNotEmpty ? _email.text.trim() : null,
           );
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
@@ -171,33 +177,36 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
             ),
           ),
         );
+      }
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     } finally {
       if (mounted) setState(() => _requestingNew = false);
     }
   }
 
-  bool _validateStep1() {
+  bool _validateStep2() {
     final errors = <String>[];
-    if (_isEmployee && _invitationCode.text.trim().isEmpty)
-      errors.add('Código de invitación requerido');
-    if (!_isEmployee && _companyName.text.trim().isEmpty)
-      errors.add('Nombre de empresa requerido');
+    if (_email.text.trim().isEmpty) {
+      errors.add('Correo requerido');
+    } else if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(_email.text.trim())) {
+      errors.add('Correo no válido');
+    }
     final p1 = _password.text;
     final p2 = _confirm.text;
     if (p1.isEmpty) errors.add('Contraseña requerida');
     if (p1.length < 6) errors.add('Contraseña mínimo 6 caracteres');
     if (p1 != p2) errors.add('Las contraseñas no coinciden');
-    final formOk = _formKey2.currentState?.validate() ?? false;
+    final formOk = _formKey3.currentState?.validate() ?? false;
     if (errors.isNotEmpty || !formOk) {
       setState(
         () => _errorSummary = errors.isNotEmpty
             ? errors.first
-            : 'Corrige los campos del paso 2',
+            : 'Corrige los campos del paso 3',
       );
       _errorFocus.requestFocus();
       return false;
@@ -212,18 +221,26 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
         _errorSummary = null;
       });
       _anim.forward(from: 0);
+    } else if (_step == 1) {
+      setState(() {
+        _step = 2;
+        _errorSummary = null;
+      });
+      _anim.forward(from: 0);
     }
   }
 
-  void _back() => setState(() {
-    _step = 0;
-    _errorSummary = null;
-  });
+  void _back() {
+    if (_step > 0) {
+      setState(() {
+        _step--;
+        _errorSummary = null;
+      });
+    }
+  }
 
   Future<void> _register() async {
-    if (!_validateStep1()) return;
-    // re-validate code before submit to give fresh preview
-    if (_isEmployee) await _validateInvitationCode();
+    if (!_validateStep2()) return;
     setState(() {
       _loading = true;
       _errorSummary = null;
@@ -402,6 +419,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
     ),
   );
 
+  Widget _detailChip(IconData icon, String label, ColorScheme cs) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    decoration: BoxDecoration(
+      color: cs.surface,
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 12, color: cs.primary),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            color: cs.onSurface,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    ),
+  );
+
   Widget _formCard(ColorScheme cs) {
     final card = ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 520),
@@ -425,7 +465,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                     ),
                   ),
                   Text(
-                    'Paso ${_step + 1} de 2',
+                    'Paso ${_step + 1} de 3',
                     style: TextStyle(
                       fontSize: 12,
                       color: cs.onSurfaceVariant,
@@ -438,7 +478,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: LinearProgressIndicator(
-                  value: (_step + 1) / 2,
+                  value: (_step + 1) / 3,
                   minHeight: 6,
                   backgroundColor: cs.surfaceContainerHighest,
                   color: cs.primary,
@@ -456,7 +496,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                           : cs.outline.withValues(alpha: 0.3),
                     ),
                   ),
-                  _stepDot(1, cs, done: false),
+                  _stepDot(1, cs, done: _step > 1),
+                  Expanded(
+                    child: Container(
+                      height: 2,
+                      color: _step > 1
+                          ? cs.primary
+                          : cs.outline.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  _stepDot(2, cs, done: false),
                 ],
               ),
               const SizedBox(height: 16),
@@ -473,33 +522,36 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                 ),
               ),
               const SizedBox(height: 8),
-              SegmentedButton<bool>(
-                segments: const [
-                  ButtonSegment(
-                    value: false,
-                    label: Text('Dueño'),
-                    icon: Icon(Icons.storefront, size: 16),
-                  ),
-                  ButtonSegment(
-                    value: true,
-                    label: Text('Colaborador'),
-                    icon: Icon(Icons.badge, size: 16),
-                  ),
-                ],
-                selected: {_isEmployee},
-                onSelectionChanged: (s) => setState(() {
-                  _isEmployee = s.first;
-                  _invitationPreview = null;
-                  if (_isEmployee) {
-                    _companyName.clear();
-                  } else {
-                    _invitationCode.clear();
+              SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<bool>(
+                  segments: const [
+                    ButtonSegment(
+                      value: false,
+                      label: Text('Dueño', style: TextStyle(fontSize: 12)),
+                      icon: Icon(Icons.storefront, size: 14),
+                    ),
+                    ButtonSegment(
+                      value: true,
+                      label: Text('Colaborador', style: TextStyle(fontSize: 12)),
+                      icon: Icon(Icons.badge, size: 14),
+                    ),
+                  ],
+                  selected: {_isEmployee},
+                  onSelectionChanged: (s) => setState(() {
+                    _isEmployee = s.first;
                     _invitationPreview = null;
-                  }
-                  _errorSummary = null;
-                }),
-                style: ButtonStyle(visualDensity: VisualDensity.comfortable),
-                showSelectedIcon: false,
+                    if (_isEmployee) {
+                      _companyName.clear();
+                    } else {
+                      _invitationCode.clear();
+                      _invitationPreview = null;
+                    }
+                    _errorSummary = null;
+                  }),
+                  style: ButtonStyle(visualDensity: VisualDensity.comfortable),
+                  showSelectedIcon: false,
+                ),
               ),
               const SizedBox(height: 16),
               if (_errorSummary != null)
@@ -534,12 +586,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
               if (_errorSummary != null) const SizedBox(height: 16),
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 250),
-                child: _step == 0 ? _stepOne(cs) : _stepTwo(cs),
+                child: _step == 0 ? _stepOne(cs) : _step == 1 ? _stepTwo(cs) : _stepThree(cs),
               ),
               const SizedBox(height: 20),
               Row(
                 children: [
-                  if (_step == 1) ...[
+                  if (_step > 0) ...[
                     Expanded(
                       child: OutlinedButton(
                         onPressed: _loading ? null : _back,
@@ -553,9 +605,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                     child: SizedBox(
                       height: 48,
                       child: FilledButton(
-                        onPressed: _loading
+                        onPressed: (_loading ||
+                                (_step == 1 && _isEmployee &&
+                                    (_validatingCode || _invitationPreview == null)))
                             ? null
-                            : (_step == 0 ? _next : _register),
+                            : (_step < 2 ? _next : _register),
                         child: _loading
                             ? const SizedBox(
                                 height: 18,
@@ -565,12 +619,39 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                                   color: Colors.white,
                                 ),
                               )
-                            : Text(_step == 0 ? 'Continuar' : 'Crear cuenta'),
+                            : _validatingCode && _step == 1 && _isEmployee
+                                ? const Text('Validando código...')
+                                : Text(_step < 2 ? 'Continuar' : 'Crear cuenta'),
                       ),
                     ),
                   ),
                 ],
               ),
+              if (_step == 1 && _isEmployee && _invitationPreview == null && !_validatingCode)
+                Container(
+                  margin: const EdgeInsets.only(top: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: cs.tertiaryContainer,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.info_outline, size: 16, color: cs.onTertiaryContainer),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Valida tu código de invitación para continuar',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: cs.onTertiaryContainer,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               const SizedBox(height: 12),
               Wrap(
                 alignment: WrapAlignment.center,
@@ -678,18 +759,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
           ),
           const SizedBox(height: 12),
           TextFormField(
-            controller: _email,
-            autofillHints: const [AutofillHints.email],
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              labelText: 'Correo electrónico',
-              prefixIcon: Icon(Icons.email_outlined, size: 20),
-              helperText: 'Usa tu correo de trabajo',
-            ),
-            validator: _emailV,
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
             controller: _phone,
             autofillHints: const [AutofillHints.telephoneNumber],
             keyboardType: TextInputType.phone,
@@ -758,7 +827,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                       ),
               ),
               onFieldSubmitted: (_) => _validateInvitationCode(),
-              onChanged: (_) => setState(() => _invitationPreview = null),
+              onEditingComplete: _validateInvitationCode,
+              onChanged: (_) {
+                setState(() {
+                  _invitationPreview = null;
+                  _canRequestNew = false;
+                });
+                _debounce?.cancel();
+                _debounce = Timer(
+                  const Duration(milliseconds: 600),
+                  _validateInvitationCode,
+                );
+              },
               validator: (v) => _isEmployee && (v == null || v.trim().isEmpty)
                   ? 'Código requerido'
                   : null,
@@ -783,32 +863,67 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
             if (_invitationPreview != null)
               Container(
                 margin: const EdgeInsets.only(top: 8),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: cs.primaryContainer.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: cs.primary.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
                 ),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.business,
-                      size: 16,
-                      color: cs.onPrimaryContainer,
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        _invitationPreview!,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: cs.onPrimaryContainer,
-                          fontWeight: FontWeight.w600,
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.business,
+                          size: 18,
+                          color: cs.primary,
                         ),
-                      ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _invitationDetails?['company']?['name'] ?? '',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: cs.onSurface,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
+                    if (_invitationDetails?['department'] != null ||
+                        _invitationDetails?['branch'] != null ||
+                        _invitationDetails?['shift'] != null) ...[
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        children: [
+                          if (_invitationDetails?['department'] != null)
+                            _detailChip(
+                              Icons.category,
+                              _invitationDetails!['department']['name'],
+                              cs,
+                            ),
+                          if (_invitationDetails?['branch'] != null)
+                            _detailChip(
+                              Icons.location_on_outlined,
+                              _invitationDetails!['branch']['name'],
+                              cs,
+                            ),
+                          if (_invitationDetails?['shift'] != null)
+                            _detailChip(
+                              Icons.schedule,
+                              _invitationDetails!['shift'],
+                              cs,
+                            ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -856,7 +971,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                   ],
                 ),
               ),
-          ] else
+          ] else ...[
             TextFormField(
               controller: _companyName,
               textCapitalization: TextCapitalization.words,
@@ -867,6 +982,130 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
               ),
               validator: (v) => _req(v, 'Empresa'),
             ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _password,
+              autofillHints: const [AutofillHints.newPassword],
+              obscureText: _obscure1,
+              decoration: InputDecoration(
+                labelText: 'Contraseña',
+                prefixIcon: const Icon(Icons.lock_outline, size: 20),
+                helperText: 'Mínimo 6 caracteres',
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscure1
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                    size: 20,
+                  ),
+                  onPressed: () => setState(() => _obscure1 = !_obscure1),
+                ),
+              ),
+              validator: (v) =>
+                  (v == null || v.length < 6) ? 'Mínimo 6 caracteres' : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _confirm,
+              autofillHints: const [AutofillHints.newPassword],
+              obscureText: _obscure2,
+              onFieldSubmitted: (_) => _register(),
+              decoration: InputDecoration(
+                labelText: 'Confirmar contraseña',
+                prefixIcon: const Icon(Icons.lock, size: 20),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscure2
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                    size: 20,
+                  ),
+                  onPressed: () => setState(() => _obscure2 = !_obscure2),
+                ),
+              ),
+              validator: (v) => v != _password.text ? 'No coinciden' : null,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _stepThree(ColorScheme cs) {
+    final companyName = _invitationDetails?['company']?['name'] as String? ?? '';
+    return Form(
+      key: _formKey3,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        key: const ValueKey(2),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: cs.primaryContainer.withValues(alpha: 0.4),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: cs.primary.withValues(alpha: 0.25),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.business, size: 22, color: cs.primary),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        companyName,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: cs.onSurface,
+                        ),
+                      ),
+                      if (_invitationPreview != null)
+                        Text(
+                          _invitationPreview!,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: cs.onSurfaceVariant,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.verified, size: 18, color: cs.primary),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Semantics(
+            header: true,
+            child: Text(
+              'Crea tu contraseña',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: cs.primary,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextFormField(
+            controller: _email,
+            autofillHints: const [AutofillHints.email],
+            keyboardType: TextInputType.emailAddress,
+            decoration: const InputDecoration(
+              labelText: 'Correo electrónico',
+              prefixIcon: Icon(Icons.email_outlined, size: 20),
+              helperText: 'Usa tu correo de trabajo',
+            ),
+            validator: _emailV,
+          ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _password,

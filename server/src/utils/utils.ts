@@ -1,6 +1,7 @@
 import "dotenv/config";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import type { Types } from 'mongoose';
 
 const saltRounds = 12;
 
@@ -20,12 +21,22 @@ const getJwtSecret = (): string => {
   return secret;
 };
 
-const signSession = (loadedUser: Record<string, any>) => {
+interface SessionPayload {
+  _id?: string | Types.ObjectId;
+  id?: string | Types.ObjectId;
+  email?: string;
+  username?: string;
+  company?: string | null | Types.ObjectId;
+  companyId?: string | null | Types.ObjectId;
+  role?: string;
+}
+
+const signSession = (loadedUser: SessionPayload) => {
   const payload = {
-    userId: loadedUser._id || loadedUser.id,
+    userId: String(loadedUser._id || loadedUser.id),
     email: loadedUser.email,
     username: loadedUser.username,
-    companyId: loadedUser.company || loadedUser.companyId || null,
+    companyId: String(loadedUser.company || loadedUser.companyId || null),
     role: loadedUser.role || 'employee',
   };
   return jwt.sign(payload, getJwtSecret(), {
@@ -33,9 +44,9 @@ const signSession = (loadedUser: Record<string, any>) => {
   });
 };
 
-const signRefreshToken = (loadedUser: Record<string, any>) => {
+const signRefreshToken = (loadedUser: SessionPayload) => {
   const payload = {
-    userId: loadedUser._id || loadedUser.id,
+    userId: String(loadedUser._id || loadedUser.id),
     type: 'refresh',
   };
   return jwt.sign(payload, getJwtSecret(), {
@@ -51,7 +62,7 @@ const verifyTokenHash = async (token: string, hash: string): Promise<boolean> =>
   return bcrypt.compare(token, hash);
 };
 
-const verifyingSession = (token: string): Record<string, any> => {
+const verifyingSession = (token: string): Record<string, string> => {
   const verifiedToken = jwt.verify(token, getJwtSecret()) as Record<string, string>;
   if (!verifiedToken) {
     throw new Error("Algo salio mal con el token");

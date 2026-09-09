@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { verifiedToken } from '@/middlewares/verifyToken.js';
 import { validate } from '@/middlewares/validate.js';
 import { registerTokenSchema } from '@/schemas/auth.js';
@@ -6,10 +6,10 @@ import PushToken from '@/db/models/pushToken.js';
 
 const router = express.Router();
 
-router.post('/register-token', verifiedToken, validate(registerTokenSchema), async (req, res) => {
+router.post('/register-token', verifiedToken, validate(registerTokenSchema), async (req: Request, res: Response) => {
   const { token, platform } = req.body;
-  const userId = (req as any).userId;
-  const companyId = (req as any).companyId;
+  const userId = req.userId!;
+  const companyId = req.companyId!;
 
   await PushToken.findOneAndUpdate(
     { userId },

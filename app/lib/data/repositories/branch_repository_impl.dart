@@ -28,6 +28,6 @@ class BranchRepositoryImpl implements BranchRepository {
   @override
   Future<void> deleteBranch(String id) async {
     final r = await _src.deleteBranchResult(id);
-    if (r is Err) throw Exception((r as Err).failure.message);
+    if (r is Err) throw Exception((r).failure.message);
   }
 }

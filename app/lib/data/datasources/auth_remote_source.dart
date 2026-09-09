@@ -7,18 +7,38 @@ class AuthRemoteSource {
   final Dio _dio;
   AuthRemoteSource(this._dio);
 
-  Future<Result<Map<String, dynamic>>> loginResult(String email, String password) async {
+  Future<Result<Map<String, dynamic>>> loginResult(
+    String email,
+    String password,
+  ) async {
     try {
-      final response = await _dio.post('/auth/login', data: {'email': email, 'password': password});
+      final response = await _dio.post(
+        '/auth/login',
+        data: {'email': email, 'password': password},
+      );
       return Ok(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       return Err(dioToFailure(e));
     }
   }
 
-  Future<Result<Map<String, dynamic>>> registerResult(String username, String email, String password, {String? companyName, String? companyId, String? role, String? phone, String? invitationCode}) async {
+  Future<Result<Map<String, dynamic>>> registerResult(
+    String username,
+    String email,
+    String password, {
+    String? companyName,
+    String? companyId,
+    String? role,
+    String? phone,
+    String? invitationCode,
+  }) async {
     try {
-      final data = <String, dynamic>{'username': username, 'email': email, 'password': password, 'confirmPassword': password};
+      final data = <String, dynamic>{
+        'username': username,
+        'email': email,
+        'password': password,
+        'confirmPassword': password,
+      };
       if (companyName != null) data['companyName'] = companyName;
       if (companyId != null) data['companyId'] = companyId;
       if (role != null) data['role'] = role;
@@ -31,7 +51,9 @@ class AuthRemoteSource {
     }
   }
 
-  Future<Result<Map<String, dynamic>>> validateInvitationResult(String code) async {
+  Future<Result<Map<String, dynamic>>> validateInvitationResult(
+    String code,
+  ) async {
     try {
       final res = await _dio.get('/invitations/validate/$code');
       return Ok(res.data as Map<String, dynamic>);
@@ -40,9 +62,16 @@ class AuthRemoteSource {
     }
   }
 
-  Future<Result<Map<String, dynamic>>> requestNewCodeResult(String code, {String? email, String? phone}) async {
+  Future<Result<Map<String, dynamic>>> requestNewCodeResult(
+    String code, {
+    String? email,
+    String? phone,
+  }) async {
     try {
-      final res = await _dio.post('/invitations/request-new', data: {'code': code, if (email != null) 'email': email, if (phone != null) 'phone': phone});
+      final res = await _dio.post(
+        '/invitations/request-new',
+        data: {'code': code, 'email': ?email, 'phone': ?phone},
+      );
       return Ok(res.data as Map<String, dynamic>);
     } on DioException catch (e) {
       return Err(dioToFailure(e));
@@ -65,8 +94,26 @@ class AuthRemoteSource {
     throw Exception((r as Err).failure.message);
   }
 
-  Future<Map<String, dynamic>> register(String username, String email, String password, {String? companyName, String? companyId, String? role, String? phone, String? invitationCode}) async {
-    final r = await registerResult(username, email, password, companyName: companyName, companyId: companyId, role: role, phone: phone, invitationCode: invitationCode);
+  Future<Map<String, dynamic>> register(
+    String username,
+    String email,
+    String password, {
+    String? companyName,
+    String? companyId,
+    String? role,
+    String? phone,
+    String? invitationCode,
+  }) async {
+    final r = await registerResult(
+      username,
+      email,
+      password,
+      companyName: companyName,
+      companyId: companyId,
+      role: role,
+      phone: phone,
+      invitationCode: invitationCode,
+    );
     if (r is Ok<Map<String, dynamic>>) return r.value;
     throw Exception((r as Err).failure.message);
   }
@@ -77,7 +124,11 @@ class AuthRemoteSource {
     throw Exception((r as Err).failure.message);
   }
 
-  Future<Map<String, dynamic>> requestNewCode(String code, {String? email, String? phone}) async {
+  Future<Map<String, dynamic>> requestNewCode(
+    String code, {
+    String? email,
+    String? phone,
+  }) async {
     final r = await requestNewCodeResult(code, email: email, phone: phone);
     if (r is Ok<Map<String, dynamic>>) return r.value;
     throw Exception((r as Err).failure.message);
@@ -91,7 +142,13 @@ class AuthRemoteSource {
 
   Future<void> logout() async => _dio.post('/auth/logout');
 
-  Future<void> changePassword(String currentPassword, String newPassword) async {
-    await _dio.put('/auth/password', data: {'currentPassword': currentPassword, 'newPassword': newPassword});
+  Future<void> changePassword(
+    String currentPassword,
+    String newPassword,
+  ) async {
+    await _dio.put(
+      '/auth/password',
+      data: {'currentPassword': currentPassword, 'newPassword': newPassword},
+    );
   }
 }

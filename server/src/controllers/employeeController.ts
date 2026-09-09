@@ -5,8 +5,8 @@ import auditLogService from '@/services/auditLogService.js';
 import { proxyController } from '@/utils/proxyController.js';
 
 async function _raw_getAllEmployees(req: Request, res: Response) {
-  const companyId = (req as any).companyId;
-  const userRole = (req as any).userRole;
+  const companyId = req.companyId!;
+  const userRole = req.userRole!;
   const employeeService = ServiceFactory.getService("employee", null, { companyId, role: userRole });
   const getUsers = await employeeService.getAll();
   res.status(httpStatusCode.OK).json({ users: getUsers });  
@@ -14,26 +14,26 @@ async function _raw_getAllEmployees(req: Request, res: Response) {
 
 async function _raw_getEmployeeById(req: Request, res: Response) {
   const { employee_id: id } = req.params as { employee_id: string };
-  const companyId = (req as any).companyId;
-  const userRole = (req as any).userRole;
+  const companyId = req.companyId!;
+  const userRole = req.userRole!;
   const employeeService = ServiceFactory.getService("employee", null, { companyId, role: userRole });
   const employee = await employeeService.getById(id);
   res.status(httpStatusCode.OK).json({ user: employee });
 }
 
 async function _raw_createEmployee(req: Request, res: Response){
-  const companyId = (req as any).companyId;
-  const userRole = (req as any).userRole;
+  const companyId = req.companyId!;
+  const userRole = req.userRole!;
   const employeeService = ServiceFactory.getService("employee", null, { companyId, role: userRole });
   const employee = await employeeService.create({ ...req.body, companyId });
-  auditLogService.log({ action: 'employee.created', entityType: 'Employee', entityId: employee?.id, userId: req.userId, companyId, ipAddress: req.ip });
+  auditLogService.log({ action: 'employee.created', entityType: 'Employee', entityId: employee?.id?.toString(), userId: req.userId, companyId, ipAddress: req.ip });
   res.status(httpStatusCode.OK).json({ user: employee });
 }
 
 async function _raw_deleteEmployee(req: Request, res: Response) {
   const { employee_id: id } = req.params as { employee_id: string };
-  const companyId = (req as any).companyId;
-  const userRole = (req as any).userRole;
+  const companyId = req.companyId!;
+  const userRole = req.userRole!;
   const employeeService = ServiceFactory.getService("employee", null, { companyId, role: userRole });
   const deletedEmployee = await employeeService.delete(id);
   if (!deletedEmployee) {
@@ -50,8 +50,8 @@ async function _raw_deleteEmployee(req: Request, res: Response) {
 
 async function _raw_updateEmployee(req: Request, res: Response) {
   const { employee_id: id } = req.params as { employee_id: string };
-  const companyId = (req as any).companyId;
-  const userRole = (req as any).userRole;
+  const companyId = req.companyId!;
+  const userRole = req.userRole!;
   const employeeService = ServiceFactory.getService("employee", null, { companyId, role: userRole });
   const updated = await employeeService.update(id, req.body);
   if (!updated) {

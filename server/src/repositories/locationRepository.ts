@@ -2,6 +2,7 @@ import { Location, Company, Branch, User } from '@/db/models/index.js';
 import { TenantContext } from '@/types/models.js';
 import { evaluateGeofence } from '@/utils/geofence.js';
 import { reverseGeocode } from '@/utils/geocoding.js';
+import { AppError } from '@/utils/appError.js';
 
 class LocationRepository {
     #companyFilter(context: TenantContext): Record<string, any> {
@@ -36,7 +37,7 @@ class LocationRepository {
 
         // --- geofence: branch-aware warning (no throw) ---
         const user = await User.findOne({ _id: locationData.employee, company: context.companyId }).select('branches').lean() as any;
-        if (!user) throw { statusCode: 404, message: 'Empleado no encontrado en esta empresa' };
+        if (!user) throw new AppError(404, 'NOT_FOUND', 'Empleado no encontrado en esta empresa');
         const branchIds: string[] = user?.branches || [];
         const branches: any[] = branchIds.length > 0
           ? await Branch.find({ _id: { $in: branchIds }, company: context.companyId, isActive: true }).lean()
@@ -46,7 +47,7 @@ class LocationRepository {
         const evalRes = evaluateGeofence(locationData.latitude, locationData.longitude, branches, companyLoc, company?.name);
         const override = locationData.override === true && ['supervisor', 'business_owner', 'admin', 'superuser', 'platform_admin'].includes(context.role);
         if (override && (!locationData.overrideReason || String(locationData.overrideReason).trim().length < 10)) {
-          throw { statusCode: 400, message: 'overrideReason requerido (mín 10 caracteres) para geofence override' };
+          throw new AppError(400, 'VALIDATION_ERROR', 'overrideReason requerido (mín 10 caracteres) para geofence override');
         }
         locationData.geofenceResult = {
           branchId: evalRes.branchId && evalRes.branchId !== 'company' ? evalRes.branchId : undefined,

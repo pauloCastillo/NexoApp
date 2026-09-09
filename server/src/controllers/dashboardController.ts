@@ -7,7 +7,7 @@ import Permission from '@/db/models/permission.js';
 import WorkOrder from '@/db/models/workOrder.js';
 
 async function _raw_getSummary(req: Request, res: Response) {
-  const companyId = (req as any).companyId;
+  const companyId = req.companyId!;
   if (!companyId) {
     return res.status(httpStatusCode.BAD_REQUEST).json({ message: 'companyId requerido' });
   }
@@ -28,7 +28,7 @@ async function _raw_getSummary(req: Request, res: Response) {
 }
 
 async function _raw_getTodayAttendance(req: Request, res: Response) {
-  const companyId = (req as any).companyId;
+  const companyId = req.companyId!;
   if (!companyId) {
     return res.status(httpStatusCode.BAD_REQUEST).json({ message: 'companyId requerido' });
   }

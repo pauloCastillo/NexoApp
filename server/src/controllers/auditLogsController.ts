@@ -5,7 +5,7 @@ import auditLogService from '@/services/auditLogService.js';
 
 async function _raw_getAuditLogs(req: Request, res: Response) {
   const companyId = req.query.company as string | undefined;
-  const context = { companyId: (req as any).companyId, role: (req as any).userRole };
+  const context = { companyId: req.companyId!, role: req.userRole! };
   if (context.role !== 'superuser' && companyId && companyId !== context.companyId) {
     return res.status(httpStatusCode.FORBIDDEN).json({ message: "Acceso denegado" });
   }

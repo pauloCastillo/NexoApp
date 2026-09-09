@@ -19,7 +19,10 @@ class EmployeeListScreen extends ConsumerStatefulWidget {
 
 class _EmployeeListScreenState extends ConsumerState<EmployeeListScreen> {
   Future<void> _addEmployee() async {
-    await showDialog(context: context, builder: (_) => const InviteEmployeeDialog());
+    await showDialog(
+      context: context,
+      builder: (_) => const InviteEmployeeDialog(),
+    );
     ref.invalidate(invitationListProvider);
   }
 
@@ -33,7 +36,9 @@ class _EmployeeListScreenState extends ConsumerState<EmployeeListScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Comparte este código con el colaborador para que cree su cuenta desde el móvil:'),
+            const Text(
+              'Comparte este código con el colaborador para que cree su cuenta desde el móvil:',
+            ),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -44,14 +49,25 @@ class _EmployeeListScreenState extends ConsumerState<EmployeeListScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(code, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, letterSpacing: 2, color: Theme.of(context).colorScheme.onPrimaryContainer, fontFamily: 'monospace')),
+                  Text(
+                    code,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 2,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
                   const SizedBox(width: 12),
                   IconButton(
                     icon: const Icon(Icons.copy_rounded),
                     tooltip: 'Copiar',
                     onPressed: () {
                       Clipboard.setData(ClipboardData(text: code));
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Código $code copiado')));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Código $code copiado')),
+                      );
                     },
                   ),
                 ],
@@ -60,12 +76,17 @@ class _EmployeeListScreenState extends ConsumerState<EmployeeListScreen> {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cerrar')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cerrar'),
+          ),
           FilledButton(
             onPressed: () {
               Clipboard.setData(ClipboardData(text: code));
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Código $code copiado')));
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text('Código $code copiado')));
             },
             child: const Text('Copiar código'),
           ),
@@ -88,9 +109,9 @@ class _EmployeeListScreenState extends ConsumerState<EmployeeListScreen> {
       ref.invalidate(employeeListProvider);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al actualizar: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error al actualizar: $e')));
     }
   }
 
@@ -100,12 +121,19 @@ class _EmployeeListScreenState extends ConsumerState<EmployeeListScreen> {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: const Text('Eliminar empleado'),
-        content: Text('¿Eliminar a ${employee.username}? Esta acción no se puede deshacer.'),
+        content: Text(
+          '¿Eliminar a ${employee.username}? Esta acción no se puede deshacer.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
             child: const Text('Eliminar'),
           ),
         ],
@@ -120,9 +148,9 @@ class _EmployeeListScreenState extends ConsumerState<EmployeeListScreen> {
       ref.invalidate(employeeListProvider);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al eliminar: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error al eliminar: $e')));
     }
   }
 
@@ -132,12 +160,19 @@ class _EmployeeListScreenState extends ConsumerState<EmployeeListScreen> {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: const Text('Revocar invitación'),
-        content: Text('¿Revocar invitación ${inv.code} para ${inv.invitedName ?? inv.invitedEmail}?'),
+        content: Text(
+          '¿Revocar invitación ${inv.code} para ${inv.invitedName ?? inv.invitedEmail}?',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
             child: const Text('Revocar'),
           ),
         ],
@@ -149,10 +184,14 @@ class _EmployeeListScreenState extends ConsumerState<EmployeeListScreen> {
       await repo.revoke(inv.code);
       if (!mounted) return;
       ref.invalidate(invitationListProvider);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Invitación revocada')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Invitación revocada')));
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al revocar: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error al revocar: $e')));
     }
   }
 
@@ -188,13 +227,18 @@ class _EmployeeListScreenState extends ConsumerState<EmployeeListScreen> {
                   onDelete: _deleteEmployee,
                   onRevokeInvitation: _revokeInvitation,
                   onCopyCode: (inv) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Código ${inv.code} copiado')));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Código ${inv.code} copiado')),
+                    );
                   },
                 ),
               if (invitationsAsync.hasError)
                 Padding(
                   padding: const EdgeInsets.only(top: 12),
-                  child: Text('Error cargando invitaciones: ${invitationsAsync.error}', style: TextStyle(color: cs.error, fontSize: 12)),
+                  child: Text(
+                    'Error cargando invitaciones: ${invitationsAsync.error}',
+                    style: TextStyle(color: cs.error, fontSize: 12),
+                  ),
                 ),
             ],
           ),
@@ -211,9 +255,19 @@ class _EmployeeListScreenState extends ConsumerState<EmployeeListScreen> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Empleados', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: cs.onSurface)),
+            Text(
+              'Empleados',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                color: cs.onSurface,
+              ),
+            ),
             const SizedBox(height: 4),
-            Text('$count registros', style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant)),
+            Text(
+              '$count registros',
+              style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant),
+            ),
           ],
         ),
         const Spacer(),
@@ -229,11 +283,30 @@ class _EmployeeListScreenState extends ConsumerState<EmployeeListScreen> {
   Widget _buildKpiRow(List<EmployeeModel> employees, ColorScheme cs) {
     final supervisors = employees.where((e) => e.role == 'supervisor').length;
     final admins = employees.where((e) => e.role == 'admin').length;
-    return Wrap(spacing: 16, runSpacing: 16, children: [
-      KpiCard(title: 'Total empleados', value: employees.length.toString(), icon: Icons.people, color: cs.primary),
-      KpiCard(title: 'Supervisores', value: supervisors.toString(), icon: Icons.supervisor_account, color: const Color(0xFF8B5CF6)),
-      KpiCard(title: 'Administradores', value: admins.toString(), icon: Icons.admin_panel_settings, color: const Color(0xFF4F6DFF)),
-    ]);
+    return Wrap(
+      spacing: 16,
+      runSpacing: 16,
+      children: [
+        KpiCard(
+          title: 'Total empleados',
+          value: employees.length.toString(),
+          icon: Icons.people,
+          color: cs.primary,
+        ),
+        KpiCard(
+          title: 'Supervisores',
+          value: supervisors.toString(),
+          icon: Icons.supervisor_account,
+          color: const Color(0xFF8B5CF6),
+        ),
+        KpiCard(
+          title: 'Administradores',
+          value: admins.toString(),
+          icon: Icons.admin_panel_settings,
+          color: const Color(0xFF4F6DFF),
+        ),
+      ],
+    );
   }
 
   Widget _buildEmptyState(ColorScheme cs) {
@@ -244,14 +317,25 @@ class _EmployeeListScreenState extends ConsumerState<EmployeeListScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.people_outline_rounded, size: 64,
-                color: cs.onSurfaceVariant.withValues(alpha: 0.3)),
+              Icon(
+                Icons.people_outline_rounded,
+                size: 64,
+                color: cs.onSurfaceVariant.withValues(alpha: 0.3),
+              ),
               const SizedBox(height: 16),
-              Text('Aún no hay empleados',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: cs.onSurfaceVariant)),
+              Text(
+                'Aún no hay empleados',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: cs.onSurfaceVariant,
+                ),
+              ),
               const SizedBox(height: 8),
-              Text('Agrega tu primer empleado para comenzar',
-                style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant)),
+              Text(
+                'Agrega tu primer empleado para comenzar',
+                style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant),
+              ),
               const SizedBox(height: 24),
               FilledButton.icon(
                 icon: const Icon(Icons.person_add_rounded),

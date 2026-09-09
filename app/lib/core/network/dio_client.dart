@@ -9,7 +9,7 @@ const _secureStorage = FlutterSecureStorage();
 Dio createDio() {
   const envUrl = String.fromEnvironment('API_URL');
   final defaultUrl = Platform.isAndroid
-      ? 'http://10.0.2.2:8080/api'
+      ? 'http://192.168.10.149:8080/api'
       : 'http://localhost:8080/api';
   final baseUrl = envUrl.isNotEmpty ? envUrl : defaultUrl;
 

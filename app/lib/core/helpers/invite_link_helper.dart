@@ -8,7 +8,11 @@ class InviteLinkHelper {
     return 'https://wa.me/?text=$text';
   }
   static Future<void> shareWhatsApp(String companyName, String code) async {
-    await Share.share('Únete a $companyName en Nexo: ${inviteLink(code)}  Código: $code');
+    await SharePlus.instance.share(
+      ShareParams(
+        text: 'Únete a $companyName en Nexo: ${inviteLink(code)}  Código: $code',
+      ),
+    );
   }
   static String? parseDeepLink(String url) {
     final uri = Uri.tryParse(url);

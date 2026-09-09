@@ -5,17 +5,17 @@ import ServiceFactory from '@/factories/serviceFactory.js';
 import auditLogService from '@/services/auditLogService.js';
 
 async function _raw_getWorkOrdersByEmployee(req: Request, res: Response) {
-  const { employee_id } = req.params;
-  const companyId = (req as any).companyId;
-  const userRole = (req as any).userRole;
+  const employee_id = req.params.employee_id as string;
+  const companyId = req.companyId!;
+  const userRole = req.userRole!;
   const workOrderService = ServiceFactory.getService("workOrder", null, { companyId, role: userRole });
   const workOrders = await workOrderService.getByEmployee(employee_id);
   res.status(httpStatusCode.OK).json({ workOrders });
 }
 
 async function _raw_createWorkOrder(req: Request, res: Response) {
-  const companyId = (req as any).companyId;
-  const userRole = (req as any).userRole;
+  const companyId = req.companyId!;
+  const userRole = req.userRole!;
   const workOrderService = ServiceFactory.getService("workOrder", req.body, { companyId, role: userRole });
   const workOrder = await workOrderService.create();
   auditLogService.log({ action: 'workOrder.created', entityType: 'WorkOrder', entityId: workOrder?._id?.toString(), userId: req.userId, companyId, ipAddress: req.ip });
@@ -27,8 +27,8 @@ async function _raw_createWorkOrder(req: Request, res: Response) {
 
 async function _raw_updateWorkOrder(req: Request, res: Response) {
   const { id } = req.params as { id: string };
-  const companyId = (req as any).companyId;
-  const userRole = (req as any).userRole;
+  const companyId = req.companyId!;
+  const userRole = req.userRole!;
   const workOrderService = ServiceFactory.getService("workOrder", req.body, { companyId, role: userRole });
   const updated = await workOrderService.update(id);
   if (!updated) {
@@ -40,8 +40,8 @@ async function _raw_updateWorkOrder(req: Request, res: Response) {
 
 async function _raw_deleteWorkOrder(req: Request, res: Response) {
   const { id } = req.params as { id: string };
-  const companyId = (req as any).companyId;
-  const userRole = (req as any).userRole;
+  const companyId = req.companyId!;
+  const userRole = req.userRole!;
   const workOrderService = ServiceFactory.getService("workOrder", null, { companyId, role: userRole });
   const deleted = await workOrderService.delete(id);
   if (!deleted) {
@@ -53,8 +53,8 @@ async function _raw_deleteWorkOrder(req: Request, res: Response) {
 
 async function _raw_startWorkOrder(req: Request, res: Response) {
   const { id } = req.params as { id: string };
-  const companyId = (req as any).companyId;
-  const userRole = (req as any).userRole;
+  const companyId = req.companyId!;
+  const userRole = req.userRole!;
   try {
     const workOrderService = ServiceFactory.getService("workOrder", null, { companyId, role: userRole });
     const updated = await workOrderService.start(id);
@@ -67,8 +67,8 @@ async function _raw_startWorkOrder(req: Request, res: Response) {
 
 async function _raw_completeWorkOrder(req: Request, res: Response) {
   const { id } = req.params as { id: string };
-  const companyId = (req as any).companyId;
-  const userRole = (req as any).userRole;
+  const companyId = req.companyId!;
+  const userRole = req.userRole!;
   try {
     const workOrderService = ServiceFactory.getService("workOrder", null, { companyId, role: userRole });
     const updated = await workOrderService.complete(id);
@@ -82,8 +82,8 @@ async function _raw_completeWorkOrder(req: Request, res: Response) {
 async function _raw_cancelWorkOrder(req: Request, res: Response) {
   const { id } = req.params as { id: string };
   const { reason } = req.body;
-  const companyId = (req as any).companyId;
-  const userRole = (req as any).userRole;
+  const companyId = req.companyId!;
+  const userRole = req.userRole!;
   try {
     const workOrderService = ServiceFactory.getService("workOrder", null, { companyId, role: userRole });
     const updated = await workOrderService.cancel(id, reason || '');

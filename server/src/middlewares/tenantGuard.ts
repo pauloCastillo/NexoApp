@@ -22,7 +22,7 @@ const requireDeptScope = async (req: Request, res: Response, next: NextFunction)
   try {
     const { User } = await import('@/db/models/index.js');
     const target = await User.findById(targetEmployeeId).select('department').lean() as any;
-    const me = await User.findById((req as any).userId).select('department').lean() as any;
+    const me = await User.findById(req.userId!).select('department').lean() as any;
     if (target && me && target.department?.toString() !== me.department?.toString()) {
       res.status(403).json({ message: 'Acceso denegado: fuera de tu departamento' });
       return;
@@ -45,7 +45,7 @@ const requireCompanyAccess = (req: Request, res: Response, next: NextFunction) =
 
   // ponytail: strip company injection from body/query — tenant comes from JWT only
   if (req.body && typeof req.body === 'object' && 'company' in req.body) {
-    delete (req.body as any).company;
+    delete (req.body).company;
   }
   if (req.query && typeof req.query === 'object' && 'company' in req.query) {
     delete (req.query as any).company;

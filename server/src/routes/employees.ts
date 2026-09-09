@@ -35,12 +35,12 @@ function setupEmployeeNamespace(io: Server) {
 
   // ponytail: socket auth — reject unauthenticated listeners (see auditoria #11)
   employeeNamespace.use((socket, next) => {
-    (socket.data as any).requestId = (socket.handshake.auth?.requestId as string) || randomUUID();
+    (socket.data).requestId = (socket.handshake.auth?.requestId as string) || randomUUID();
     const token = socket.handshake.auth?.token || (socket.handshake.headers as any)?.authorization?.replace('Bearer ', '');
     if (!token) return next(new Error('UNAUTHORIZED'));
     try {
       const decoded: any = verifyingSession(token);
-      (socket.data as any).user = decoded;
+      (socket.data).user = decoded;
       next();
     } catch {
       next(new Error('UNAUTHORIZED'));
@@ -48,16 +48,16 @@ function setupEmployeeNamespace(io: Server) {
   });
 
   employeeNamespace.on('connection', async (socket) => {
-    const requestId = (socket.data as any).requestId as string;
+    const requestId = (socket.data).requestId as string;
     const log = logger.child({ requestId });
     try {
-      const decoded: any = (socket.data as any).user;
+      const decoded: any = (socket.data).user;
       if (!decoded) {
         const e = catalogEntry('UNAUTHORIZED');
         socket.emit('error', { message: e.message, code: 'UNAUTHORIZED', requestId });
         return;
       }
-      const context = { companyId: (decoded as any).companyId, role: (decoded as any).role };
+      const context = { companyId: (decoded).companyId, role: (decoded).role };
       const employeeService = ServiceFactory.getService("employee", null, context);
       const employees = await employeeService.getAll();
       employeeNamespace.emit("getAllEmployees", JSON.stringify({ users: employees, requestId }));

@@ -12,20 +12,20 @@ export function proxyController(handlers: Record<string, Handler>): Record<strin
       try {
         await fn(req, res, _next);
       } catch (e: unknown) {
-        const requestId = (req as any).id as string | undefined;
+        const requestId = req.id;
         const appErr = normalizeError(e, requestId);
         const entry = catalogEntry(appErr.code);
         // friendly message from catalog if code matches, else appErr.message (already friendly)
         const message = appErr.message || entry.message;
-        const log = (req as any).log ?? logger.child({ requestId });
-        log.error({ err: e, code: appErr.code, statusCode: appErr.statusCode, requestId, technical: (appErr as any).technical ?? (e instanceof Error ? e.message : String(e)) }, 'request failed');
+        const log = req.log ?? logger.child({ requestId });
+        log.error({ err: e, code: appErr.code, statusCode: appErr.statusCode, requestId, technical: appErr.technical ?? (e instanceof Error ? e.message : String(e)) }, 'request failed');
         const isDev = process.env.DEV_STATUS === 'development';
         res.status(appErr.statusCode).json({
           message,
           code: appErr.code,
           requestId,
           ...(appErr.errors && { errors: appErr.errors }),
-          ...(isDev && { debug: { technical: (appErr as any).technical ?? (e instanceof Error ? e.message : String(e)), stack: (e instanceof Error ? e.stack : undefined) } }),
+          ...(isDev && { debug: { technical: appErr.technical ?? (e instanceof Error ? e.message : String(e)), stack: (e instanceof Error ? e.stack : undefined) } }),
         });
       }
     };

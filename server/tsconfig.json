@@ -6,6 +6,7 @@
     "outDir": "./dist",
     "rootDir": ".",
     "strict": true,
+    "useUnknownInCatchVariables": true,
     "ignoreDeprecations": "6.0",
     "moduleDetection": "force",
     "esModuleInterop": true,
