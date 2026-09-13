@@ -8,8 +8,8 @@ import auditLogService from '@/services/auditLogService.js';
 const CAN_EDIT = ['business_owner', 'admin', 'supervisor', 'superuser', 'platform_admin'];
 
 async function _raw_assignBranches(req: Request, res: Response) {
-  const role = (req as any).userRole;
-  const companyId = (req as any).companyId;
+  const role = req.userRole!;
+  const companyId = req.companyId!;
   if (!CAN_EDIT.includes(role)) return res.status(httpStatusCode.FORBIDDEN).json({ message: 'Acceso denegado: solo supervisor y business_owner pueden asignar zonas' });
   const parsed = assignBranchesSchema.safeParse(req.body);
   if (!parsed.success) return res.status(httpStatusCode.BAD_REQUEST).json({ message: 'Datos inválidos', errors: parsed.error.flatten() });
@@ -23,7 +23,7 @@ async function _raw_assignBranches(req: Request, res: Response) {
   const prev = (employee as any).branches?.map((b: any) => String(b)) || [];
   (employee as any).branches = parsed.data.branchIds;
   await employee.save();
-  await auditLogService.log({ action: 'employee.branches.assigned', entityType: 'User', entityId: String(employee._id), userId: (req as any).userId, companyId: String(employee.company ?? companyId), previousValue: { branches: prev }, newValue: { branches: parsed.data.branchIds }, metadata: { reason: parsed.data.reason }, ipAddress: req.ip });
+  await auditLogService.log({ action: 'employee.branches.assigned', entityType: 'User', entityId: String(employee._id), userId: req.userId!, companyId: String(employee.company ?? companyId), previousValue: { branches: prev }, newValue: { branches: parsed.data.branchIds }, metadata: { reason: parsed.data.reason }, ipAddress: req.ip });
   const populated = await User.findById(employee._id).populate('branches');
   res.status(httpStatusCode.OK).json({ user: populated });
 }

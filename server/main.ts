@@ -58,24 +58,22 @@ app.use("/api", router);
 
 // 404 fallback — additive, returns unified contract
 app.use((req: Request, res: Response) => {
-  const requestId = (req as any).id;
   const entry = catalogEntry('NOT_FOUND');
-  res.status(entry.statusCode).json({ message: entry.message, code: 'NOT_FOUND', requestId });
+  res.status(entry.statusCode).json({ message: entry.message, code: 'NOT_FOUND', requestId: req.id });
 });
 
 // safety net for errors outside proxies (express.json syntax, etc.)
 app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
-  const requestId = (req as any).id;
-  const appErr = normalizeError(err, requestId);
+  const appErr = normalizeError(err, req.id);
   const entry = catalogEntry(appErr.code);
   const message = appErr.message || entry.message;
-  const log = (req as any).log ?? logger.child({ requestId });
-  log.error({ err, code: appErr.code, statusCode: appErr.statusCode, requestId, technical: (appErr as any).technical ?? (err instanceof Error ? err.message : String(err)) }, 'Unhandled error');
+  const log = req.log ?? logger.child({ requestId: req.id });
+  log.error({ err, code: appErr.code, statusCode: appErr.statusCode, requestId: req.id, technical: (appErr as any).technical ?? (err instanceof Error ? err.message : String(err)) }, 'Unhandled error');
   const isDev = process.env.DEV_STATUS === 'development';
   res.status(appErr.statusCode).json({
     message,
     code: appErr.code,
-    requestId,
+    requestId: req.id,
     ...(appErr.errors && { errors: appErr.errors }),
     ...(isDev && { debug: { technical: (appErr as any).technical ?? (err instanceof Error ? err.message : String(err)), stack: err instanceof Error ? err.stack : undefined } }),
   });

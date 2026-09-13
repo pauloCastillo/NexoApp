@@ -1,34 +1,39 @@
-// ponytail: legacy throw {statusCode, message} — normalized via normalizeError, migrate to AppError on next touch
 import { checkingPassword, signSession, signRefreshToken, hashToken, verifyTokenHash } from '@/utils/utils.js';
 import { User, Company } from '@/db/models/index.js';
 import auditLogService from '@/services/auditLogService.js';
 import jwt from 'jsonwebtoken';
-import { registerOwnerSchema } from '@/schemas/auth.js';
+import { registerOwnerSchema, registerSchema, loginSchema } from '@/schemas/auth.js';
+import { AppError } from '@/utils/appError.js';
+import type { z } from 'zod';
+
+type RegisterOwnerBody = z.infer<typeof registerOwnerSchema>;
+type RegisterUserBody = z.infer<typeof registerSchema>;
+type LoginBody = z.infer<typeof loginSchema>;
 
 class AuthService {
-  async registerOwner(body: any) {
+  async registerOwner(body: RegisterOwnerBody) {
     const { email, password, confirmPassword } = body;
 
     if (confirmPassword !== password) {
-      throw { statusCode: 400, message: "Las contraseñas no coinciden" };
+      throw new AppError(400, 'VALIDATION_ERROR', "Las contraseñas no coinciden");
     }
 
     const existing = await User.findOne({ email });
     if (existing) {
-      throw { statusCode: 409, message: "Ya existe un usuario registrado con esos datos, inicie sesión si es usted" };
+      throw new AppError(409, 'DUPLICATE', "Ya existe un usuario registrado con esos datos, inicie sesión si es usted");
     }
 
     const parsed = registerOwnerSchema.safeParse(body);
     if (!parsed.success) {
       const errors = parsed.error.issues.map((e) => ({ field: e.path.join('.'), message: e.message }));
-      throw { statusCode: 400, message: 'Datos inválidos', errors };
+      throw new AppError(400, 'VALIDATION_ERROR', 'Datos inválidos', { errors });
     }
 
     const { username: ownerName, email: ownerEmail, password: ownerPassword, companyName: ownerCompanyName, phone: ownerPhone } = parsed.data;
 
     const existingCompany = await Company.findOne({ name: new RegExp(`^${ownerCompanyName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') });
     if (existingCompany) {
-      throw { statusCode: 409, message: "La empresa ya está registrada" };
+      throw new AppError(409, 'DUPLICATE', "La empresa ya está registrada");
     }
 
     // ponytail: atomic Company+User creation (see auditoria #8)
@@ -62,19 +67,19 @@ class AuthService {
     };
   }
 
-  async registerUser(body: any) {
+  async registerUser(body: RegisterUserBody & { invitationCode?: string; role?: string }) {
     const { email, password, confirmPassword, username, companyName, phone, jobTitle, role, invitationCode } = body;
 
     if (confirmPassword !== password) {
-      throw { statusCode: 400, message: "Las contraseñas no coinciden" };
+      throw new AppError(400, 'VALIDATION_ERROR', "Las contraseñas no coinciden");
     }
     if (!password || String(password).length < 6) {
-      throw { statusCode: 400, message: "La contraseña debe tener al menos 6 caracteres" };
+      throw new AppError(400, 'VALIDATION_ERROR', "La contraseña debe tener al menos 6 caracteres");
     }
 
     const existing = await User.findOne({ email });
     if (existing) {
-      throw { statusCode: 409, message: "Ya existe un usuario registrado con esos datos, inicie sesión si es usted" };
+      throw new AppError(409, 'DUPLICATE', "Ya existe un usuario registrado con esos datos, inicie sesión si es usted");
     }
 
     // ponytail: invitationCode determines role, legacy flag removed
@@ -92,19 +97,19 @@ class AuthService {
       );
       if (!inv) {
         const exists = await Invitation.findOne({ code });
-        if (exists) throw { statusCode: 400, code: 'INVITATION_INVALID', message: "Código inválido o expirado" };
-        throw { statusCode: 400, code: 'INVITATION_INVALID', message: "Código inválido o expirado" };
+        if (exists) throw new AppError(400, 'INVITATION_INVALID', "Código inválido o expirado");
+        throw new AppError(400, 'INVITATION_INVALID', "Código inválido o expirado");
       }
-      if (inv.expiresAt && new Date(inv.expiresAt) < new Date()) throw { statusCode: 400, code: 'INVITATION_INVALID', message: "Código inválido o expirado" };
+      if (inv.expiresAt && new Date(inv.expiresAt) < new Date()) throw new AppError(400, 'INVITATION_INVALID', "Código inválido o expirado");
       company = await Company.findById(inv.company);
-      if (!company) throw { statusCode: 404, message: "Empresa de la invitación no encontrada" };
+      if (!company) throw new AppError(404, 'NOT_FOUND', "Empresa de la invitación no encontrada");
       finalRole = inv.role || 'employee';
       (body as any)._invitation = inv;
     } else {
       // legacy: allow employee by companyName for backwards compat, but prefer invitation
       const normalizedName = companyName?.trim();
       if (!normalizedName) {
-        throw { statusCode: 400, message: "Código de invitación requerido para colaboradores. Solicítalo a tu administrador." };
+        throw new AppError(400, 'VALIDATION_ERROR', "Código de invitación requerido para colaboradores. Solicítalo a tu administrador.");
       }
       let found = await Company.findOne({ name: new RegExp(`^${normalizedName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') });
       if (!found) {
@@ -142,22 +147,22 @@ class AuthService {
     };
   }
 
-  async login(body: any) {
+  async login(body: LoginBody) {
     const { email, password } = body;
     if (!email || !password) {
-      throw { statusCode: 400, message: "Correo y contraseña requeridos" };
+      throw new AppError(400, 'VALIDATION_ERROR', "Correo y contraseña requeridos");
     }
 
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
       auditLogService.log({ action: 'auth.login_failed', entityType: 'User', metadata: { email, reason: 'not_found' } });
-      throw { statusCode: 404, message: "Usuario no encontrado" };
+      throw new AppError(404, 'NOT_FOUND', "Usuario no encontrado");
     }
 
     const isValid = await checkingPassword(password, user.password);
     if (!isValid) {
       auditLogService.log({ action: 'auth.login_failed', entityType: 'User', entityId: user._id.toString(), metadata: { email, reason: 'wrong_password' } });
-      throw { statusCode: 401, message: "Contraseña incorrecta" };
+      throw new AppError(401, 'UNAUTHORIZED', "Contraseña incorrecta");
     }
 
     const userData = {
@@ -183,18 +188,18 @@ class AuthService {
 
   async refreshToken(refreshToken: string) {
     if (!refreshToken) {
-      throw { statusCode: 400, message: "Refresh token requerido" };
+      throw new AppError(400, 'VALIDATION_ERROR', "Refresh token requerido");
     }
 
     try {
       const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET_KEY!) as Record<string, any>;
       if (decoded.type !== 'refresh') {
-        throw { statusCode: 401, message: "Token inválido" };
+        throw new AppError(401, 'UNAUTHORIZED', "Token inválido");
       }
 
       const user = await User.findById(decoded.userId).select('+refreshTokenHash');
       if (!user) {
-      throw { statusCode: 404, message: "No encontramos una cuenta con ese correo electrónico. Verifica e intenta de nuevo." };
+      throw new AppError(404, 'NOT_FOUND', "No encontramos una cuenta con ese correo electrónico. Verifica e intenta de nuevo.");
       }
 
       if (user.refreshTokenHash) {
@@ -202,7 +207,7 @@ class AuthService {
         if (!isValid) {
           user.refreshTokenHash = undefined;
           await user.save();
-          throw { statusCode: 401, message: "Token reutilizado detectado — sesión invalidada" };
+          throw new AppError(401, 'UNAUTHORIZED', "Token reutilizado detectado — sesión invalidada");
         }
       }
 
@@ -219,28 +224,28 @@ class AuthService {
       await user.save();
 
       return { token: newToken, refreshToken: newRefreshToken };
-    } catch (err: any) {
-      if (err.statusCode) throw err;
-      throw { statusCode: 401, message: "Refresh token inválido o expirado" };
+    } catch (err: unknown) {
+      if (err instanceof AppError) throw err;
+      throw new AppError(401, 'UNAUTHORIZED', "Refresh token inválido o expirado");
     }
   }
 
   async changePassword(userId: string, currentPassword: string, newPassword: string) {
     if (!currentPassword || !newPassword) {
-      throw { statusCode: 400, message: "Contraseña actual y nueva son requeridas" };
+      throw new AppError(400, 'VALIDATION_ERROR', "Contraseña actual y nueva son requeridas");
     }
     if (newPassword.length < 6) {
-      throw { statusCode: 400, message: "La nueva contraseña debe tener al menos 6 caracteres" };
+      throw new AppError(400, 'VALIDATION_ERROR', "La nueva contraseña debe tener al menos 6 caracteres");
     }
 
     const user = await User.findById(userId).select('+password');
     if (!user) {
-      throw { statusCode: 404, message: "Usuario no encontrado" };
+      throw new AppError(404, 'NOT_FOUND', "Usuario no encontrado");
     }
 
     const isValid = await checkingPassword(currentPassword, user.password);
     if (!isValid) {
-      throw { statusCode: 401, message: "La contraseña actual no es correcta" };
+      throw new AppError(401, 'UNAUTHORIZED', "La contraseña actual no es correcta");
     }
 
     user.password = newPassword;
@@ -253,7 +258,7 @@ class AuthService {
 
   async logout(userId: string) {
     if (!userId) {
-      throw { statusCode: 400, message: "Usuario requerido" };
+      throw new AppError(400, 'VALIDATION_ERROR', "Usuario requerido");
     }
 
     const user = await User.findById(userId).select('+refreshTokenHash');

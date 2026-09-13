@@ -44,11 +44,11 @@ export interface IUser extends Document {
   password: string;
   phone?: string;
   role: UserRole;
-  company: any;
-  department?: any;
+  company: string;
+  department?: string;
   branches?: import('mongoose').Types.ObjectId[] | IBranch[];
   jobTitle?: string;
-  controlTimeID?: any;
+  controlTimeID?: string;
   refreshTokenHash?: string;
   isActive: boolean;
   authenticateUser(password: string, id: string): Promise<boolean>;
@@ -222,4 +222,13 @@ export interface IRegisterRequest {
   confirmPassword: string;
   phone?: string;
   jobTitle?: string;
+}
+
+export interface RegisterUserRequest {
+  role: UserRole;
+  body: IRegisterRequest;
+  department?: string;
+  branchId?: string;
+  shiftLabel?: string;
+  shiftId?: string;
 }

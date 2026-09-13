@@ -24,11 +24,13 @@ class InvitationRemoteSource {
           ? r.data as List
           : (r.data['invitations'] as List? ?? r.data as List);
       // server returns array directly or wrapped; handle both
-      if (r.data is List)
+      if (r.data is List) {
         return Ok((r.data as List).cast<Map<String, dynamic>>());
-      final list = (r.data as Map<String, dynamic>);
-      if (list.containsKey('invitations'))
+      }
+      final list = (data as Map<String, dynamic>);
+      if (list.containsKey('invitations')) {
         return Ok((list['invitations'] as List).cast<Map<String, dynamic>>());
+      }
       // fallback: server returns mapped list without wrapper? try direct
       return Ok((r.data as List).cast<Map<String, dynamic>>());
     } on DioException catch (e) {
@@ -62,11 +64,7 @@ class InvitationRemoteSource {
     try {
       final r = await _dio.post(
         '/invitations/request-new',
-        data: {
-          'code': code,
-          if (email != null) 'email': email,
-          if (phone != null) 'phone': phone,
-        },
+        data: {'code': code, 'email': ?email, 'phone': ?phone},
       );
       return Ok(r.data as Map<String, dynamic>);
     } on DioException catch (e) {

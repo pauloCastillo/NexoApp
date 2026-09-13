@@ -12,9 +12,7 @@ import 'package:nexo_app/features/companies/providers/company_provider.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
-Widget createTestApp({
-  required AuthRepository authRepo,
-}) {
+Widget createTestApp({required AuthRepository authRepo}) {
   return ProviderScope(
     overrides: [
       authRepositoryProvider.overrideWithValue(authRepo),
@@ -29,10 +27,15 @@ void main() {
 
   setUp(() {
     authRepo = MockAuthRepository();
+    // ignore: invalid_use_of_visible_for_testing_member
     FlutterSecureStorage.setMockInitialValues({});
   });
 
-  Future<void> fillTextField(WidgetTester tester, String label, String value) async {
+  Future<void> fillTextField(
+    WidgetTester tester,
+    String label,
+    String value,
+  ) async {
     final tf = find.widgetWithText(TextField, label);
     await tester.ensureVisible(tf);
     await tester.tap(tf);
@@ -43,15 +46,17 @@ void main() {
     const testEmail = 'test@nexoapp.com';
     const testPassword = 'password123';
 
-    when(() => authRepo.register(
-      any(),
-      any(),
-      any(),
-      companyName: any(named: 'companyName'),
-      role: any(named: 'role'),
-      companyId: any(named: 'companyId'),
-      phone: any(named: 'phone'),
-    )).thenAnswer(
+    when(
+      () => authRepo.register(
+        any(),
+        any(),
+        any(),
+        companyName: any(named: 'companyName'),
+        role: any(named: 'role'),
+        companyId: any(named: 'companyId'),
+        phone: any(named: 'phone'),
+      ),
+    ).thenAnswer(
       (_) async => UserModel(
         id: 'u1',
         email: testEmail,

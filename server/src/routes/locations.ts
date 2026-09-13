@@ -34,11 +34,11 @@ function setupEmployeeLocationNamespace(io: Server) {
   // ponytail: socket auth — reject unauthenticated listeners (see auditoria #11)
   employeeNamespace.use((socket, next) => {
     const uuid = (socket.handshake.auth?.requestId as string) || randomUUID();
-    (socket.data as any).requestId = uuid;
+    (socket.data).requestId = uuid;
     const token = (socket.handshake.auth as any)?.token || (socket.handshake.headers as any)?.authorization?.replace('Bearer ', '');
     if (!token) return next(new Error('UNAUTHORIZED'));
     try {
-      (socket.data as any).user = verifyingSession(token);
+      (socket.data).user = verifyingSession(token);
       next();
     } catch {
       next(new Error('UNAUTHORIZED'));
@@ -46,7 +46,7 @@ function setupEmployeeLocationNamespace(io: Server) {
   });
 
   employeeNamespace.on('connection', async (socket) => {
-    const requestId = (socket.data as any).requestId as string;
+    const requestId = (socket.data).requestId as string;
     const log = logger.child({ requestId, socketId: socket.id });
     log.info('Location socket connected');
     socket.on("getLocation", async (data) => {

@@ -2,6 +2,8 @@
 
 > SSOT is outside the repo: `/home/pollomonroy/Documentos/work/clients/pauloCastillo/projects/NexoApp/.opencode/docs/00_meta/ssot.md` + `/home/pollomonroy/Documentos/work/clients/pauloCastillo/projects/NexoApp/.opencode/docs/01_planning_and_requirements/PRD_Master.md`. Repo specs live in `openspec/`. See `docs/refactoring-alignment.md` for current gaps (RN-001, RN-005, invitations).
 
+> **Idioma:** todas las respuestas del agente deben ser en español.
+
 ## Structure
 
 - `server/` — Express 5 + TypeScript (NodeNext/ESM) + Mongoose + Socket.io + Zod + Pino. Entrypoint `server/main.ts`, routes auto-mounted from `server/src/routes/*.ts`.

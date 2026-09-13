@@ -13,8 +13,10 @@ class BiometricAuth {
     }
   }
 
-  static Future<bool> authenticate({String reason = 'Autentícate para continuar'}) async {
-    // TODO: implement with local_auth once dep added:
+  static Future<bool> authenticate({
+    String reason = 'Autentícate para continuar',
+  }) async {
+    // Hook for a future local_auth integration.
     // final auth = LocalAuthentication();
     // return await auth.authenticate(localizedReason: reason, options: const AuthenticationOptions(biometricOnly: true, stickyAuth: true));
     return false;

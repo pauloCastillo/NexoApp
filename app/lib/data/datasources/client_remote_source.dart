@@ -12,10 +12,24 @@ class ClientRemoteSource {
       final response = await _dio.get('/clients');
       final data = response.data;
       List list;
-      if (data is List) list = data;
-      else if (data is Map && data['clients'] is List) list = data['clients'] as List;
-      else return Err(const Failure(message: 'No pudimos cargar clientes.', code: 'INVALID_RESPONSE'));
-      return Ok(list.map((e) => ClientModel.fromJson(e as Map<String, dynamic>)).toList());
+      if (data is List) {
+        list = data;
+      } else if (data is Map && data['clients'] is List) {
+        list = data['clients'] as List;
+      } else {
+        return Err(
+          const Failure(
+            message: 'No pudimos cargar clientes.',
+            code: 'INVALID_RESPONSE',
+          ),
+        );
+      }
+
+      return Ok(
+        list
+            .map((e) => ClientModel.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
     } on DioException catch (e) {
       return Err(dioToFailure(e));
     }
@@ -24,17 +38,24 @@ class ClientRemoteSource {
   Future<Result<ClientModel>> createResult(Map<String, dynamic> data) async {
     try {
       final response = await _dio.post('/clients', data: data);
-      final map = response.data is Map && response.data['client'] != null ? response.data['client'] as Map<String, dynamic> : response.data as Map<String, dynamic>;
+      final map = response.data is Map && response.data['client'] != null
+          ? response.data['client'] as Map<String, dynamic>
+          : response.data as Map<String, dynamic>;
       return Ok(ClientModel.fromJson(map));
     } on DioException catch (e) {
       return Err(dioToFailure(e));
     }
   }
 
-  Future<Result<ClientModel>> updateResult(String id, Map<String, dynamic> data) async {
+  Future<Result<ClientModel>> updateResult(
+    String id,
+    Map<String, dynamic> data,
+  ) async {
     try {
       final response = await _dio.put('/clients/$id', data: data);
-      final map = response.data is Map && response.data['client'] != null ? response.data['client'] as Map<String, dynamic> : response.data as Map<String, dynamic>;
+      final map = response.data is Map && response.data['client'] != null
+          ? response.data['client'] as Map<String, dynamic>
+          : response.data as Map<String, dynamic>;
       return Ok(ClientModel.fromJson(map));
     } on DioException catch (e) {
       return Err(dioToFailure(e));

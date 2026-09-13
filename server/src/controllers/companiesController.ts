@@ -9,8 +9,8 @@ async function _raw_listPublicCompanies(req: Request, res: Response) {
 }
 
 async function _raw_getAllCompanies(req: Request, res: Response) {
-  const role = (req as any).userRole;
-  const companyId = (req as any).companyId;
+  const role = req.userRole!;
+  const companyId = req.companyId!;
 
   let companies;
   if (role === 'superuser') {
@@ -44,8 +44,8 @@ async function _raw_getCompanyById(req: Request, res: Response) {
     return res.status(httpStatusCode.NOT_FOUND).json({ message: "Empresa no encontrada" });
   }
 
-  const role = (req as any).userRole;
-  const userCompanyId = (req as any).companyId;
+  const role = req.userRole!;
+  const userCompanyId = req.companyId!;
   if (role !== 'superuser' && company._id.toString() !== userCompanyId) {
     return res.status(httpStatusCode.FORBIDDEN).json({ message: "Acceso denegado" });
   }
@@ -54,7 +54,7 @@ async function _raw_getCompanyById(req: Request, res: Response) {
 }
 
 async function _raw_getMyCompany(req: Request, res: Response) {
-  const companyId = (req as any).companyId;
+  const companyId = req.companyId!;
   const company = await Company.findById(companyId);
   if (!company) {
     return res.status(httpStatusCode.NOT_FOUND).json({ message: "Empresa no encontrada" });
@@ -63,8 +63,8 @@ async function _raw_getMyCompany(req: Request, res: Response) {
 }
 
 async function _raw_updateCompany(req: Request, res: Response) {
-  const companyId = (req as any).companyId;
-  const role = (req as any).userRole;
+  const companyId = req.companyId!;
+  const role = req.userRole!;
   if (role !== 'business_owner' && role !== 'admin' && role !== 'platform_admin' && role !== 'superuser') {
     return res.status(httpStatusCode.FORBIDDEN).json({ message: "Acceso denegado" });
   }
